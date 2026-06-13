@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co https://*.supabase.in https://*.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), usb=(), payment=(), serial=(), bluetooth=()" />
+  <title>Characters · Phmurt Studios</title>
+  <meta name="description" content="Your character hub — view your roster, build new characters, and manage your adventurers." />
+  <meta property="og:title" content="Characters · Phmurt Studios" />
+  <meta property="og:description" content="Your character hub — build, manage, and view your D&D characters." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://phmurtstudios.com/characters.html" />
+  <meta property="og:image" content="https://phmurtstudios.com/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Characters · Phmurt Studios" />
+  <meta name="twitter:description" content="Your character hub — build, manage, and view your D&D characters." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://zrfmboqoyrqsyckktgpv.supabase.co" />
+  <link rel="dns-prefetch" href="https://js.stripe.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="stylesheet" href="style.css?v=185" />
+  <script src="theme.js?v=185"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.0" crossorigin="anonymous" integrity="sha384-fm42zLXjam4N3lT5umWgNtBBPMP3Ddrdmr9lnPKtDWzs5Dqy457Yn6+eTvCgRU3n"></script>
+  <script src="supabase-config.js?v=185"></script>
+  <script defer src="stripe-env.js?v=188"></script>
+  <script src="stripe-config.js?v=185"></script>
+  <script src="phmurt-auth.js?v=187"></script>
+  <script src="phmurt-utils.js?v=186"></script>
+
+  <style>
+    /* ── Hub layout ──────────────────────────────────────────────── */
+    .ch-hub { max-width: 1100px; margin: 0 auto; padding: 0 56px 64px; }
+
+    /* ── Toolbar ─────────────────────────────────────────────────── */
+    .ch-toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
+    }
+    .ch-count {
+      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--text-faint);
+    }
+    .ch-count strong { color: var(--text-muted); }
+    .ch-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .ch-btn {
+      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1.5px;
+      text-transform: uppercase; padding: 10px 20px; border-radius: 4px;
+      cursor: pointer; text-decoration: none; display: inline-flex;
+      align-items: center; gap: 8px; transition: all 0.15s; border: none;
+    }
+    .ch-btn-primary {
+      background: var(--crimson); color: var(--bg, #0f0c08);
+      font-weight: 600;
+    }
+    .ch-btn-primary:hover { background: var(--gold); }
+    .ch-btn-secondary {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .ch-btn-secondary:hover { border-color: var(--crimson); color: var(--crimson); }
+
+    /* ── Character cards ─────────────────────────────────────────── */
+    .ch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .ch-card {
+      background: var(--bg-card);
+      border: 1px solid var(--crimson-border);
+      border-radius: 6px;
+      padding: 24px 22px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .ch-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+      border-color: rgba(212,67,58,0.4);
+    }
+
+    /* Card header */
+    .ch-card-head { display: flex; justify-content: space-between; align-items: flex-start; }
+    .ch-card-name {
+      font-family: 'Cinzel', serif; font-size: 17px; font-weight: 500;
+      color: var(--text); letter-spacing: 0.5px; line-height: 1.2;
+      margin: 0; overflow-wrap: anywhere;
+    }
+    .ch-card-edition {
+      font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.5px;
+      text-transform: uppercase; padding: 3px 8px; border-radius: 3px;
+      font-weight: 600; flex-shrink: 0; margin-left: 10px;
+    }
+    .ch-card-edition.e5 { background: rgba(212,67,58,0.1); color: var(--crimson); }
+    .ch-card-edition.e35 { background: rgba(201,168,76,0.12); color: var(--gold); }
+
+    /* Card body */
+    .ch-card-meta {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      font-family: 'Spectral', serif; font-size: 14px; color: var(--text-dim);
+    }
+    .ch-card-meta span { display: flex; align-items: center; gap: 5px; }
+    .ch-card-meta .ch-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--crimson-border); }
+
+    /* Level badge */
+    .ch-card-level {
+      font-family: 'Cinzel', serif; font-size: 28px; font-weight: 700;
+      color: var(--text-faint); position: absolute; top: 18px; right: 22px;
+      opacity: 0.15; pointer-events: none; line-height: 1;
+    }
+
+    /* Card footer */
+    .ch-card-foot {
+      display: flex; gap: 8px; margin-top: auto;
+      border-top: 1px solid var(--crimson-border); padding-top: 14px;
+    }
+    .ch-card-action {
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px;
+      text-transform: uppercase; padding: 6px 14px; border-radius: 3px;
+      cursor: pointer; transition: all 0.15s; text-decoration: none;
+      display: inline-block;
+    }
+    .ch-card-action.view {
+      background: rgba(212,67,58,0.08); border: 1px solid rgba(212,67,58,0.2);
+      color: var(--crimson);
+    }
+    .ch-card-action.view:hover { background: rgba(212,67,58,0.15); }
+    .ch-card-action.edit {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .ch-card-action.edit:hover { border-color: var(--text-dim); color: var(--text-dim); }
+    .ch-card-action.share {
+      background: transparent; border: 1px solid rgba(139,105,20,0.3);
+      color: #8b6914;
+    }
+    .ch-card-action.share:hover { background: rgba(139,105,20,0.08); border-color: #b88a1a; }
+    .ch-card-action.share[data-shared="1"] {
+      border-color: rgba(46,139,87,0.3); color: #2e8b57;
+    }
+    .ch-card-action.share[data-shared="1"]:hover { background: rgba(46,139,87,0.08); border-color: #2e8b57; }
+    .ch-card-action.delete {
+      background: transparent; border: 1px solid transparent;
+      color: var(--text-faint); margin-left: auto;
+    }
+    .ch-card-action.delete:hover { color: #e74c3c; border-color: rgba(231,76,60,0.2); }
+
+    /* ── Empty state ─────────────────────────────────────────────── */
+    .ch-empty {
+      text-align: center; padding: 80px 24px;
+    }
+    .ch-empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+    .ch-empty-title {
+      font-family: 'Cinzel', serif; font-size: 18px; color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+    .ch-empty-desc {
+      font-family: 'Spectral', serif; font-size: 15px; color: var(--text-faint);
+      max-width: 400px; margin: 0 auto 28px; line-height: 1.6;
+    }
+
+    /* ── Signed-out state ────────────────────────────────────────── */
+    .ch-auth-gate {
+      text-align: center; padding: 80px 24px;
+    }
+    .ch-auth-gate p {
+      font-family: 'Spectral', serif; font-size: 17px; color: var(--text-dim);
+      margin-bottom: 28px; line-height: 1.6;
+    }
+
+    /* ── Loading state ───────────────────────────────────────────── */
+    .ch-loading {
+      text-align: center; padding: 60px 0;
+      font-family: 'Spectral', serif; font-size: 14px;
+      color: var(--text-faint); letter-spacing: 1px;
+    }
+
+    /* ── Create modal ────────────────────────────────────────────── */
+    .ch-create-overlay {
+      position: fixed; inset: 0; z-index: 90000;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(10,8,5,0.75); animation: phmurt-fade-in 0.2s ease;
+    }
+    .ch-create-modal {
+      background: var(--bg-card); border: 1px solid var(--crimson-border);
+      border-radius: 8px; padding: 36px 32px 28px; max-width: 400px;
+      width: 90%; text-align: center; position: relative;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .ch-create-modal h2 {
+      font-family: 'Cinzel', serif; font-size: 18px; letter-spacing: 2px;
+      color: var(--text); margin: 0 0 6px;
+    }
+    .ch-create-modal p {
+      font-family: 'Spectral', serif; font-size: 14px; color: var(--text-dim);
+      margin: 0 0 24px;
+    }
+    .ch-create-modal .ch-edition-btns { display: flex; gap: 12px; }
+    .ch-edition-choice {
+      flex: 1; padding: 20px 16px; border-radius: 6px; cursor: pointer;
+      text-decoration: none; text-align: center; transition: all 0.15s;
+      border: 1px solid var(--crimson-border);
+      background: transparent;
+    }
+    .ch-edition-choice:hover {
+      border-color: var(--crimson);
+      background: rgba(212,67,58,0.04);
+    }
+    .ch-edition-choice .ed-label {
+      font-family: 'Cinzel', serif; font-size: 14px; font-weight: 600;
+      letter-spacing: 1px; color: var(--text); display: block; margin-bottom: 4px;
+    }
+    .ch-edition-choice .ed-sub {
+      font-family: 'Spectral', serif; font-size: 12px; color: var(--text-faint);
+      font-style: italic;
+    }
+    .ch-create-close {
+      position: absolute; top: 12px; right: 14px; background: none;
+      border: none; color: var(--text-faint); cursor: pointer;
+      font-size: 20px; line-height: 1;
+    }
+    .ch-create-close:hover { color: var(--text); }
+
+    @keyframes phmurt-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .ch-hub { padding: 0 20px 48px; }
+      .ch-grid { grid-template-columns: 1fr; }
+      .ch-card-level { display: none; }
+    }
+
+    @media (max-width: 375px) {
+      .ch-hub { padding: 24px 14px 60px; }
+      .ch-card { padding: 18px 14px; }
+      .ch-card-name { font-size: 16px; }
+      .ch-card-footer { flex-wrap: wrap; gap: 6px; }
+      .ch-card-action { font-size: 9px; padding: 6px 10px; }
+      .ch-new-card { padding: 28px 14px; }
+      #ch-filter-bar { flex-wrap: wrap; gap: 8px; }
+      #ch-filter-bar select, #ch-filter-bar input { font-size: 14px; min-width: 0; flex: 1 1 100%; }
+    }
+  </style>
+  <link rel="canonical" href="https://phmurtstudios.com/characters.html" />
+</head>
+<body data-nav-active="Characters" data-footer-copy="Roll Well. Play Weird." data-breadcrumb="Home|index.html;Characters">
+
+  <a href="#main-content" class="ps-skip-nav">Skip to content</a>
+
+  <noscript>
+    <div style="max-width:640px;margin:60px auto;padding:32px 24px;font-family:'Spectral',serif;color:#f2e8d6;background:#141420;border:1px solid rgba(255,255,255,0.11);border-radius:8px;text-align:center;">
+      <h1 style="font-family:'Cinzel',serif;font-size:1.4rem;margin:0 0 12px;">JavaScript Required</h1>
+      <p style="margin:0 0 14px;line-height:1.6;">The Character Hub reads and writes to your local browser storage and the cloud, and needs JavaScript to run.</p>
+      <p style="margin:0 0 18px;font-size:0.95rem;color:#9a8870;line-height:1.55;">Enable JavaScript to build characters, sync sheets, and manage your party.</p>
+      <p style="margin:0;font-size:0.9rem;"><a href="index.html" style="color:#d4433a;">Return to Home</a> &middot; <a href="gallery.html" style="color:#d4433a;">Browse Character Gallery</a> &middot; <a href="learn.html" style="color:#d4433a;">Player Basics</a></p>
+    </div>
+  </noscript>
+
+  <div id="ps-site-shell"></div>
+  <div id="ps-page-breadcrumb"></div>
+
+  <!-- ── Hero ──────────────────────────────────────────────────────── -->
+  <div class="ps-page-hero" id="main-content">
+    <div class="ps-page-eyebrow">Character Hub</div>
+    <div class="ps-page-title">Characters</div>
+    <div class="ps-page-subtitle">Build, manage, and play your adventurers</div>
+  </div>
+
+  <div class="ps-divider"><div class="ps-div-line"></div><div class="ps-div-ornament"><div class="ps-div-dot"></div><div class="ps-div-gem"></div><div class="ps-div-dot"></div></div><div class="ps-div-line r"></div></div>
+
+  <!-- ── Main content ──────────────────────────────────────────────── -->
+  <div class="ch-hub reveal">
+
+    <!-- Signed-out state -->
+    <div class="ch-auth-gate" id="ch-auth-gate" style="display:none;">
+      <div style="font-size:42px;margin-bottom:16px;opacity:0.3;">&#9876;</div>
+      <p>Sign in to view and manage your characters.</p>
+      <button class="ch-btn ch-btn-primary" id="ch-auth-gate-btn">Sign In</button>
+    </div>
+
+    <!-- Signed-in state -->
+    <div id="ch-main" style="display:none;">
+
+      <!-- Toolbar -->
+      <div class="ch-toolbar">
+        <div class="ch-count" id="ch-count"></div>
+        <div class="ch-actions">
+          <a href="campaigns.html?tab=dashboard" class="ch-btn ch-btn-secondary">Campaign Manager</a>
+          <button class="ch-btn ch-btn-primary" id="ch-create-btn">+ New Character</button>
+        </div>
+      </div>
+
+      <!-- Character list -->
+      <div id="ch-list"></div>
+
+    </div>
+  </div>
+
+  <div class="ps-divider"><div class="ps-div-line"></div><div class="ps-div-ornament"><div class="ps-div-dot"></div><div class="ps-div-gem"></div><div class="ps-div-dot"></div></div><div class="ps-div-line r"></div></div>
+  <div class="fantasy-section-end">&diams;   &diams;   &diams;</div>
+
+  <div id="ps-site-footer"></div>
+  <script src="phmurt-shell.js?v=187"></script>
+
+  <script>
+  (function () {
+    var _chars = [];
+
+    function esc(v) {
+      return String(v == null ? '' : v)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    /* ── Render the character grid ──────────────────────────────── */
+    function render() {
+      var session = window.PhmurtDB ? PhmurtDB.getSession() : null;
+      var authGate = document.getElementById('ch-auth-gate');
+      var main = document.getElementById('ch-main');
+      var list = document.getElementById('ch-list');
+      var count = document.getElementById('ch-count');
+
+      if (!session) {
+        authGate.style.display = 'block';
+        main.style.display = 'none';
+        return;
+      }
+
+      authGate.style.display = 'none';
+      main.style.display = 'block';
+
+      /* Count label */
+      var limitInfo = '';
+      if (typeof PhmurtDB.getSession === 'function') {
+        var s = PhmurtDB.getSession();
+        if (s && !s.isSubscribed && !s.isAdmin && !s.isSuperuser) {
+          limitInfo = ' <span style="opacity:0.5">/ 3 free</span>';
+        }
+      }
+      count.innerHTML = '<strong>' + _chars.length + '</strong> Character' + (_chars.length !== 1 ? 's' : '') + limitInfo;
+
+      /* Subtle upgrade hint when approaching free limit */
+      var existingHint = document.getElementById('ch-upgrade-hint');
+      if (existingHint) existingHint.remove();
+      if (s && !s.isSubscribed && !s.isAdmin && !s.isSuperuser && _chars.length >= 2) {
+        var hintDiv = document.createElement('div');
+        hintDiv.id = 'ch-upgrade-hint';
+        hintDiv.style.cssText = 'margin-bottom:20px;padding:12px 18px;border-radius:6px;border:1px solid rgba(212,67,58,0.15);background:rgba(212,67,58,0.04);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;';
+        var hintText = _chars.length >= 3
+          ? 'You\'ve reached the free limit of 3 characters. Upgrade to create unlimited adventurers.'
+          : 'You have ' + _chars.length + ' of 3 free characters. Upgrade for unlimited slots.';
+        hintDiv.innerHTML =
+          '<span style="font-family:Spectral,serif;font-size:14px;color:var(--text-muted,#9a8870);">' + hintText + '</span>' +
+          '<a href="pricing.html" style="font-family:Cinzel,serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--crimson,#d4433a);text-decoration:none;white-space:nowrap;padding:6px 14px;border:1px solid rgba(212,67,58,0.25);border-radius:4px;">View Plans</a>';
+        var toolbar = document.querySelector('.ch-toolbar');
+        if (toolbar && toolbar.nextSibling) {
+          toolbar.parentNode.insertBefore(hintDiv, toolbar.nextSibling);
+        }
+      }
+
+      /* Empty state */
+      if (!_chars.length) {
+        list.innerHTML =
+          '<div class="ch-empty">' +
+            '<div class="ch-empty-icon">&#9876;</div>' +
+            '<div class="ch-empty-title">No Characters Yet</div>' +
+            '<div class="ch-empty-desc">Your roster is empty. Create your first character and begin your adventure.</div>' +
+            '<button class="ch-btn ch-btn-primary" id="ch-empty-create-btn">+ Create Character</button>' +
+          '</div>';
+        // Attach handler to the new empty state button
+        var emptyBtn = document.getElementById('ch-empty-create-btn');
+        if (emptyBtn) {
+          emptyBtn.addEventListener('click', openCreateModal);
+        }
+        return;
+      }
+
+      /* Build cards */
+      list.innerHTML = '<div class="ch-grid">' + _chars.map(function (c) {
+        var id = encodeURIComponent(c.id !== undefined ? c.id : '');
+        var name = esc(c.name || 'Unnamed Character');
+        var race = esc(c.race || '');
+        var cls = esc(c.class || c.class_ || '');
+        var level = c.level || 1;
+        // INTEGRATION (V-011b): Use edition field if builder_type not present (for backward compatibility)
+        var builder = c.builder_type || c.edition || '5e';
+        var is35 = builder === '35e' || builder === '3.5';
+        var edClass = is35 ? 'e35' : 'e5';
+        var edLabel = is35 ? '3.5e' : '5e';
+        var viewHref = 'character-builder.html' + (is35 ? '#35e' : '') + '?load=' + id;
+
+        return '<div class="ch-card" data-id="' + id + '" data-href="' + viewHref + '">' +
+          '<div class="ch-card-level">' + level + '</div>' +
+          '<div class="ch-card-head">' +
+            '<h3 class="ch-card-name">' + name + '</h3>' +
+            '<span class="ch-card-edition ' + edClass + '">' + edLabel + '</span>' +
+          '</div>' +
+          '<div class="ch-card-meta">' +
+            (race ? '<span>' + race + '</span>' : '') +
+            (race && cls ? '<span class="ch-dot"></span>' : '') +
+            (cls ? '<span>' + cls + '</span>' : '') +
+            '<span class="ch-dot"></span>' +
+            '<span>Level ' + level + '</span>' +
+          '</div>' +
+          '<div class="ch-card-foot">' +
+            '<a href="' + viewHref + '" class="ch-card-action view" data-prevent-propagation="true">View Sheet</a>' +
+            '<a href="' + viewHref + '" class="ch-card-action edit" data-prevent-propagation="true">Edit</a>' +
+            '<button class="ch-card-action share" data-char-id="' + id + '" data-shared="' + (c.is_public ? '1' : '0') + '">' + (c.is_public ? '\uD83D\uDD17 In Gallery' : '\uD83C\uDF10 Publish to Gallery') + '</button>' +
+            '<button class="ch-card-action delete" data-char-id="' + id + '">Delete</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+
+      /* Card click → view sheet */
+      list.querySelectorAll('.ch-card').forEach(function (card) {
+        card.addEventListener('click', function () {
+          var href = card.getAttribute('data-href');
+          if (href) window.location.href = href;
+        });
+      });
+
+      /* Action button handlers */
+      list.querySelectorAll('.ch-card-action[data-prevent-propagation]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+      });
+
+      list.querySelectorAll('.ch-card-action.delete').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var id = btn.getAttribute('data-char-id');
+          if (id) deleteChar(decodeURIComponent(id));
+        });
+      });
+
+      /* Share / unshare button handlers */
+      list.querySelectorAll('.ch-card-action.share').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var charId = decodeURIComponent(btn.getAttribute('data-char-id'));
+          var isShared = btn.getAttribute('data-shared') === '1';
+          if (!window.PhmurtDB) return;
+
+          if (isShared) {
+            /* Already shared — copy link */
+            var url = PhmurtDB.getShareUrl('character', charId);
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(url).then(function () {
+                if (window.psToast) window.psToast('Share link copied!');
+              });
+            } else if (window.psToast) {
+              window.psToast(url);
+            }
+          } else {
+            /* Publish to gallery */
+            btn.textContent = 'Publishing\u2026';
+            btn.disabled = true;
+            PhmurtDB.shareCharacter(charId).then(function (result) {
+              if (result.success) {
+                btn.textContent = '\uD83D\uDD17 In Gallery';
+                btn.setAttribute('data-shared', '1');
+                btn.disabled = false;
+                /* Update local data */
+                var c = _chars.find(function (ch) { return String(ch.id) === charId; });
+                if (c) c.is_public = true;
+                /* Copy URL to clipboard */
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                  navigator.clipboard.writeText(result.url).then(function () {
+                    if (window.psToast) window.psToast('Published to gallery! Link copied.');
+                  });
+                } else if (window.psToast) {
+                  window.psToast('Published to gallery!');
+                }
+              } else {
+                btn.textContent = '\uD83C\uDF10 Publish to Gallery';
+                btn.disabled = false;
+                if (window.psToast) window.psToast(result.error || 'Publish failed.');
+              }
+            });
+          }
+        });
+      });
+    }
+
+    /* ── Load from database ─────────────────────────────────────── */
+    function load() {
+      var session = window.PhmurtDB ? PhmurtDB.getSession() : null;
+      if (!session) { render(); return; }
+
+      var list = document.getElementById('ch-list');
+      if (list) list.innerHTML = '<div class="ch-loading">Loading your characters&hellip;</div>';
+      document.getElementById('ch-auth-gate').style.display = 'none';
+      document.getElementById('ch-main').style.display = 'block';
+
+      PhmurtDB.getCharacters().then(function (chars) {
+        _chars = chars || [];
+        render();
+      }).catch(function () {
+        _chars = [];
+        render();
+      });
+    }
+
+    /* ── Delete character ────────────────────────────────────────── */
+    window.deleteChar = function (id) {
+      if (!window.PhmurtDB || !PhmurtDB.getSession()) return;
+      if (!confirm('Delete this character? This cannot be undone.')) return;
+      PhmurtDB.deleteCharacter(decodeURIComponent(id)).then(function (ok) {
+        if (ok) {
+          _chars = _chars.filter(function (c) { return String(c.id) !== decodeURIComponent(id); });
+          render();
+          if (window.psToast) window.psToast('Character deleted.');
+        } else {
+          if (window.psToast) window.psToast('Delete failed.');
+        }
+      });
+    };
+
+    /* ── Create new character (with limit check) ─────────────────── */
+    function openCreateModal() {
+      /* Check limit first */
+      if (typeof PhmurtDB !== 'undefined' && PhmurtDB.getSession() && typeof PhmurtDB.checkCharacterLimit === 'function') {
+        PhmurtDB.checkCharacterLimit().then(function (result) {
+          if (result && result.blocked) return; /* Upgrade modal fires automatically */
+          showEditionPicker();
+        }).catch(function () { showEditionPicker(); });
+      } else {
+        showEditionPicker();
+      }
+    }
+
+    function showEditionPicker() {
+      if (document.getElementById('ch-create-overlay')) return;
+      var overlay = document.createElement('div');
+      overlay.className = 'ch-create-overlay';
+      overlay.id = 'ch-create-overlay';
+      overlay.innerHTML =
+        '<div class="ch-create-modal">' +
+          '<button class="ch-create-close" id="ch-create-close">&times;</button>' +
+          '<h2>New Character</h2>' +
+          '<p>Choose your edition to get started.</p>' +
+          '<div class="ch-edition-btns">' +
+            '<a href="character-builder.html" class="ch-edition-choice" id="ch-pick-5e">' +
+              '<span class="ed-label">D&amp;D 5e</span>' +
+              '<span class="ed-sub">5th Edition</span>' +
+            '</a>' +
+            '<a href="character-builder.html" class="ch-edition-choice" id="ch-pick-35e">' +
+              '<span class="ed-label">D&amp;D 3.5e</span>' +
+              '<span class="ed-sub">3.5 Edition</span>' +
+            '</a>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(overlay);
+
+      /* Clear localStorage before navigating */
+      function clearAndGo(href) {
+        try { localStorage.removeItem('phmurt_current_char_id'); } catch(e) {}
+        try { localStorage.removeItem('phmurt_current_char35_id'); } catch(e) {}
+        try { localStorage.removeItem('phmurt_builder_5e'); } catch(e) {}
+        try { localStorage.removeItem('phmurt_builder_35e'); } catch(e) {}
+        window.location.href = href;
+      }
+
+      document.getElementById('ch-pick-5e').addEventListener('click', function (e) {
+        e.preventDefault(); clearAndGo('character-builder.html');
+      });
+      document.getElementById('ch-pick-35e').addEventListener('click', function (e) {
+        e.preventDefault(); clearAndGo('character-builder.html#35e');
+      });
+      document.getElementById('ch-create-close').addEventListener('click', function () { overlay.remove(); });
+      overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove(); });
+    }
+
+    /* ── Init ────────────────────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', function () {
+      var createBtn = document.getElementById('ch-create-btn');
+      if (createBtn) {
+        createBtn.addEventListener('click', openCreateModal);
+      }
+
+      var authGateBtn = document.getElementById('ch-auth-gate-btn');
+      if (authGateBtn) {
+        authGateBtn.addEventListener('click', function () {
+          if (window.PhmurtDB) {
+            window.PhmurtDB.openAuth();
+          }
+        });
+      }
+
+      load();
+      window.addEventListener('phmurt-auth-change', load);
+    });
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1012 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// CAMPAIGN SEASONS, CALENDAR & WEATHER SYSTEM
+// D&D Campaign Manager Module
+// ═══════════════════════════════════════════════════════════════════════════
+
+window.CampaignSeasons = (function(){
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // FANTASY CALENDAR METADATA
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const FANTASY_CALENDAR = {
+    seasons: [
+      { id: 'verdance', name: 'Verdance', season: 'Spring', color: '#2ecc71', description: 'Season of renewal and growth' },
+      { id: 'solstice', name: 'Solstice', season: 'Summer', color: '#f39c12', description: 'Season of light and heat' },
+      { id: 'harvest', name: 'Harvest', season: 'Autumn', color: '#e67e22', description: 'Season of abundance and change' },
+      { id: 'frostfall', name: 'Frostfall', season: 'Winter', color: '#3498db', description: 'Season of cold and darkness' }
+    ],
+    months: [
+      // Verdance (Spring)
+      { name: 'Thawmist', season: 'verdance', num: 1 },
+      { name: 'Bloomsreach', season: 'verdance', num: 2 },
+      { name: 'Seedswell', season: 'verdance', num: 3 },
+      // Solstice (Summer)
+      { name: 'Sunsheight', season: 'solstice', num: 4 },
+      { name: 'Goldfire', season: 'solstice', num: 5 },
+      { name: 'Highsun', season: 'solstice', num: 6 },
+      // Harvest (Autumn)
+      { name: 'Amberfall', season: 'harvest', num: 7 },
+      { name: 'Grainmoon', season: 'harvest', num: 8 },
+      { name: 'Rustleaf', season: 'harvest', num: 9 },
+      // Frostfall (Winter)
+      { name: 'Dimhallow', season: 'frostfall', num: 10 },
+      { name: 'Snowveil', season: 'frostfall', num: 11 },
+      { name: 'Deepwinter', season: 'frostfall', num: 12 }
+    ],
+    dayNames: ['Moonday', 'Tideday', 'Windday', 'Flameday', 'Earthday', 'Starday'],
+    daysPerMonth: 30,
+    monthsPerSeason: 3,
+    seasonsPerYear: 4,
+    daysPerYear: 360
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SEASONAL EVENTS TEMPLATES
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const SEASONAL_EVENTS = {
+    first_frost: {
+      name: 'First Frost',
+      season: 'frostfall',
+      headline: 'The First Frost descends upon the land',
+      detail: 'Temperatures plummet as winter makes its appearance. Rivers begin to freeze at their edges.',
+      category: 'weather',
+      icon: '✧',
+      importance: 'major',
+      mutations: { frostfall_power: 15, movement_penalty: 0.1 },
+      calendarEffect: { winter_begins: true }
+    },
+    spring_thaw: {
+      name: 'Spring Thaw',
+      season: 'verdance',
+      headline: 'The Spring Thaw awakens the world',
+      detail: 'Snow melts rapidly, swelling rivers and streams. Flooding is common in low-lying areas.',
+      category: 'environmental',
+      icon: '≈',
+      importance: 'major',
+      mutations: { verdance_power: 20, flooding_risk: true },
+      calendarEffect: { spring_begins: true }
+    },
+    harvest_festival: {
+      name: 'Harvest Festival',
+      season: 'harvest',
+      headline: 'The Harvest Festival commences',
+      detail: 'Communities gather to celebrate the season of plenty. Trade flourishes and spirits are high.',
+      category: 'cultural',
+      icon: '⚌',
+      importance: 'major',
+      mutations: { harvest_power: 25, trade_bonus: 0.3 },
+      calendarEffect: { harvest_season: true }
+    },
+    midsummer_celebration: {
+      name: 'Midsummer Celebration',
+      season: 'solstice',
+      headline: 'The Midsummer Celebration brings revelry',
+      detail: 'The longest day arrives. Festivals light fires, bards sing, and magic feels strongest.',
+      category: 'cultural',
+      icon: '⟡',
+      importance: 'major',
+      mutations: { solstice_power: 20, magic_surge: true },
+      calendarEffect: { midsummer: true }
+    },
+    drought: {
+      name: 'Drought',
+      season: 'solstice',
+      headline: 'Severe drought grips the southern lands',
+      detail: 'Crops wither, wells run dry, and water becomes precious. Prices for grain skyrocket.',
+      category: 'environmental',
+      icon: '✦',
+      importance: 'severe',
+      mutations: { water_prices: 2.0, crop_yield: 0.5, unrest: 0.2 },
+      calendarEffect: { drought: true }
+    },
+    flood: {
+      name: 'Flood',
+      season: 'verdance',
+      headline: 'Catastrophic floods sweep through the valleys',
+      detail: 'Rivers overflow their banks. Villages are threatened and trade routes become impassable.',
+      category: 'environmental',
+      icon: '≈',
+      importance: 'severe',
+      mutations: { travel_blocked: true, unrest: 0.3, damage: 0.2 },
+      calendarEffect: { flood: true }
+    },
+    unseasonable_cold: {
+      name: 'Unseasonable Cold',
+      season: 'solstice',
+      headline: 'Unseasonable cold strikes during summer',
+      detail: 'Unexpected frosts damage crops and confuse wildlife. People huddle in unusual times.',
+      category: 'weather',
+      icon: '✧',
+      importance: 'moderate',
+      mutations: { crop_yield: 0.7, unrest: 0.1 },
+      calendarEffect: {}
+    },
+    perfect_growing_season: {
+      name: 'Perfect Growing Season',
+      season: 'verdance',
+      headline: 'The perfect growing season arrives',
+      detail: 'Weather, rain, and sun align perfectly. Crops flourish beyond expectation.',
+      category: 'environmental',
+      icon: '❦',
+      importance: 'major',
+      mutations: { crop_yield: 1.5, prosperity: 0.2 },
+      calendarEffect: { abundance: true }
+    },
+    eclipse: {
+      name: 'Arcane Eclipse',
+      season: null, // Can occur any season
+      headline: 'The moons align in an Arcane Eclipse',
+      detail: 'Reality shivers as the moons pass. Magical energies surge wildly across the world.',
+      category: 'arcane',
+      icon: '☽',
+      importance: 'severe',
+      mutations: { wild_magic: true, magic_surge: 0.5, planar_breach: true },
+      calendarEffect: { eclipse: true }
+    },
+    blood_moon: {
+      name: 'Blood Moon',
+      season: null, // Can occur any season
+      headline: 'The Blood Moon rises in the sky',
+      detail: 'The moon turns red. Undead stir from their rest, and evil things grow bold.',
+      category: 'supernatural',
+      icon: '☾',
+      importance: 'severe',
+      mutations: { undead_activity: 2.0, evil_power: 0.3, unrest: 0.2 },
+      calendarEffect: { blood_moon: true }
+    }
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CLIMATE SYSTEM
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  const CLIMATE_TYPES = {
+    arctic: { name: 'Arctic', baseWeathers: ['Clear', 'Cloudy', 'Snow', 'Blizzard', 'Fog'] },
+    temperate: { name: 'Temperate', baseWeathers: ['Clear', 'Cloudy', 'Light Rain', 'Fog'] },
+    tropical: { name: 'Tropical', baseWeathers: ['Clear', 'Cloudy', 'Heavy Rain', 'Thunderstorm', 'Heatwave'] },
+    arid: { name: 'Arid', baseWeathers: ['Clear', 'Heatwave', 'Sandstorm', 'Fog'] },
+    coastal: { name: 'Coastal', baseWeathers: ['Clear', 'Cloudy', 'Light Rain', 'Heavy Rain', 'Thunderstorm', 'Fog'] },
+    mountain: { name: 'Mountain', baseWeathers: ['Clear', 'Cloudy', 'Fog', 'Snow', 'Thunderstorm'] }
+  };
+
+  const WEATHER_STATES = {
+    Clear: { icon: '✦', visibility: 'excellent', hazard: false, effects: [] },
+    Cloudy: { icon: '◌', visibility: 'good', hazard: false, effects: [] },
+    'Light Rain': { icon: '⏐', visibility: 'fair', hazard: false, effects: ['ground_wet'] },
+    'Heavy Rain': { icon: '⏐', visibility: 'poor', hazard: true, effects: ['movement_slow', 'ranged_disadvantage'] },
+    Thunderstorm: { icon: '↯', visibility: 'very_poor', hazard: true, effects: ['movement_slow', 'ranged_disadvantage', 'metal_danger', 'fire_damage_up'] },
+    Fog: { icon: '≡', visibility: 'very_poor', hazard: false, effects: ['stealth_advantage', 'ranged_disadvantage'] },
+    Snow: { icon: '✧', visibility: 'poor', hazard: true, effects: ['movement_slow', 'cold_damage'] },
+    Blizzard: { icon: '◇', visibility: 'none', hazard: true, effects: ['movement_halved', 'ranged_disadvantage', 'cold_damage_severe'] },
+    Heatwave: { icon: '⟡', visibility: 'excellent', hazard: true, effects: ['con_saves', 'heat_damage'] },
+    Sandstorm: { icon: '∿', visibility: 'poor', hazard: true, effects: ['movement_slow', 'ranged_disadvantage', 'sand_damage'] }
+  };
+
+  // Helper: Sanitize string for safe concatenation (XSS protection)
+  const sanitizeString = function(str) {
+    if (!str || typeof str !== 'string') return '';
+    return str.replace(/[<>&"']/g, char => ({
+      '<': '&lt;',
+      '>': '&gt;',
+      '&': '&amp;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[char]));
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CALENDAR TRACKER CLASS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function CalendarTracker(startDay, startMonth, startYear) {
+    this.day = startDay || 1;
+    this.month = startMonth || 1;
+    this.year = startYear || 1000;
+    this.dayOfWeek = 0; // 0-5 for 6-day week
+    this.eventLog = [];
+  }
+
+  CalendarTracker.prototype.advance = function(days) {
+    days = parseInt(days, 10) || 0;
+    if (days === 0) return { from: null, to: null, seasonChanged: false };
+
+    var dpm = FANTASY_CALENDAR.daysPerMonth;
+    var mpy = FANTASY_CALENDAR.months.length;
+    var dpy = dpm * mpy;
+    var dayNamesLen = FANTASY_CALENDAR.dayNames.length;
+
+    var prevSeason = this.getSeason();
+    var prevMonth = this.month;
+    var prevYear = this.year;
+
+    // O(1) advancement — no loop
+    var totalDayOfYear = (this.month - 1) * dpm + this.day - 1 + days;
+    var newYear = this.year + Math.floor(totalDayOfYear / dpy);
+    var dayInYear = ((totalDayOfYear % dpy) + dpy) % dpy; // handles negatives
+    if (totalDayOfYear < 0 && (totalDayOfYear % dpy !== 0)) {
+      newYear -= 1;
+    }
+    this.month = Math.floor(dayInYear / dpm) + 1;
+    this.day = (dayInYear % dpm) + 1;
+    this.year = newYear;
+
+    // Day of week
+    var dowOffset = ((this.dayOfWeek + days) % dayNamesLen + dayNamesLen) % dayNamesLen;
+    this.dayOfWeek = dowOffset;
+
+    var newSeason = this.getSeason();
+    var seasonChanged = !!(prevSeason && newSeason && prevSeason.id !== newSeason.id);
+    if (seasonChanged) {
+      this.logEvent('Season changed: ' + prevSeason.name + ' → ' + newSeason.name);
+    }
+
+    return {
+      from: { year: prevYear, month: prevMonth, season: prevSeason ? prevSeason.id : null },
+      to: { year: this.year, month: this.month, season: newSeason ? newSeason.id : null },
+      seasonChanged: seasonChanged
+    };
+  };
+
+  CalendarTracker.prototype.getDateObject = function() {
+    return { day: this.day, month: this.month, year: this.year };
+  };
+
+  CalendarTracker.prototype.daysUntilSeasonChange = function() {
+    var monthObj = FANTASY_CALENDAR.months[this.month - 1];
+    if (!monthObj) return 0;
+    var currentSeason = monthObj.season;
+    var dpm = FANTASY_CALENDAR.daysPerMonth;
+
+    // Walk forward (max one full year) to find the next month with different season
+    for (var step = 0; step < FANTASY_CALENDAR.daysPerYear; step++) {
+      var curDayOfYear = (this.month - 1) * dpm + this.day + step;
+      var futureDayInYear = ((curDayOfYear - 1) % FANTASY_CALENDAR.daysPerYear);
+      var futureMonthIdx = Math.floor(futureDayInYear / dpm);
+      var futureMonth = FANTASY_CALENDAR.months[futureMonthIdx];
+      if (futureMonth && futureMonth.season !== currentSeason) return step;
+    }
+    return 0;
+  };
+
+  CalendarTracker.prototype.getDateString = function() {
+    var monthObj = FANTASY_CALENDAR.months[this.month - 1];
+    var monthName = monthObj ? monthObj.name : 'Unknown';
+    var dayName = FANTASY_CALENDAR.dayNames[this.dayOfWeek];
+    var suffix = this._getDaySuffix(this.day);
+    return dayName + ', ' + this.day + suffix + ' of ' + monthName + ', Year ' + this.year;
+  };
+
+  CalendarTracker.prototype._getDaySuffix = function(day) {
+    if (day >= 11 && day <= 13) return 'th';
+    switch (day % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  };
+
+  CalendarTracker.prototype.getSeason = function() {
+    var monthObj = FANTASY_CALENDAR.months[this.month - 1];
+    if (!monthObj) return null;
+    var seasonId = monthObj.season;
+    return FANTASY_CALENDAR.seasons.find(function(s) { return s.id === seasonId; });
+  };
+
+  CalendarTracker.prototype.getMonth = function() {
+    return FANTASY_CALENDAR.months[this.month - 1] || null;
+  };
+
+  CalendarTracker.prototype.getDayOfYear = function() {
+    return (this.month - 1) * FANTASY_CALENDAR.daysPerMonth + this.day;
+  };
+
+  CalendarTracker.prototype.getDaysSince = function(otherDate) {
+    if (!otherDate) return 0;
+
+    var thisDayOfYear = this.getDayOfYear() + (this.year * FANTASY_CALENDAR.daysPerYear);
+    var otherDayOfYear = (otherDate.month - 1) * FANTASY_CALENDAR.daysPerMonth + otherDate.day +
+                         (otherDate.year * FANTASY_CALENDAR.daysPerYear);
+
+    return Math.max(0, thisDayOfYear - otherDayOfYear);
+  };
+
+  CalendarTracker.prototype.serialize = function() {
+    return {
+      day: this.day,
+      month: this.month,
+      year: this.year,
+      dayOfWeek: this.dayOfWeek,
+      eventLog: this.eventLog.slice()
+    };
+  };
+
+  CalendarTracker.prototype.deserialize = function(data) {
+    if (!data || typeof data !== 'object') return;
+    this.day = (typeof data.day === 'number' && data.day > 0) ? data.day : 1;
+    this.month = (typeof data.month === 'number' && data.month > 0) ? data.month : 1;
+    this.year = (typeof data.year === 'number') ? data.year : 1000;
+    this.dayOfWeek = (typeof data.dayOfWeek === 'number' && data.dayOfWeek >= 0) ? data.dayOfWeek : 0;
+    this.eventLog = Array.isArray(data.eventLog) ? data.eventLog.slice() : [];
+  };
+
+  CalendarTracker.prototype.logEvent = function(event) {
+    this.eventLog.push({
+      date: this.getDateString(),
+      event: event,
+      timestamp: Date.now()
+    });
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // WEATHER ENGINE CLASS
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function WeatherEngine(seed) {
+    this.seed = seed || 42;
+    this.rng = mulberry32(this.seed);
+    this.regionWeather = new Map();
+    this.weatherHistory = new Map();
+  }
+
+  WeatherEngine.prototype._initRegionWeather = function(regionId, climate, worldRegion) {
+    if (!this.regionWeather.has(regionId)) {
+      var climateData = CLIMATE_TYPES[climate] || CLIMATE_TYPES.temperate;
+      var initialWeather = climateData.baseWeathers[Math.floor(this.rng() * climateData.baseWeathers.length)];
+      this.regionWeather.set(regionId, {
+        current: initialWeather,
+        climate: climate,
+        duration: 1 + Math.floor(this.rng() * 5),
+        durationRemaining: 1,
+        worldRegion: worldRegion || null
+      });
+    }
+  };
+
+  WeatherEngine.prototype._getWeatherTransitions = function(current, climate, season) {
+    var climateData = CLIMATE_TYPES[climate] || CLIMATE_TYPES.temperate;
+    var baseOptions = climateData.baseWeathers.slice();
+    var seasonMod = {};
+
+    // Seasonal modifiers
+    if (season === 'verdance') seasonMod = { 'Light Rain': 0.6, 'Heavy Rain': 0.5, 'Clear': 0.3 };
+    else if (season === 'solstice') seasonMod = { 'Heatwave': 0.7, 'Clear': 0.5, 'Heavy Rain': 0.2 };
+    else if (season === 'harvest') seasonMod = { 'Clear': 0.4, 'Cloudy': 0.4, 'Light Rain': 0.3 };
+    else if (season === 'frostfall') seasonMod = { 'Snow': 0.6, 'Blizzard': 0.4, 'Clear': 0.2 };
+
+    // Build weighted transition table
+    var weights = {};
+    baseOptions.forEach(function(w) {
+      weights[w] = 0.3; // Base weight for any weather
+    });
+
+    // Current weather has 40% chance to persist
+    weights[current] = (weights[current] || 0) + 0.4;
+
+    // Apply season modifiers
+    Object.keys(seasonMod).forEach(function(w) {
+      if (weights[w] !== undefined) weights[w] += seasonMod[w];
+    });
+
+    return weights;
+  };
+
+  WeatherEngine.prototype._rollWeather = function(current, climate, season) {
+    var transitions = this._getWeatherTransitions(current, climate, season);
+    var weathers = Object.keys(transitions);
+
+    // Normalize weights so distribution is fair regardless of how many weights were added
+    var total = 0;
+    for (var w = 0; w < weathers.length; w++) total += transitions[weathers[w]];
+    if (total <= 0) return current;
+
+    var roll = this.rng() * total;
+    var cumulative = 0;
+    for (var i = 0; i < weathers.length; i++) {
+      cumulative += transitions[weathers[i]];
+      if (roll <= cumulative) return weathers[i];
+    }
+
+    return current;
+  };
+
+  WeatherEngine.prototype.advanceDay = function(regions, calendar, worldData) {
+    if (!Array.isArray(regions) || !calendar) return [];
+    var results = [];
+    var season = calendar.getSeason();
+    var seasonId = season ? season.id : 'verdance';
+
+    regions.forEach(function(region) {
+      if (!region || !region.id) return;
+      var climateType = this._determineClimate(region);
+      this._initRegionWeather(region.id, climateType, region);
+
+      var weatherData = this.regionWeather.get(region.id);
+      if (!weatherData) return;
+
+      weatherData.durationRemaining = (weatherData.durationRemaining || 1) - 1;
+
+      if (weatherData.durationRemaining <= 0) {
+        var newWeather = this._rollWeather(weatherData.current, climateType, seasonId);
+        weatherData.current = newWeather;
+        weatherData.duration = 1 + Math.floor(this.rng() * 7);
+        weatherData.durationRemaining = weatherData.duration;
+      }
+
+      var dateStr = calendar.getDateString();
+      if (dateStr) {
+        var histKey = region.id + '_' + dateStr;
+        if (!this.weatherHistory.has(histKey)) {
+          this.weatherHistory.set(histKey, {
+            weather: weatherData.current,
+            date: dateStr,
+            regionId: region.id,
+            regionName: region.name || 'Unknown'
+          });
+        }
+      }
+
+      var state = WEATHER_STATES[weatherData.current];
+      results.push({
+        regionId: region.id,
+        regionName: region.name || 'Unknown',
+        weather: weatherData.current,
+        icon: state ? state.icon : '?',
+        hazard: state ? state.hazard : false
+      });
+    }, this);
+
+    return results;
+  };
+
+  WeatherEngine.prototype.getWeatherReport = function(regionName, worldData) {
+    if (!worldData) return 'Weather report unavailable.';
+
+    var region = null;
+    var cities = [];
+
+    // Find the region by name
+    if (worldData.regions && Array.isArray(worldData.regions)) {
+      region = worldData.regions.find(function(r) { return r && r.name === regionName; });
+    }
+
+    if (!region || !region.id) return 'Unable to locate region: ' + sanitizeString(regionName);
+
+    // Find cities in this region
+    if (worldData.cities && Array.isArray(worldData.cities)) {
+      cities = worldData.cities.filter(function(c) { return c && c.region === regionName; });
+    }
+
+    var weatherData = this.regionWeather.get(region.id);
+    if (!weatherData) return 'No weather data for ' + regionName;
+
+    var weather = weatherData.current;
+    var narrative = 'A ' + weather.toLowerCase() + ' sweeps across ' + sanitizeString(regionName);
+
+    if (cities.length > 0) {
+      var cityName = cities[Math.floor(this.rng() * cities.length)].name;
+      narrative += ', flooding the streets of ' + sanitizeString(cityName);
+    }
+
+    narrative += '.';
+    return narrative;
+  };
+
+  WeatherEngine.prototype.getCurrentWeather = function(regionId) {
+    var weatherData = this.regionWeather.get(regionId);
+    if (!weatherData) return null;
+
+    var state = WEATHER_STATES[weatherData.current];
+    return {
+      weather: weatherData.current,
+      climate: weatherData.climate,
+      icon: state ? state.icon : '?',
+      visibility: state ? state.visibility : 'unknown',
+      hazard: state ? state.hazard : false,
+      effects: state ? state.effects.slice() : [],
+      duration: weatherData.durationRemaining + ' day' + (weatherData.durationRemaining === 1 ? '' : 's')
+    };
+  };
+
+  WeatherEngine.prototype.getForecast = function(regionId, days) {
+    days = Math.min(Math.max(1, days || 3), 14);
+    var current = this.regionWeather.get(regionId);
+    if (!current) return [];
+
+    var forecast = [];
+    var testWeather = current.current;
+    var climate = current.climate;
+
+    for (var i = 0; i < days; i++) {
+      var state = WEATHER_STATES[testWeather];
+      forecast.push({
+        day: i + 1,
+        weather: testWeather,
+        icon: state ? state.icon : '?',
+        confidence: Math.max(50, 100 - (i * 8)) + '%',
+        hazard: state ? state.hazard : false
+      });
+
+      // Rough simulation for forecast
+      if (i < days - 1) {
+        var rand = this.rng();
+        if (rand < 0.4) {
+          // Keep same weather
+        } else {
+          var climateData = CLIMATE_TYPES[climate] || CLIMATE_TYPES.temperate;
+          testWeather = climateData.baseWeathers[Math.floor(this.rng() * climateData.baseWeathers.length)];
+        }
+      }
+    }
+
+    return forecast;
+  };
+
+  WeatherEngine.prototype.getRegionForecast = function(regionName, worldData, days) {
+    days = Math.min(Math.max(1, days || 3), 14);
+    if (!worldData || !worldData.regions || !Array.isArray(worldData.regions)) return [];
+
+    var region = worldData.regions.find(function(r) { return r && r.name === regionName; });
+    if (!region || !region.id) return [];
+
+    var regionId = region.id;
+    var current = this.regionWeather.get(regionId);
+    if (!current) return [];
+
+    var cities = [];
+    var pois = [];
+
+    if (worldData.cities && Array.isArray(worldData.cities)) {
+      cities = worldData.cities.filter(function(c) { return c.region === regionName; });
+    }
+
+    if (worldData.pois && Array.isArray(worldData.pois)) {
+      pois = worldData.pois.filter(function(p) { return p.region === regionName; });
+    }
+
+    var forecast = [];
+    var testWeather = current.current;
+    var climate = current.climate;
+
+    for (var i = 0; i < days; i++) {
+      var state = WEATHER_STATES[testWeather];
+      var narrative = 'Day ' + (i + 1) + ': ' + testWeather + ' expected';
+
+      // Add location references to narrative
+      if (cities.length > 0 && i === 0) {
+        var city = cities[Math.floor(this.rng() * cities.length)];
+        narrative += ' around ' + sanitizeString(city.name);
+      }
+      if (pois.length > 0 && i === days - 1) {
+        var poi = pois[Math.floor(this.rng() * pois.length)];
+        narrative += ' (affecting ' + sanitizeString(poi.name) + ')';
+      }
+
+      forecast.push({
+        day: i + 1,
+        weather: testWeather,
+        narrative: narrative,
+        icon: state ? state.icon : '?',
+        confidence: Math.max(50, 100 - (i * 8)) + '%',
+        hazard: state ? state.hazard : false
+      });
+
+      // Rough simulation for forecast
+      if (i < days - 1) {
+        var rand = this.rng();
+        if (rand < 0.4) {
+          // Keep same weather
+        } else {
+          var climateData = CLIMATE_TYPES[climate] || CLIMATE_TYPES.temperate;
+          testWeather = climateData.baseWeathers[Math.floor(this.rng() * climateData.baseWeathers.length)];
+        }
+      }
+    }
+
+    return forecast;
+  };
+
+  WeatherEngine.prototype._determineClimate = function(region) {
+    // Use terrain field if available for more accurate climate determination
+    var terrainStr = region.terrain || region.type || '';
+    if (!terrainStr) return 'temperate';
+
+    var t = terrainStr.toLowerCase();
+
+    // Terrain-based mapping
+    if (t.includes('tundra') || t.includes('glacier') || t.includes('arctic') || t.includes('frozen')) return 'arctic';
+    if (t.includes('desert') || t.includes('badlands') || t.includes('arid')) return 'arid';
+    if (t.includes('swamp') || t.includes('marsh') || t.includes('forest')) return 'temperate';
+    if (t.includes('coast') || t.includes('archipelago') || t.includes('sea')) return 'coastal';
+    if (t.includes('mountain') || t.includes('highland') || t.includes('peak')) return 'mountain';
+    if (t.includes('jungle') || t.includes('rainforest') || t.includes('tropical')) return 'tropical';
+
+    return 'temperate';
+  };
+
+  WeatherEngine.prototype.serialize = function() {
+    var regions = [];
+    var histories = [];
+
+    this.regionWeather.forEach(function(data, regionId) {
+      regions.push({
+        regionId: regionId,
+        data: {
+          current: data.current,
+          climate: data.climate,
+          duration: data.duration,
+          durationRemaining: data.durationRemaining
+        }
+      });
+    });
+
+    this.weatherHistory.forEach(function(data, key) {
+      histories.push(data);
+    });
+
+    return {
+      seed: this.seed,
+      regionWeather: regions,
+      weatherHistory: histories
+    };
+  };
+
+  WeatherEngine.prototype.deserialize = function(data) {
+    if (!data || typeof data !== 'object') return;
+    this.seed = (typeof data.seed === 'number') ? data.seed : 42;
+    this.rng = mulberry32(this.seed);
+    this.regionWeather.clear();
+    this.weatherHistory.clear();
+
+    if (Array.isArray(data.regionWeather)) {
+      data.regionWeather.forEach(function(item) {
+        if (item && item.regionId && item.data && typeof item.data === 'object') {
+          this.regionWeather.set(item.regionId, item.data);
+        }
+      }, this);
+    }
+
+    if (Array.isArray(data.weatherHistory)) {
+      data.weatherHistory.forEach(function(item) {
+        if (item && item.regionId && item.date && typeof item.date === 'string') {
+          var key = item.regionId + '_' + item.date;
+          this.weatherHistory.set(key, item);
+        }
+      }, this);
+    }
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SEASONS & EVENTS MANAGER
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function SeasonalEffectsManager(seed) {
+    this.activeEvents = [];
+    this.eventHistory = [];
+    this.seed = seed || 42;
+    this.rng = mulberry32(this.seed);
+  }
+
+  SeasonalEffectsManager.prototype.getSeasonalEffects = function(season, data) {
+    var effects = {
+      factionModifiers: {},
+      priceModifiers: {},
+      mechanics: {},
+      cityEffects: {},
+      npcReactions: []
+    };
+
+    if (!season || !data || typeof data !== 'object') return effects;
+
+    switch (season.id) {
+      case 'frostfall':
+        // Northern regions suffer
+        if (data.regions) {
+          data.regions.forEach(function(r) {
+            if (r.terrain && (r.terrain.toLowerCase().includes('north') || r.terrain.toLowerCase().includes('tundra') || r.terrain.toLowerCase().includes('glacier'))) {
+              effects.factionModifiers[r.id] = (effects.factionModifiers[r.id] || 0) - 10;
+            }
+          });
+        }
+
+        // Port cities suffer more in winter
+        if (data.cities && Array.isArray(data.cities)) {
+          data.cities.forEach(function(c) {
+            if (c.features && Array.isArray(c.features) && c.features.some(function(f) { return f.toLowerCase().includes('port'); })) {
+              effects.cityEffects[c.name] = { trade_penalty: 0.7, movement_penalty: 0.15 };
+            }
+          });
+        }
+
+        // NPC reactions
+        if (data.npcs && Array.isArray(data.npcs)) {
+          data.npcs.forEach(function(npc) {
+            if (npc.role && npc.role.toLowerCase().includes('merchant')) {
+              effects.npcReactions.push('The merchant ' + sanitizeString(npc.name) + ' warns of scarce supplies this Frostfall.');
+            }
+          });
+        }
+
+        effects.priceModifiers.food = 1.5;
+        effects.mechanics.movementPenalty = 0.1;
+        break;
+
+      case 'solstice':
+        // Southern/arid regions suffer heat
+        if (data.regions) {
+          data.regions.forEach(function(r) {
+            if (r.terrain && (r.terrain.toLowerCase().includes('south') || r.terrain.toLowerCase().includes('desert') || r.terrain.toLowerCase().includes('badlands'))) {
+              effects.priceModifiers[r.id] = (effects.priceModifiers[r.id] || 1) * 1.3;
+            }
+          });
+        }
+
+        // Desert/arid cities heavily affected
+        if (data.cities && Array.isArray(data.cities)) {
+          data.cities.forEach(function(c) {
+            if (c.region) {
+              var cityRegion = data.regions ? data.regions.find(function(r) { return r.name === c.region; }) : null;
+              if (cityRegion && cityRegion.terrain && (cityRegion.terrain.toLowerCase().includes('desert') || cityRegion.terrain.toLowerCase().includes('arid'))) {
+                effects.cityEffects[c.name] = { water_scarcity: true, population_morale: -15 };
+              }
+            }
+          });
+        }
+
+        // NPC reactions to heat
+        if (data.npcs && Array.isArray(data.npcs)) {
+          data.npcs.forEach(function(npc) {
+            if (npc.traits && Array.isArray(npc.traits) && npc.traits.some(function(t) { return t.toLowerCase().includes('farmer'); })) {
+              effects.npcReactions.push(sanitizeString(npc.name) + ' frets about the crops withering in the relentless Solstice heat.');
+            }
+          });
+        }
+
+        effects.mechanics.fireSpellDamageBump = 1;
+        effects.mechanics.heatExhaustion = true;
+        break;
+
+      case 'verdance':
+        // Spring flooding, new growth bonuses
+        effects.mechanics.floodingRisk = true;
+        effects.mechanics.cropGrowth = 1.2;
+
+        // Specific faction bonuses
+        if (data.factions) {
+          data.factions.forEach(function(f) {
+            effects.factionModifiers[f.name] = (effects.factionModifiers[f.name] || 0) + 5;
+          });
+        }
+
+        // Riverside/coast cities at flood risk
+        if (data.cities && Array.isArray(data.cities)) {
+          data.cities.forEach(function(c) {
+            if (c.features && Array.isArray(c.features) && (c.features.some(function(f) { return f.toLowerCase().includes('river'); }) || c.features.some(function(f) { return f.toLowerCase().includes('coast'); }))) {
+              effects.cityEffects[c.name] = { flooding_risk: 0.4, supply_disruption: true };
+            }
+          });
+        }
+
+        break;
+
+      case 'harvest':
+        // Harvest bonuses
+        effects.mechanics.cropYield = 1.3;
+        effects.mechanics.tradeBump = 1.25;
+
+        // All factions benefit
+        if (data.factions) {
+          data.factions.forEach(function(f) {
+            effects.factionModifiers[f.name] = (effects.factionModifiers[f.name] || 0) + 15;
+          });
+        }
+
+        // Trade hub cities thrive
+        if (data.cities && Array.isArray(data.cities)) {
+          data.cities.forEach(function(c) {
+            if (c.features && Array.isArray(c.features) && c.features.some(function(f) { return f.toLowerCase().includes('market') || f.toLowerCase().includes('trade'); })) {
+              effects.cityEffects[c.name] = { trade_surge: 1.4, population_happiness: 20 };
+            }
+          });
+        }
+
+        break;
+    }
+
+    return effects;
+  };
+
+  SeasonalEffectsManager.prototype.triggerSeasonalEvent = function(eventId, calendar, worldData) {
+    if (!eventId || !SEASONAL_EVENTS[eventId]) return null;
+    var eventTemplate = SEASONAL_EVENTS[eventId];
+
+    var event = {
+      id: eventId,
+      name: eventTemplate.name,
+      headline: eventTemplate.headline,
+      detail: eventTemplate.detail,
+      category: eventTemplate.category,
+      icon: eventTemplate.icon,
+      importance: eventTemplate.importance,
+      triggeredAt: Date.now(),
+      mutations: Object.assign({}, eventTemplate.mutations || {}),
+      calendarEffect: Object.assign({}, eventTemplate.calendarEffect || {}),
+      worldContext: {
+        celebratingCities: [],
+        affectedFactions: [],
+        involvedNPCs: []
+      }
+    };
+
+    // Populate with world-specific details if worldData provided
+    if (worldData && typeof worldData === 'object') {
+      // Find cities that would celebrate or be affected by this event
+      if (worldData.cities && Array.isArray(worldData.cities) && worldData.cities.length > 0) {
+        var celebratingCount = Math.min(2, Math.max(1, Math.floor(worldData.cities.length / 3)));
+        var usedCities = new Set();
+        for (var i = 0; i < celebratingCount && usedCities.size < worldData.cities.length; i++) {
+          var cityIdx = Math.floor(this.rng() * worldData.cities.length);
+          if (worldData.cities[cityIdx] && worldData.cities[cityIdx].name && !usedCities.has(cityIdx)) {
+            event.worldContext.celebratingCities.push(sanitizeString(worldData.cities[cityIdx].name));
+            usedCities.add(cityIdx);
+          }
+        }
+      }
+
+      // Find factions that benefit or are affected
+      if (worldData.factions && Array.isArray(worldData.factions) && worldData.factions.length > 0) {
+        var affectedCount = Math.min(2, Math.max(1, Math.floor(worldData.factions.length / 2)));
+        var usedFactions = new Set();
+        for (var j = 0; j < affectedCount && usedFactions.size < worldData.factions.length; j++) {
+          var factionIdx = Math.floor(this.rng() * worldData.factions.length);
+          if (worldData.factions[factionIdx] && worldData.factions[factionIdx].name && !usedFactions.has(factionIdx)) {
+            event.worldContext.affectedFactions.push(sanitizeString(worldData.factions[factionIdx].name));
+            usedFactions.add(factionIdx);
+          }
+        }
+      }
+
+      // Find NPCs involved
+      if (worldData.npcs && Array.isArray(worldData.npcs) && worldData.npcs.length > 0) {
+        var involvedCount = Math.min(1, Math.max(0, Math.floor(worldData.npcs.length / 4)));
+        var usedNpcs = new Set();
+        for (var k = 0; k < involvedCount && usedNpcs.size < worldData.npcs.length; k++) {
+          var npcIdx = Math.floor(this.rng() * worldData.npcs.length);
+          if (worldData.npcs[npcIdx] && worldData.npcs[npcIdx].name && !usedNpcs.has(npcIdx)) {
+            event.worldContext.involvedNPCs.push(sanitizeString(worldData.npcs[npcIdx].name));
+            usedNpcs.add(npcIdx);
+          }
+        }
+      }
+
+      // Enhance detail with world context
+      if (event.worldContext.celebratingCities.length > 0) {
+        var cityList = event.worldContext.celebratingCities.join(' and ');
+        event.detail += ' ' + cityList + ' join in celebration.';
+      }
+    }
+
+    this.activeEvents.push(event);
+    this.eventHistory.push(event);
+
+    return event;
+  };
+
+  SeasonalEffectsManager.prototype.getActiveEvents = function() {
+    return this.activeEvents.slice();
+  };
+
+  SeasonalEffectsManager.prototype.clearExpiredEvents = function(maxAge) {
+    maxAge = maxAge || 90; // Default: events expire after 90 days
+    var now = Date.now();
+
+    this.activeEvents = this.activeEvents.filter(function(e) {
+      return (now - e.triggeredAt) < (maxAge * 24 * 60 * 60 * 1000);
+    });
+  };
+
+  // Clear events that took place more than `maxDays` ago in the campaign's calendar
+  SeasonalEffectsManager.prototype.clearExpiredByCalendar = function(calendar, maxDays) {
+    if (!calendar || typeof calendar.getDateObject !== 'function') return;
+    maxDays = maxDays || 30;
+    var nowDate = calendar.getDateObject();
+    this.activeEvents = this.activeEvents.filter(function(e) {
+      if (!e.calendarTriggeredOn) return true; // legacy event, keep
+      var diff = calendar.getDaysSince(e.calendarTriggeredOn);
+      return diff < maxDays;
+    });
+  };
+
+  // Suggest a list of seasonal event ids appropriate for the current season
+  SeasonalEffectsManager.prototype.getEligibleEvents = function(seasonId) {
+    var ids = [];
+    Object.keys(SEASONAL_EVENTS).forEach(function(id) {
+      var ev = SEASONAL_EVENTS[id];
+      if (!ev.season || ev.season === seasonId) ids.push(id);
+    });
+    return ids;
+  };
+
+  // Pick a random eligible event and trigger it; returns null if none triggered
+  SeasonalEffectsManager.prototype.maybeTriggerRandomEvent = function(calendar, worldData, chance) {
+    if (!calendar || typeof calendar.getSeason !== 'function') return null;
+    chance = (typeof chance === 'number') ? chance : 0.05;
+    if (this.rng() > chance) return null;
+
+    var season = calendar.getSeason();
+    var eligible = this.getEligibleEvents(season ? season.id : null);
+    if (!eligible.length) return null;
+
+    var pick = eligible[Math.floor(this.rng() * eligible.length)];
+    var event = this.triggerSeasonalEvent(pick, calendar, worldData);
+    if (event && typeof calendar.getDateObject === 'function') {
+      event.calendarTriggeredOn = calendar.getDateObject();
+    }
+    return event;
+  };
+
+  SeasonalEffectsManager.prototype.summary = function() {
+    var byCategory = {};
+    this.activeEvents.forEach(function(e) {
+      byCategory[e.category] = (byCategory[e.category] || 0) + 1;
+    });
+    return {
+      activeCount: this.activeEvents.length,
+      historyCount: this.eventHistory.length,
+      byCategory: byCategory
+    };
+  };
+
+  SeasonalEffectsManager.prototype.serialize = function() {
+    return {
+      activeEvents: this.activeEvents.slice(),
+      eventHistory: this.eventHistory.slice()
+    };
+  };
+
+  SeasonalEffectsManager.prototype.deserialize = function(data) {
+    if (!data || typeof data !== 'object') return;
+    this.activeEvents = Array.isArray(data.activeEvents) ? data.activeEvents.slice() : [];
+    this.eventHistory = Array.isArray(data.eventHistory) ? data.eventHistory.slice() : [];
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // HELPER: Simple PRNG
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function mulberry32(a) {
+    return function() {
+      a |= 0;
+      a = (a + 0x6d2b79f5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PUBLIC API
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  return {
+    CalendarTracker: CalendarTracker,
+    WeatherEngine: WeatherEngine,
+    SeasonalEffectsManager: SeasonalEffectsManager,
+    FANTASY_CALENDAR: FANTASY_CALENDAR,
+    SEASONAL_EVENTS: SEASONAL_EVENTS,
+    CLIMATE_TYPES: CLIMATE_TYPES,
+    WEATHER_STATES: WEATHER_STATES
+  };
+
+})();
+
+// Export to window
+window.CalendarTracker = window.CampaignSeasons.CalendarTracker;
+window.WeatherEngine = window.CampaignSeasons.WeatherEngine;
+window.SeasonalEffectsManager = window.CampaignSeasons.SeasonalEffectsManager;
+window.FANTASY_CALENDAR = window.CampaignSeasons.FANTASY_CALENDAR;
+window.SEASONAL_EVENTS = window.CampaignSeasons.SEASONAL_EVENTS;
+window.CLIMATE_TYPES = window.CampaignSeasons.CLIMATE_TYPES;
+window.WEATHER_STATES = window.CampaignSeasons.WEATHER_STATES;

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Phmurt Studios Blog</title>
+    <link>https://phmurtstudios.com/blog.html</link>
+    <description>Design notes, playtest reports, and DM tips from the Phmurt Studios team. Articles on homebrew classes, campaign design, and running great D&amp;D games.</description>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 18 Apr 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://phmurtstudios.com/rss.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+      <title>Welcome to Phmurt Studios</title>
+      <link>https://phmurtstudios.com/blog-welcome.html</link>
+      <guid isPermaLink="true">https://phmurtstudios.com/blog-welcome.html</guid>
+      <pubDate>Sat, 18 Apr 2026 00:00:00 +0000</pubDate>
+      <description>What we're building, why we're building it, and what you can expect from this blog. An indie studio's opening salvo and a rough map of where we're headed.</description>
+      <category>Studio Note</category>
+    </item>
+
+  </channel>
+</rss>

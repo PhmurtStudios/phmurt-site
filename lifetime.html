@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co https://*.supabase.in https://*.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), usb=(), payment=(), serial=(), bluetooth=()" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Lifetime Pass · Phmurt Studios</title>
+  <meta name="description" content="One payment, forever. The Phmurt Studios Lifetime Pass — every Pro feature plus access to every piece of content we ever publish, past and future. Limited to the first 200 early supporters." />
+  <meta property="og:title" content="Lifetime Pass · Phmurt Studios" />
+  <meta property="og:description" content="One payment, forever. Every Pro feature plus all content past & future. Limited to 200 early supporters." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://phmurtstudios.com/lifetime.html" />
+  <meta property="og:image" content="https://phmurtstudios.com/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Lifetime Pass · Phmurt Studios" />
+  <meta name="twitter:description" content="One payment, forever. Limited to 200 early supporters." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="style.css?v=185" />
+  <script defer src="theme.js?v=185"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.0" crossorigin="anonymous" integrity="sha384-fm42zLXjam4N3lT5umWgNtBBPMP3Ddrdmr9lnPKtDWzs5Dqy457Yn6+eTvCgRU3n"></script>
+  <script defer src="supabase-config.js?v=185"></script>
+  <script defer src="stripe-env.js?v=188"></script>
+  <script defer src="stripe-config.js?v=185"></script>
+  <script defer src="phmurt-auth.js?v=187"></script>
+  <link rel="canonical" href="https://phmurtstudios.com/lifetime.html" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Phmurt Studios Lifetime Pass",
+    "description": "One-time $50 payment for lifetime access to every Pro feature and all published content, past and future. Limited to 200 early supporters.",
+    "brand": { "@type": "Brand", "name": "Phmurt Studios" },
+    "offers": {
+      "@type": "Offer",
+      "price": "50.00",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/LimitedAvailability",
+      "url": "https://phmurtstudios.com/lifetime.html",
+      "priceValidUntil": "2027-12-31"
+    }
+  }
+  </script>
+
+  <style>
+    .lf-wrap { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    .lf-hero {
+      text-align: center;
+      padding: 48px 24px 40px;
+      background: linear-gradient(135deg, var(--bg-card, #141420) 0%, rgba(201,168,76,.07) 100%);
+      border: 1px solid rgba(201,168,76,0.45);
+      border-radius: 12px;
+      margin-bottom: 48px;
+    }
+    .lf-hero-eyebrow {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 5px;
+      text-transform: uppercase; color: #c9a84c; margin-bottom: 14px;
+    }
+    .lf-hero-title {
+      font-family: 'Cinzel', serif; font-size: 2.4rem; font-weight: 700;
+      color: var(--text, #f2e8d6); margin: 0 0 14px; letter-spacing: 1px;
+    }
+    .lf-hero-subtitle {
+      font-family: 'Spectral', serif; font-size: 1.15rem; line-height: 1.6;
+      color: var(--text-muted, #9a8870); max-width: 620px; margin: 0 auto 28px;
+    }
+    .lf-hero-price {
+      font-family: 'Cinzel', serif; font-size: 3rem; font-weight: 700;
+      color: #c9a84c; margin: 18px 0 4px; letter-spacing: 1px;
+    }
+    .lf-hero-price-note {
+      font-family: 'Spectral', serif; font-style: italic; font-size: 14px;
+      color: var(--text-muted, #9a8870); margin-bottom: 22px;
+    }
+    .lf-hero-counter {
+      font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--crimson, #d4433a);
+      padding: 8px 16px; border: 1px solid var(--crimson, #d4433a);
+      border-radius: 3px; display: inline-block; margin-bottom: 22px;
+    }
+    .lf-hero-cta {
+      display: inline-block; font-family: 'Cinzel', serif; font-size: 12px;
+      letter-spacing: 3px; text-transform: uppercase; font-weight: 600;
+      padding: 14px 38px; background: #c9a84c; color: #0a0a0a;
+      border: none; border-radius: 4px; text-decoration: none; cursor: pointer;
+      transition: opacity .2s;
+    }
+    .lf-hero-cta:hover { opacity: .88; }
+    .lf-hero-cta:disabled { cursor: not-allowed; opacity: .5; }
+    .lf-hero-fine {
+      font-family: 'Spectral', serif; font-style: italic; font-size: 12px;
+      color: var(--text-faint, #7a6a55); margin-top: 16px;
+    }
+
+    /* Why Lifetime */
+    .lf-why-title {
+      font-family: 'Cinzel', serif; font-size: 14px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--text, #f2e8d6); text-align: center; margin: 0 0 8px;
+    }
+    .lf-why-sub {
+      font-family: 'Spectral', serif; font-style: italic; text-align: center;
+      color: var(--text-muted, #9a8870); margin: 0 auto 32px; max-width: 540px;
+    }
+    .lf-benefits {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 20px; margin-bottom: 48px;
+    }
+    .lf-benefit {
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 8px; padding: 22px 24px;
+    }
+    .lf-benefit-title {
+      font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
+      letter-spacing: 1.5px; color: #c9a84c; margin: 0 0 10px;
+    }
+    .lf-benefit-desc {
+      font-family: 'Spectral', serif; font-size: 14px; line-height: 1.55;
+      color: var(--text-muted, #9a8870); margin: 0;
+    }
+
+    /* Everything you get */
+    .lf-list-wrap {
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 8px; padding: 32px 28px; margin-bottom: 48px;
+    }
+    .lf-list-title {
+      font-family: 'Cinzel', serif; font-size: 14px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--text, #f2e8d6); text-align: center; margin: 0 0 22px;
+    }
+    .lf-list {
+      list-style: none; padding: 0; margin: 0;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 22px;
+    }
+    .lf-list li {
+      font-family: 'Spectral', serif; font-size: 14px;
+      color: var(--text, #f2e8d6); line-height: 1.5;
+      padding-left: 24px; position: relative;
+    }
+    .lf-list li::before {
+      content: '\2713'; position: absolute; left: 0; top: 0;
+      color: #c9a84c; font-weight: 700;
+    }
+
+    /* Founder note */
+    .lf-founder {
+      background: var(--bg-card, #141420);
+      border-left: 3px solid #c9a84c;
+      border-radius: 4px;
+      padding: 24px 28px; margin-bottom: 48px;
+    }
+    .lf-founder-label {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 3px;
+      text-transform: uppercase; color: #c9a84c; margin-bottom: 10px;
+    }
+    .lf-founder-body {
+      font-family: 'Spectral', serif; font-size: 15px; line-height: 1.7;
+      color: var(--text-muted, #9a8870); margin: 0;
+    }
+    .lf-founder-body p { margin: 0 0 12px; }
+    .lf-founder-body p:last-child { margin-bottom: 0; }
+    .lf-founder-body strong { color: var(--text, #f2e8d6); font-weight: 600; }
+
+    /* FAQ */
+    .lf-faq-title {
+      font-family: 'Cinzel', serif; font-size: 14px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--text, #f2e8d6); text-align: center; margin: 0 0 24px;
+    }
+    .lf-faq { margin-bottom: 48px; }
+    .lf-faq-item {
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 6px; margin-bottom: 10px; overflow: hidden;
+    }
+    .lf-faq-q {
+      font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
+      color: var(--text, #f2e8d6); padding: 16px 22px;
+      cursor: pointer; user-select: none; display: flex; justify-content: space-between;
+      align-items: center;
+    }
+    .lf-faq-q::after { content: '+'; color: #c9a84c; font-size: 1.4rem; transition: transform .2s; }
+    .lf-faq-item.open .lf-faq-q::after { transform: rotate(45deg); }
+    .lf-faq-a {
+      display: none; padding: 0 22px 18px;
+      font-family: 'Spectral', serif; font-size: 14px; line-height: 1.6;
+      color: var(--text-muted, #9a8870);
+    }
+    .lf-faq-item.open .lf-faq-a { display: block; }
+
+    /* Final CTA */
+    .lf-final {
+      text-align: center;
+      padding: 40px 24px;
+      background: linear-gradient(135deg, var(--bg-card, #141420) 0%, rgba(201,168,76,.08) 100%);
+      border: 1px solid #c9a84c; border-radius: 8px;
+    }
+    .lf-final-title {
+      font-family: 'Cinzel', serif; font-size: 20px; font-weight: 600;
+      color: var(--text, #f2e8d6); margin: 0 0 10px;
+    }
+    .lf-final-sub {
+      font-family: 'Spectral', serif; font-size: 15px; color: var(--text-muted, #9a8870);
+      margin: 0 0 22px;
+    }
+
+    /* Waitlist form (shown when sold out) */
+    #lf-waitlist { display: none; margin-top: 16px; }
+    #lf-waitlist-email {
+      padding: 12px 14px; border-radius: 4px;
+      background: rgba(10,10,10,0.6);
+      border: 1px solid #c9a84c55;
+      color: var(--text, #e7dcc6);
+      font-family: Spectral, serif; font-size: .95rem;
+      width: 280px; max-width: 100%;
+    }
+    #lf-waitlist-submit {
+      font-family: Cinzel, serif; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase; font-weight: 600;
+      padding: 12px 22px; background: #c9a84c; color: #0a0a0a;
+      border: none; border-radius: 4px; cursor: pointer; margin-left: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .lf-hero-title { font-size: 1.6rem; }
+      .lf-hero-price { font-size: 2.2rem; }
+      .lf-benefits { grid-template-columns: 1fr; }
+      .lf-list { grid-template-columns: 1fr; }
+      #lf-waitlist-email, #lf-waitlist-submit { width: 100%; margin: 6px 0; }
+    }
+  </style>
+</head>
+<body data-nav-active="Home" data-footer-copy="Roll Well. Play Weird." data-breadcrumb="Home|index.html;Pricing|pricing.html;Lifetime Pass">
+  <noscript>
+    <div style="padding:30px;background:#c9a84c;color:#0a0a0a;text-align:center;font-family:Cinzel,serif;">
+      This page requires JavaScript to check Lifetime slot availability and open checkout. Please enable JavaScript, or email <a href="mailto:contact@phmurtstudios.com" style="color:#0a0a0a;">contact@phmurtstudios.com</a> to claim your Lifetime Pass.
+    </div>
+  </noscript>
+  <a href="#main-content" class="ps-skip-nav">Skip to content</a>
+  <div id="ps-site-shell"></div>
+  <div id="ps-page-breadcrumb"></div>
+
+  <main id="main-content">
+    <div class="lf-wrap">
+
+      <div class="lf-hero">
+        <div class="lf-hero-eyebrow">Early Supporter Edition</div>
+        <h1 class="lf-hero-title">The Lifetime Pass</h1>
+        <p class="lf-hero-subtitle">One payment. Every Pro feature forever. Every class, supplement, and system we ever publish &mdash; yours the day it drops. Limited to the first <strong>200 founders</strong>.</p>
+        <div class="lf-hero-price">$50</div>
+        <div class="lf-hero-price-note">one payment &middot; no subscription &middot; no price hike, ever</div>
+        <div class="lf-hero-counter" id="lf-counter">Checking availability&hellip;</div>
+        <div>
+          <button class="lf-hero-cta" id="lf-cta-top">Claim Lifetime Access</button>
+        </div>
+        <div class="lf-hero-fine">Secure checkout via Stripe &middot; 14-day refund if you change your mind</div>
+
+        <!-- Waitlist form (shown when sold out) -->
+        <div id="lf-waitlist">
+          <div style="font-family:Cinzel,serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;">All 200 slots claimed &mdash; join the waitlist</div>
+          <input type="email" id="lf-waitlist-email" placeholder="you@example.com" autocomplete="email" />
+          <button type="button" id="lf-waitlist-submit">Notify Me</button>
+          <div style="font-family:Spectral,serif;font-style:italic;font-size:12px;color:var(--text-faint,#7a6a55);margin-top:10px;">We'll only email you if a slot reopens. No newsletter.</div>
+        </div>
+      </div>
+
+      <!-- Why Lifetime -->
+      <div class="lf-why-title">Why The Lifetime Pass Exists</div>
+      <p class="lf-why-sub">We built this for the people who want to bet on an indie studio before it gets popular. You fund the next classes; we promise you'll never pay for anything we make again.</p>
+      <div class="lf-benefits">
+        <div class="lf-benefit">
+          <div class="lf-benefit-title">Every Release, Forever</div>
+          <p class="lf-benefit-desc">Every class, supplement, generator, engine, and original system we publish after today &mdash; instant access the day it launches. No gating, no upsells, no "Pro+" tier down the road.</p>
+        </div>
+        <div class="lf-benefit">
+          <div class="lf-benefit-title">Locked-In Price</div>
+          <p class="lf-benefit-desc">If Pro goes to $8/mo, $12/mo, or anything else in the future, you're unaffected. Your $50 is the last dollar you ever spend with us.</p>
+        </div>
+        <div class="lf-benefit">
+          <div class="lf-benefit-title">Founder Badge &amp; Voice</div>
+          <p class="lf-benefit-desc">A visible founder badge on your profile and homebrew submissions. Plus a private Discord channel where Lifetime members vote on what we build next.</p>
+        </div>
+        <div class="lf-benefit">
+          <div class="lf-benefit-title">Support an Indie Studio</div>
+          <p class="lf-benefit-desc">This is a small team. The Lifetime Pass funds the next year of development directly &mdash; so you get better tools, faster content drops, and a studio that stays independent.</p>
+        </div>
+      </div>
+
+      <!-- Everything you get -->
+      <div class="lf-list-wrap">
+        <div class="lf-list-title">Everything You Get, Forever</div>
+        <ul class="lf-list">
+          <li>Unlimited characters</li>
+          <li>Unlimited campaigns</li>
+          <li>5e &amp; 3.5e Character Builders</li>
+          <li>Interactive character sheets + PDF export</li>
+          <li>All 13 random generators</li>
+          <li>Homebrew Workshop (all categories)</li>
+          <li>Campaign Manager + multiplayer</li>
+          <li>Advanced campaign tabs: heist, intrigue, prophecy, puzzles</li>
+          <li>Hexcrawl &amp; World Atlas</li>
+          <li>Economy &amp; Faction War engines</li>
+          <li>Downtime &amp; Religion systems</li>
+          <li>Battle Map &amp; Living World (when it ships)</li>
+          <li>Every class, supplement, system we release</li>
+          <li>Priority support via Discord</li>
+          <li>Lifetime founder badge</li>
+          <li>Private feedback &amp; roadmap channel</li>
+        </ul>
+      </div>
+
+      <!-- Founder's Note -->
+      <div class="lf-founder">
+        <div class="lf-founder-label">A note from the studio</div>
+        <div class="lf-founder-body">
+          <p>Phmurt Studios is a small team with a lot of ideas. The Soup Savant and Legendary Soups are out; the Runewright and Ashen Crown are next; a battle map and kingdom engine are in design.</p>
+          <p>The Lifetime Pass is how we fund that work without turning the site into a subscription treadmill. If 200 people believe in what we're doing enough to pay once and walk with us, we get to keep shipping &mdash; and you get <strong>everything we make, forever, for the price of a Pro year</strong>.</p>
+          <p>This offer exists exactly once. When the 200 slots are claimed, it's gone.</p>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div class="lf-faq-title">Questions, Answered</div>
+      <div class="lf-faq">
+        <div class="lf-faq-item">
+          <div class="lf-faq-q" role="button" tabindex="0">What counts as "content published after today"?</div>
+          <div class="lf-faq-a">Every class, supplement, system, generator, engine, or tool we release on phmurtstudios.com. If we publish it here, Lifetime members have access the day it goes live.</div>
+        </div>
+        <div class="lf-faq-item">
+          <div class="lf-faq-q" role="button" tabindex="0">What if the studio shuts down?</div>
+          <div class="lf-faq-a">If Phmurt Studios ever winds down, we commit to open-sourcing the already-published material and keeping the site accessible for 12 months minimum. You won't lose your characters or campaigns &mdash; full data export is built in.</div>
+        </div>
+        <div class="lf-faq-item">
+          <div class="lf-faq-q" role="button" tabindex="0">Can I refund?</div>
+          <div class="lf-faq-a">Yes. 14-day no-questions refund. Email contact@phmurtstudios.com and we'll process it.</div>
+        </div>
+        <div class="lf-faq-item">
+          <div class="lf-faq-q" role="button" tabindex="0">How is it different from Pro?</div>
+          <div class="lf-faq-a">Pro is $5/month. Lifetime is $50 once &mdash; so it breaks even at 10 months. You also get the founder badge, the private roadmap channel, access to every future content drop (Pro doesn't include exclusive future content), and immunity from future price changes. Pro is a monthly tool; Lifetime is a bet on the studio.</div>
+        </div>
+        <div class="lf-faq-item">
+          <div class="lf-faq-q" role="button" tabindex="0">What if I already have a Pro subscription?</div>
+          <div class="lf-faq-a">You can upgrade to Lifetime and we'll prorate your current Pro billing cycle. Your Pro sub cancels automatically at checkout and you start Lifetime the same day.</div>
+        </div>
+        <div class="lf-faq-item">
+          <div class="lf-faq-q" role="button" tabindex="0">Will Lifetime ever come back after it sells out?</div>
+          <div class="lf-faq-a">No. The Lifetime Pass is a one-time founder offer capped at 200. When it's gone, Pro and Party Pass are the only ongoing options. We won't re-open it at a higher price, we won't quietly raise the cap, and we won't do a "second wave."</div>
+        </div>
+      </div>
+
+      <!-- Final CTA -->
+      <div class="lf-final">
+        <div class="lf-final-title">Ready to Claim Your Slot?</div>
+        <p class="lf-final-sub">One payment. Every feature. Every release. Forever.</p>
+        <button class="lf-hero-cta" id="lf-cta-bottom">Claim Lifetime Access &mdash; $50</button>
+        <div class="lf-hero-fine" style="margin-top:16px;" id="lf-counter-bottom">Checking availability&hellip;</div>
+      </div>
+
+    </div>
+  </main>
+
+  <script defer src="phmurt-shell.js?v=187"></script>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var MAX_LIFETIME = 200;
+      var counterEl = document.getElementById('lf-counter');
+      var counterBottomEl = document.getElementById('lf-counter-bottom');
+      var ctaTop = document.getElementById('lf-cta-top');
+      var ctaBottom = document.getElementById('lf-cta-bottom');
+      var waitlistEl = document.getElementById('lf-waitlist');
+
+      function setCounter(text, color) {
+        if (counterEl) {
+          counterEl.textContent = text;
+          if (color) counterEl.style.color = counterEl.style.borderColor = color;
+        }
+        if (counterBottomEl) counterBottomEl.textContent = text;
+      }
+
+      function showSoldOut() {
+        setCounter('SOLD OUT — All 200 slots claimed', '#ef4444');
+        [ctaTop, ctaBottom].forEach(function(btn) {
+          if (btn) { btn.disabled = true; btn.textContent = 'Sold Out'; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; }
+        });
+        if (waitlistEl) waitlistEl.style.display = 'block';
+      }
+
+      // Load live slot count from Supabase
+      (function loadSlots() {
+        try {
+          if (typeof phmurtSupabase === 'undefined' || !phmurtSupabase) {
+            // Wait briefly for supabase to load then retry
+            setTimeout(loadSlots, 500);
+            return;
+          }
+          phmurtSupabase.from('profiles')
+            .select('id', { count: 'exact', head: true })
+            .eq('subscription_tier', 'lifetime')
+            .eq('subscription_status', 'active')
+            .then(function(res) {
+              var sold = (res && res.count != null) ? res.count : 0;
+              var remaining = Math.max(0, MAX_LIFETIME - sold);
+              if (remaining === 0) { showSoldOut(); return; }
+              setCounter(remaining + ' of ' + MAX_LIFETIME + ' slots remaining');
+            })
+            .catch(function() {
+              setCounter('Check availability at checkout', '#c9a84c');
+            });
+        } catch (e) {
+          setCounter('Check availability at checkout', '#c9a84c');
+        }
+      })();
+
+      // Checkout handler
+      function handleClaim() {
+        if (typeof PhmurtDB === 'undefined') {
+          showToast('Please sign in first to claim your Lifetime Pass.', 'error');
+          return;
+        }
+        var sess = PhmurtDB.getSession();
+        if (!sess || !sess.userId) {
+          window.dispatchEvent(new CustomEvent('phmurt-show-auth', { detail: { tab: 'signup' } }));
+          return;
+        }
+        [ctaTop, ctaBottom].forEach(function(btn) {
+          if (btn) { btn.disabled = true; btn.textContent = 'Connecting\u2026'; }
+        });
+        PhmurtDB.startSubscription(window.location.origin + '/pricing.html', 'lifetime')
+          .catch(function(err) {
+            console.error('Lifetime checkout error:', err);
+            var msg = (err && err.message) ? err.message : 'Could not start checkout. Please try again.';
+            showToast(msg, 'error');
+            [ctaTop, ctaBottom].forEach(function(btn) {
+              if (btn) { btn.disabled = false; btn.textContent = btn === ctaTop ? 'Claim Lifetime Access' : 'Claim Lifetime Access \u2014 $50'; }
+            });
+          });
+      }
+      if (ctaTop) ctaTop.addEventListener('click', handleClaim);
+      if (ctaBottom) ctaBottom.addEventListener('click', handleClaim);
+
+      // Waitlist handler
+      var wEmail = document.getElementById('lf-waitlist-email');
+      var wSubmit = document.getElementById('lf-waitlist-submit');
+      function submitWaitlist() {
+        if (!wEmail) return;
+        var email = (wEmail.value || '').trim();
+        if (!/^\S+@\S+\.\S+$/.test(email) || email.length > 254) {
+          showToast('Please enter a valid email address.', 'error');
+          return;
+        }
+        if (typeof PhmurtDB === 'undefined' || !PhmurtDB.getSession || !PhmurtDB.getSession()) {
+          showToast('Please sign in first to join the waitlist.', 'error');
+          return;
+        }
+        if (typeof phmurtSupabase === 'undefined' || !phmurtSupabase) {
+          showToast('Could not reach waitlist service.', 'error'); return;
+        }
+        wSubmit.disabled = true; wSubmit.textContent = 'Submitting\u2026';
+        phmurtSupabase.rpc('lifetime_waitlist_join', { p_email: email })
+          .then(function(res) {
+            if (res && res.error) {
+              showToast(res.error.message || 'Could not join waitlist.', 'error');
+              wSubmit.disabled = false; wSubmit.textContent = 'Notify Me';
+              return;
+            }
+            showToast('You\u2019re on the list. We\u2019ll email you if a slot opens up.', 'success');
+            wEmail.disabled = true; wSubmit.disabled = true; wSubmit.textContent = 'On the Waitlist';
+            try { PhmurtDB.logEvent('lifetime-waitlist-joined', { source: 'lifetime-landing' }); } catch(e) {}
+          })
+          .catch(function(err) {
+            showToast((err && err.message) || 'Could not join waitlist.', 'error');
+            wSubmit.disabled = false; wSubmit.textContent = 'Notify Me';
+          });
+      }
+      if (wSubmit) wSubmit.addEventListener('click', submitWaitlist);
+      if (wEmail) wEmail.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); submitWaitlist(); } });
+
+      // FAQ accordion
+      document.querySelectorAll('.lf-faq-q').forEach(function(q) {
+        q.addEventListener('click', function() { q.parentElement.classList.toggle('open'); });
+        q.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); q.parentElement.classList.toggle('open'); }
+        });
+      });
+
+      // Log page view for funnel analytics
+      try {
+        if (typeof PhmurtDB !== 'undefined' && PhmurtDB.logEvent) {
+          PhmurtDB.logEvent('lifetime-landing-viewed', { referrer: document.referrer ? 'has-referrer' : 'direct' });
+        }
+      } catch (e) {}
+
+      // Inline toast helper (matches pricing.html pattern)
+      function showToast(msg, type) {
+        var old = document.getElementById('lf-toast');
+        if (old) old.remove();
+        var t = document.createElement('div');
+        t.id = 'lf-toast';
+        var bg = type === 'success' ? 'rgba(34,197,94,0.15)' : type === 'error' ? 'rgba(239,68,68,0.15)' : 'rgba(201,168,76,0.12)';
+        var border = type === 'success' ? 'rgba(34,197,94,0.4)' : type === 'error' ? 'rgba(239,68,68,0.4)' : 'rgba(201,168,76,0.35)';
+        var color = type === 'success' ? '#5ee09a' : type === 'error' ? '#ef4444' : '#c9a84c';
+        t.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:10001;padding:14px 24px;border-radius:8px;font-family:Spectral,serif;font-size:15px;color:'+color+';background:'+bg+';border:1px solid '+border+';backdrop-filter:blur(12px);box-shadow:0 4px 24px rgba(0,0,0,0.3);max-width:480px;text-align:center;';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(function() { t.style.transition = 'opacity .4s'; t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 400); }, 5000);
+      }
+      window.showToast = window.showToast || showToast;
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Encounter Enemies — Preview v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Spectral:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #08080a; --bg-card: #141420; --border: rgba(255,255,255,0.11);
+    --crimson: #d4433a; --text: #f2e8d6; --text-muted: #9a8870;
+    --text-faint: #5a5040; --gold: #c9b458;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Spectral',Georgia,serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:30px 20px;}
+  .demo-wrap{width:100%;max-width:750px;}
+  h1{font-family:'Cinzel',serif;color:var(--crimson);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 16px 0;}
+
+  /* Inputs */
+  input[type="text"],select{background:var(--bg-card)!important;border:1px solid var(--border)!important;color:var(--text)!important;font-family:'Spectral',Georgia,serif;font-size:13px;padding:8px 10px;border-radius:6px;outline:none;transition:border-color .12s;}
+  input[type="text"]:focus,select:focus{border-color:rgba(212,67,58,.5)!important;}
+
+  /* ── Roster ──────────────────────────────────── */
+  .cr-roster{margin-bottom:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg-card);}
+  .cr-roster-header{font-family:'Cinzel',serif;font-size:11px;font-weight:bold;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);padding:10px 12px 6px;border-bottom:1px solid var(--border);}
+  .cr-roster-row{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;color:var(--text);}
+  .cr-roster-row:last-child{border-bottom:none;}
+  .cr-roster-info{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+  .cr-roster-name{font-family:'Cinzel',serif;font-size:14px;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cr-roster-badge{font-size:10px;font-weight:bold;font-family:'Cinzel',serif;color:var(--bg);padding:2px 8px;border-radius:12px;white-space:nowrap;flex-shrink:0;}
+  .cr-roster-controls{display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:12px;}
+  .cr-roster-btn{background:rgba(255,255,255,.08);border:1px solid var(--border);color:var(--text);width:28px;height:28px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:background .1s;font-family:inherit;}
+  .cr-roster-btn:hover{background:rgba(255,255,255,.14);}
+  .cr-roster-remove{color:#d4433a;font-size:12px;}
+  .cr-roster-remove:hover{background:rgba(212,67,58,.2);}
+  .cr-roster-count{min-width:24px;text-align:center;font-weight:700;font-size:15px;font-family:'Cinzel',serif;}
+  .cr-roster-xp{font-size:11px;color:var(--text-muted);min-width:56px;text-align:right;margin:0 6px;}
+  .cr-autocalc{font-size:12px;color:var(--text-muted);padding:6px 2px;margin-bottom:10px;}
+  .cr-autocalc strong{color:var(--text);font-weight:600;}
+
+  /* ── Picker ──────────────────────────────────── */
+  .cr-picker{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg-card);}
+  .cr-picker-toolbar{display:flex;gap:8px;padding:10px 12px;background:rgba(0,0,0,.18);border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center;}
+  .cr-picker-search-wrap{position:relative;flex:1;min-width:180px;}
+  .cr-picker-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:13px;pointer-events:none;}
+  .cr-picker-search-wrap input[type="text"]{width:100%;padding-left:30px!important;}
+  .cr-picker-toolbar select{min-width:80px;}
+  .cr-picker-filters{display:flex;gap:6px;padding:8px 12px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:rgba(0,0,0,.08);}
+  .cr-filter-pill{padding:4px 12px;border-radius:16px;cursor:pointer;font-size:11px;font-family:'Cinzel',serif;border:1px solid var(--border);background:transparent;color:var(--text-muted);transition:all .15s;white-space:nowrap;}
+  .cr-filter-pill:hover{border-color:rgba(212,67,58,.4);color:var(--text);}
+  .cr-filter-pill.active{border-color:var(--crimson);background:var(--crimson);color:var(--bg);}
+  .cr-picker-count{font-size:11px;color:var(--text-muted);padding:5px 12px 3px;font-family:'Cinzel',serif;letter-spacing:.03em;}
+  .cr-picker-list{max-height:500px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;}
+  .cr-picker-list::-webkit-scrollbar{width:6px;}
+  .cr-picker-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px;}
+
+  /* ── Monster row ─────────────────────────────── */
+  .cr-mp-row{display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.04);transition:background .1s;}
+  .cr-mp-row:last-of-type{border-bottom:none;}
+  .cr-mp-row:hover{background:rgba(255,255,255,.03);}
+  .cr-mp-row-main{display:flex;align-items:center;flex:1;padding:10px 12px;cursor:pointer;gap:10px;min-width:0;}
+  .cr-mp-row-main:hover{background:rgba(212,67,58,.06);}
+  .cr-mp-cr-stripe{width:3px;align-self:stretch;flex-shrink:0;border-radius:2px;}
+  .cr-mp-badge{font-size:10px;font-weight:bold;font-family:'Cinzel',serif;color:var(--bg);padding:2px 8px;border-radius:12px;white-space:nowrap;flex-shrink:0;}
+  .cr-mp-name{font-family:'Cinzel',serif;font-size:13px;color:var(--gold);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cr-mp-meta{display:flex;gap:12px;font-size:11px;color:var(--text-muted);flex-shrink:0;align-items:center;}
+  .cr-mp-meta-item{white-space:nowrap;}
+  .cr-mp-hb-tag{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.08em;color:var(--gold);background:rgba(201,180,88,.1);padding:1px 6px;border-radius:8px;}
+  .cr-mp-add-btn{background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;font-size:11px;font-family:'Cinzel',serif;border-radius:4px;cursor:pointer;transition:all .12s;flex-shrink:0;margin-right:4px;}
+  .cr-mp-add-btn:hover{border-color:var(--crimson);color:var(--crimson);background:rgba(212,67,58,.08);}
+  .cr-mp-expand-btn{background:none;border:none;color:var(--text-faint);cursor:pointer;padding:10px 12px 10px 6px;font-size:14px;transition:color .1s,transform .2s;flex-shrink:0;display:flex;align-items:center;}
+  .cr-mp-expand-btn:hover{color:var(--text);}
+  .cr-mp-expand-btn.open{transform:rotate(90deg);}
+
+  /* ── STAT BLOCK (traditional D&D style) ──────── */
+  .cr-statblock-wrap{display:none;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.15);padding:12px 14px 14px 14px;}
+  .cr-statblock-wrap.open{display:block;}
+
+  .cr-statblock{
+    max-width:420px; margin:0 auto;
+    background:var(--bg-card); border:1px solid var(--border);
+    border-top:3px solid var(--crimson); border-bottom:3px solid var(--crimson);
+    padding:16px 18px; font-family:'Spectral',serif; font-size:12px;
+    color:var(--text); line-height:1.5; position:relative;
+  }
+  .cr-statblock::before,.cr-statblock::after{
+    content:''; position:absolute; left:12px; right:12px; height:1px;
+    background:linear-gradient(90deg,transparent,var(--crimson),transparent);
+  }
+  .cr-statblock::before{top:0;}
+  .cr-statblock::after{bottom:0;}
+
+  .cr-sb-name{font-family:'Cinzel',serif;font-size:18px;color:var(--crimson);margin:0 0 0 0;font-weight:700;line-height:1.2;}
+  .cr-sb-subtitle{font-size:11px;font-style:italic;color:var(--text-muted);margin:0 0 10px 0;}
+  .cr-sb-divider{border:none;border-top:2px solid var(--crimson);margin:8px 0;opacity:.4;}
+  .cr-sb-prop{margin:2px 0;}
+  .cr-sb-prop-label{color:var(--crimson);font-weight:700;}
+
+  .cr-sb-abilities{display:flex;justify-content:space-around;text-align:center;margin:6px 0;padding:6px 0;border-top:1px solid rgba(212,67,58,.2);border-bottom:1px solid rgba(212,67,58,.2);}
+  .cr-sb-ability{display:flex;flex-direction:column;align-items:center;gap:1px;}
+  .cr-sb-ability-label{font-family:'Cinzel',serif;font-size:10px;font-weight:700;color:var(--crimson);letter-spacing:.04em;}
+  .cr-sb-ability-val{font-size:12px;color:var(--text);}
+
+  .cr-sb-section-title{font-family:'Cinzel',serif;font-size:13px;color:var(--crimson);margin:10px 0 4px;font-weight:700;border-bottom:1px solid rgba(212,67,58,.15);padding-bottom:2px;}
+  .cr-sb-trait{margin:4px 0;}
+  .cr-sb-trait-name{font-style:italic;font-weight:700;color:var(--text);}
+
+  .cr-mp-empty{padding:40px 20px;text-align:center;color:var(--text-muted);font-style:italic;font-size:14px;}
+  .cr-mp-empty-icon{font-size:40px;margin-bottom:12px;opacity:.2;}
+</style>
+</head>
+<body>
+
+<div class="demo-wrap">
+  <h1>Enemies <span style="font-weight:400;font-size:11px;opacity:.5;text-transform:none;letter-spacing:0;">search &amp; click to add</span></h1>
+  <div class="cr-roster" id="roster"></div>
+  <div class="cr-autocalc" id="xp-summary"></div>
+  <div class="cr-picker">
+    <div class="cr-picker-toolbar">
+      <div class="cr-picker-search-wrap">
+        <span class="cr-picker-search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <input type="text" id="mp-search" placeholder="Search monsters…" autocomplete="off" />
+      </div>
+      <select id="mp-cr"><option value="">All CRs</option></select>
+      <select id="mp-sort">
+        <option value="name">Sort: Name</option>
+        <option value="cr-asc">Sort: CR ↑</option>
+        <option value="cr-desc">Sort: CR ↓</option>
+        <option value="xp">Sort: XP</option>
+      </select>
+    </div>
+    <div class="cr-picker-filters">
+      <span style="font-size:10px;color:var(--text-faint);font-family:'Cinzel',serif;letter-spacing:.05em;align-self:center;margin-right:4px;">TYPE</span>
+      <button class="cr-filter-pill active" data-filter="type" data-val="">All</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="aberration">Aberration</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="beast">Beast</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="celestial">Celestial</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="construct">Construct</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="dragon">Dragon</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="elemental">Elemental</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="fey">Fey</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="fiend">Fiend</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="giant">Giant</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="humanoid">Humanoid</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="monstrosity">Monstrosity</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="ooze">Ooze</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="plant">Plant</button>
+      <button class="cr-filter-pill" data-filter="type" data-val="undead">Undead</button>
+    </div>
+    <div class="cr-picker-filters">
+      <span style="font-size:10px;color:var(--text-faint);font-family:'Cinzel',serif;letter-spacing:.05em;align-self:center;margin-right:4px;">SIZE</span>
+      <button class="cr-filter-pill active" data-filter="size" data-val="">All</button>
+      <button class="cr-filter-pill" data-filter="size" data-val="tiny">Tiny</button>
+      <button class="cr-filter-pill" data-filter="size" data-val="small">Small</button>
+      <button class="cr-filter-pill" data-filter="size" data-val="medium">Medium</button>
+      <button class="cr-filter-pill" data-filter="size" data-val="large">Large</button>
+      <button class="cr-filter-pill" data-filter="size" data-val="huge">Huge</button>
+      <button class="cr-filter-pill" data-filter="size" data-val="gargantuan">Gargantuan</button>
+    </div>
+    <div class="cr-picker-filters">
+      <span style="font-size:10px;color:var(--text-faint);font-family:'Cinzel',serif;letter-spacing:.05em;align-self:center;margin-right:4px;">SOURCE</span>
+      <button class="cr-filter-pill active" data-filter="source" data-val="">All</button>
+      <button class="cr-filter-pill" data-filter="source" data-val="SRD">SRD</button>
+      <button class="cr-filter-pill" data-filter="source" data-val="Homebrew">Homebrew</button>
+    </div>
+    <div class="cr-picker-count" id="mp-count"></div>
+    <div class="cr-picker-list" id="mp-list"></div>
+  </div>
+</div>
+
+<script>
+var CR_OPTS=['0','1/8','1/4','1/2','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30'];
+var CR_XP={'0':10,'1/8':25,'1/4':50,'1/2':100,'1':200,'2':450,'3':700,'4':1100,'5':1800,'6':2300,'7':2900,'8':3900,'9':5000,'10':5900,'11':7200,'12':8400,'13':10000,'14':11500,'15':13000,'16':15000,'17':18000,'18':20000,'19':22000,'20':25000,'21':33000,'22':41000,'23':50000,'24':62000,'25':75000,'26':90000,'27':105000,'28':120000,'29':135000,'30':155000};
+var CR_COLORS={'0':'#8a7c6f','1/8':'#8a7c6f','1/4':'#8a7c6f','1/2':'#8a7c6f','1':'#8a7c6f','2':'#6ba85c','3':'#5c9ba8','4':'#5c7ba8','5':'#6b5ca8','6':'#8a5ca8','7':'#a85c6b','8':'#a87c5c','9':'#a8a35c','10':'#d4433a','11':'#d4433a','12':'#d4433a','13':'#d4433a','14':'#d4433a','15':'#d4433a','16':'#d4433a','17':'#b8860b','18':'#b8860b','19':'#b8860b','20':'#b8860b','21':'#b8860b','22':'#8b0000','23':'#8b0000','24':'#8b0000','25':'#8b0000','26':'#8b0000','27':'#8b0000','28':'#8b0000','29':'#8b0000','30':'#8b0000'};
+function crColor(cr){return CR_COLORS[String(cr)]||'#8a7c6f';}
+function crToNum(cr){if(cr==='1/8')return .125;if(cr==='1/4')return .25;if(cr==='1/2')return .5;return parseFloat(cr)||0;}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
+function fmtMod(score){var m=Math.floor((score-10)/2);return(m>=0?'+':'')+m;}
+
+/* SRD monsters with full stat block data */
+var SRD_MONSTERS=[
+  {n:"Aboleth",cr:"10",type:"aberration",size:"large",align:"lawful evil",ac:17,hp:"135 (18d10+36)",spd:"10 ft., swim 40 ft.",str:21,dex:9,con:15,int:18,wis:15,cha:18,saves:"Con +6, Int +8, Wis +6",skills:"History +12, Perception +10",senses:"darkvision 120 ft., passive Perception 20",lang:"Deep Speech, telepathy 120 ft.",traits:[{n:"Amphibious",d:"The aboleth can breathe air and water."},{n:"Mucous Cloud",d:"While underwater, the aboleth is surrounded by transformative mucus."}],actions:[{n:"Multiattack",d:"The aboleth makes three tentacle attacks."},{n:"Tentacle",d:"Melee Weapon Attack: +9 to hit, reach 10 ft. Hit: 12 (2d6+5) bludgeoning damage."}]},
+  {n:"Acolyte",cr:"1/4",type:"humanoid",size:"medium",align:"any alignment",ac:10,hp:"9 (2d8)",spd:"30 ft.",str:10,dex:10,con:10,int:10,wis:14,cha:11,skills:"Medicine +4, Religion +2",senses:"passive Perception 12",lang:"any one language",traits:[{n:"Spellcasting",d:"The acolyte is a 1st-level spellcaster (spell save DC 12, +4 to hit). Cantrips: light, sacred flame, thaumaturgy. 1st level (3 slots): bless, cure wounds, sanctuary."}],actions:[{n:"Club",d:"Melee Weapon Attack: +2 to hit, reach 5 ft. Hit: 2 (1d4) bludgeoning damage."}]},
+  {n:"Adult Red Dragon",cr:"17",type:"dragon",size:"huge",align:"chaotic evil",ac:19,hp:"256 (19d12+133)",spd:"40 ft., climb 40 ft., fly 80 ft.",str:27,dex:10,con:25,int:16,wis:13,cha:21,saves:"Dex +6, Con +13, Wis +7, Cha +11",skills:"Perception +13, Stealth +6",senses:"blindsight 60 ft., darkvision 120 ft., passive Perception 23",lang:"Common, Draconic",traits:[{n:"Legendary Resistance (3/Day)",d:"If the dragon fails a saving throw, it can choose to succeed instead."}],actions:[{n:"Multiattack",d:"The dragon can use its Frightful Presence. It then makes three attacks: one with its bite and two with its claws."},{n:"Bite",d:"Melee Weapon Attack: +14 to hit, reach 10 ft. Hit: 19 (2d10+8) piercing damage plus 7 (2d6) fire damage."},{n:"Fire Breath (Recharge 5–6)",d:"The dragon exhales fire in a 60-foot cone. DC 21 Dex save, 63 (18d6) fire damage on a failure."}],legendary:[{n:"Detect",d:"The dragon makes a Wisdom (Perception) check."},{n:"Tail Attack",d:"The dragon makes a tail attack."},{n:"Wing Attack (Costs 2 Actions)",d:"The dragon beats its wings. Each creature within 10 ft. must succeed on a DC 22 Dex save or take 15 (2d6+8) bludgeoning damage."}]},
+  {n:"Ancient Red Dragon",cr:"24",type:"dragon",size:"gargantuan",align:"chaotic evil",ac:22,hp:"546 (28d20+252)",spd:"40 ft., climb 40 ft., fly 80 ft.",str:30,dex:10,con:29,int:18,wis:15,cha:23,saves:"Dex +7, Con +16, Wis +9, Cha +13",skills:"Perception +16, Stealth +7",senses:"blindsight 60 ft., darkvision 120 ft., passive Perception 26",lang:"Common, Draconic",traits:[{n:"Legendary Resistance (3/Day)",d:"If the dragon fails a saving throw, it can choose to succeed instead."}],actions:[{n:"Multiattack",d:"The dragon uses Frightful Presence then makes three attacks: one bite and two claws."},{n:"Bite",d:"Melee Weapon Attack: +17 to hit, reach 15 ft. Hit: 21 (2d10+10) piercing plus 14 (4d6) fire damage."},{n:"Fire Breath (Recharge 5–6)",d:"90-foot cone. DC 24 Dex save, 91 (26d6) fire damage on failure, half on success."}],legendary:[{n:"Detect",d:"Wisdom (Perception) check."},{n:"Tail Attack",d:"The dragon makes a tail attack."},{n:"Wing Attack (Costs 2 Actions)",d:"DC 25 Dex save or 17 (2d6+10) bludgeoning and knocked prone."}]},
+  {n:"Ancient Gold Dragon",cr:"24",type:"dragon",size:"gargantuan",align:"lawful good",ac:22,hp:"546 (28d20+252)",spd:"40 ft., fly 80 ft., swim 40 ft.",str:30,dex:14,con:29,int:18,wis:17,cha:28,saves:"Dex +9, Con +16, Wis +10, Cha +16",skills:"Insight +10, Perception +17, Persuasion +16, Stealth +9",senses:"blindsight 60 ft., darkvision 120 ft., passive Perception 27",lang:"Common, Draconic",traits:[{n:"Amphibious",d:"The dragon can breathe air and water."},{n:"Legendary Resistance (3/Day)",d:"If the dragon fails a saving throw, it can choose to succeed instead."}],actions:[{n:"Multiattack",d:"The dragon uses Frightful Presence, then three attacks: one bite and two claws."},{n:"Fire Breath (Recharge 5–6)",d:"60-foot cone. DC 24 Dex save, 71 (13d10) fire damage."},{n:"Weakening Breath (Recharge 5–6)",d:"60-foot cone. DC 24 Str save or disadvantage on Str-based attacks/checks/saves for 1 minute."}],legendary:[{n:"Detect",d:"Wisdom (Perception) check."},{n:"Tail Attack",d:"The dragon makes a tail attack."},{n:"Wing Attack (Costs 2 Actions)",d:"DC 25 Dex save or 17 (2d6+10) bludgeoning and knocked prone."}]},
+  {n:"Animated Armor",cr:"1",type:"construct",size:"medium",align:"unaligned",ac:18,hp:"33 (6d8+6)",spd:"25 ft.",str:14,dex:11,con:13,int:1,wis:3,cha:1,senses:"blindsight 60 ft., passive Perception 6",lang:"—",traits:[{n:"Antimagic Susceptibility",d:"The armor is incapacitated in an antimagic field."},{n:"False Appearance",d:"While motionless, indistinguishable from normal armor."}],actions:[{n:"Multiattack",d:"The armor makes two melee attacks."},{n:"Slam",d:"Melee Weapon Attack: +4 to hit, reach 5 ft. Hit: 5 (1d6+2) bludgeoning damage."}]},
+  {n:"Ankheg",cr:"2",type:"monstrosity",size:"large",align:"unaligned",ac:14,hp:"39 (6d10+6)",spd:"30 ft., burrow 10 ft.",str:17,dex:11,con:13,int:1,wis:13,cha:6,senses:"darkvision 60 ft., tremorsense 60 ft., passive Perception 11",lang:"—",actions:[{n:"Bite",d:"Melee Weapon Attack: +5 to hit, reach 5 ft. Hit: 10 (2d6+3) slashing plus 3 (1d6) acid."},{n:"Acid Spray (Recharge 6)",d:"30-foot line. DC 13 Dex save, 10 (3d6) acid damage."}]},
+  {n:"Balor",cr:"19",type:"fiend",size:"huge",align:"chaotic evil",ac:19,hp:"262 (21d12+126)",spd:"40 ft., fly 80 ft.",str:26,dex:15,con:22,int:20,wis:16,cha:22,saves:"Str +14, Con +12, Wis +9, Cha +12",senses:"truesight 120 ft., passive Perception 13",lang:"Abyssal, telepathy 120 ft.",traits:[{n:"Death Throes",d:"When the balor dies, it explodes. 20-foot radius, DC 20 Dex, 70 (20d6) fire damage."},{n:"Fire Aura",d:"Creatures within 5 ft. take 10 (3d6) fire damage at start of each of the balor's turns."},{n:"Magic Resistance",d:"Advantage on saving throws against spells."}],actions:[{n:"Multiattack",d:"The balor makes two attacks: one longsword and one whip."},{n:"Longsword",d:"+14 to hit, reach 10 ft. Hit: 21 (3d8+8) slashing plus 13 (3d8) lightning damage."},{n:"Whip",d:"+14 to hit, reach 30 ft. Hit: 15 (2d6+8) slashing plus 10 (3d6) fire damage. Pull target up to 25 ft."}]},
+  {n:"Bandit",cr:"1/8",type:"humanoid",size:"medium",align:"any non-lawful",ac:12,hp:"11 (2d8+2)",spd:"30 ft.",str:11,dex:12,con:12,int:10,wis:10,cha:10,senses:"passive Perception 10",lang:"any one language",actions:[{n:"Scimitar",d:"Melee Weapon Attack: +3 to hit, reach 5 ft. Hit: 4 (1d6+1) slashing."},{n:"Light Crossbow",d:"Ranged Weapon Attack: +3 to hit, range 80/320 ft. Hit: 5 (1d8+1) piercing."}]},
+  {n:"Bandit Captain",cr:"2",type:"humanoid",size:"medium",align:"any non-lawful",ac:15,hp:"65 (10d8+20)",spd:"30 ft.",str:15,dex:16,con:14,int:14,wis:11,cha:14,saves:"Str +4, Dex +5, Wis +2",skills:"Athletics +4, Deception +4",senses:"passive Perception 10",lang:"any two languages",actions:[{n:"Multiattack",d:"Three melee attacks: two with scimitar and one with dagger."},{n:"Scimitar",d:"+5 to hit, reach 5 ft. Hit: 6 (1d6+3) slashing."},{n:"Dagger",d:"+5 to hit, reach 5 ft. or range 20/60 ft. Hit: 5 (1d4+3) piercing."}]},
+  {n:"Basilisk",cr:"3",type:"monstrosity",size:"medium",align:"unaligned",ac:15,hp:"52 (8d8+16)",spd:"20 ft.",str:16,dex:8,con:15,int:2,wis:8,cha:7,senses:"darkvision 60 ft., passive Perception 9",lang:"—",traits:[{n:"Petrifying Gaze",d:"If a creature starts its turn within 30 ft. and both can see each other, the basilisk can force it to make a DC 12 Con save or be petrified."}],actions:[{n:"Bite",d:"Melee Weapon Attack: +5 to hit, reach 5 ft. Hit: 10 (2d6+3) piercing plus 7 (2d6) poison."}]},
+  {n:"Bugbear",cr:"1",type:"humanoid",size:"medium",align:"chaotic evil",ac:16,hp:"27 (5d8+5)",spd:"30 ft.",str:15,dex:14,con:13,int:8,wis:11,cha:9,skills:"Stealth +6, Survival +2",senses:"darkvision 60 ft., passive Perception 10",lang:"Common, Goblin",traits:[{n:"Brute",d:"A melee weapon deals one extra die of its damage (included)."},{n:"Surprise Attack",d:"If bugbear surprises a creature in the first round, +7 (2d6) extra damage."}],actions:[{n:"Morningstar",d:"+4 to hit, reach 5 ft. Hit: 11 (2d8+2) piercing."},{n:"Javelin",d:"+4 to hit, range 30/120 ft. Hit: 9 (2d6+2) piercing."}]},
+  {n:"Chimera",cr:"6",type:"monstrosity",size:"large",align:"chaotic evil",ac:14,hp:"114 (12d10+48)",spd:"30 ft., fly 60 ft.",str:19,dex:11,con:19,int:3,wis:14,cha:10,skills:"Perception +8",senses:"darkvision 60 ft., passive Perception 18",lang:"understands Draconic",actions:[{n:"Multiattack",d:"Three attacks: one bite, one horns, one claws. May use Fire Breath in place of bite."},{n:"Bite",d:"+7, reach 5 ft. Hit: 11 (2d6+4) piercing."},{n:"Fire Breath (Recharge 5–6)",d:"15-foot cone. DC 15 Dex, 31 (7d8) fire damage."}]},
+  {n:"Commoner",cr:"0",type:"humanoid",size:"medium",align:"any alignment",ac:10,hp:"4 (1d8)",spd:"30 ft.",str:10,dex:10,con:10,int:10,wis:10,cha:10,senses:"passive Perception 10",lang:"any one language",actions:[{n:"Club",d:"+2 to hit, reach 5 ft. Hit: 2 (1d4) bludgeoning."}]},
+  {n:"Dire Wolf",cr:"1",type:"beast",size:"large",align:"unaligned",ac:14,hp:"37 (5d10+10)",spd:"50 ft.",str:17,dex:15,con:15,int:3,wis:12,cha:7,skills:"Perception +3, Stealth +4",senses:"passive Perception 13",lang:"—",traits:[{n:"Keen Hearing and Smell",d:"Advantage on Perception checks relying on hearing or smell."},{n:"Pack Tactics",d:"Advantage on attack if an ally is within 5 ft. of the target."}],actions:[{n:"Bite",d:"+5 to hit, reach 5 ft. Hit: 10 (2d6+3) piercing. DC 13 Str save or knocked prone."}]},
+  {n:"Fire Elemental",cr:"5",type:"elemental",size:"large",align:"neutral",ac:13,hp:"102 (12d10+36)",spd:"50 ft.",str:10,dex:17,con:16,int:6,wis:10,cha:7,senses:"darkvision 60 ft., passive Perception 10",lang:"Ignan",traits:[{n:"Fire Form",d:"Can move through a space as narrow as 1 inch. Creatures that touch or hit in melee take 5 (1d10) fire damage."},{n:"Illumination",d:"Sheds bright light in a 30-foot radius."},{n:"Water Susceptibility",d:"Takes 1 cold damage per gallon of water splashed on it."}],actions:[{n:"Multiattack",d:"Two touch attacks."},{n:"Touch",d:"+6 to hit, reach 5 ft. Hit: 10 (2d6+3) fire. Flammable objects ignite."}]},
+  {n:"Goblin",cr:"1/4",type:"humanoid",size:"small",align:"neutral evil",ac:15,hp:"7 (2d6)",spd:"30 ft.",str:8,dex:14,con:10,int:10,wis:8,cha:8,skills:"Stealth +6",senses:"darkvision 60 ft., passive Perception 9",lang:"Common, Goblin",traits:[{n:"Nimble Escape",d:"The goblin can take the Disengage or Hide action as a bonus action."}],actions:[{n:"Scimitar",d:"+4 to hit, reach 5 ft. Hit: 5 (1d6+2) slashing."},{n:"Shortbow",d:"+4 to hit, range 80/320 ft. Hit: 5 (1d6+2) piercing."}]},
+  {n:"Kobold",cr:"1/8",type:"humanoid",size:"small",align:"lawful evil",ac:12,hp:"5 (2d6-2)",spd:"30 ft.",str:7,dex:15,con:9,int:8,wis:7,cha:8,senses:"darkvision 60 ft., passive Perception 8",lang:"Common, Draconic",traits:[{n:"Sunlight Sensitivity",d:"Disadvantage on attack rolls and Perception checks in sunlight."},{n:"Pack Tactics",d:"Advantage on attack if an ally is within 5 ft. of the target."}],actions:[{n:"Dagger",d:"+4 to hit, reach 5 ft. Hit: 4 (1d4+2) piercing."},{n:"Sling",d:"+4 to hit, range 30/120 ft. Hit: 4 (1d4+2) bludgeoning."}]},
+  {n:"Kraken",cr:"23",type:"monstrosity",size:"gargantuan",align:"chaotic evil",ac:18,hp:"472 (27d20+189)",spd:"20 ft., swim 60 ft.",str:30,dex:11,con:25,int:22,wis:18,cha:20,saves:"Str +17, Dex +7, Con +14, Int +13, Wis +11",senses:"truesight 120 ft., passive Perception 14",lang:"understands Abyssal, Celestial, Infernal, Primordial",traits:[{n:"Amphibious",d:"Can breathe air and water."},{n:"Freedom of Movement",d:"Ignores difficult terrain, cannot be restrained."},{n:"Siege Monster",d:"Deals double damage to objects and structures."}],actions:[{n:"Multiattack",d:"Three tentacle attacks, each of which can be replaced with Fling."},{n:"Tentacle",d:"+17 to hit, reach 30 ft. Hit: 20 (3d6+10) bludgeoning, target is grappled (escape DC 18)."},{n:"Lightning Storm",d:"Each creature within 120 ft. in water: DC 23 Dex, 22 (4d10) lightning."}],legendary:[{n:"Tentacle Attack or Fling",d:"One tentacle attack or fling."},{n:"Lightning Storm (Costs 2 Actions)",d:"The kraken uses Lightning Storm."},{n:"Ink Cloud (Costs 3 Actions)",d:"While underwater, 60-foot radius of ink. Heavily obscured for 1 minute."}]},
+  {n:"Lich",cr:"21",type:"undead",size:"medium",align:"any evil alignment",ac:17,hp:"135 (18d8+54)",spd:"30 ft.",str:11,dex:16,con:16,int:20,wis:14,cha:16,saves:"Con +10, Int +12, Wis +9",skills:"Arcana +18, History +12, Insight +9, Perception +9",senses:"truesight 120 ft., passive Perception 19",lang:"Common plus up to five others",traits:[{n:"Legendary Resistance (3/Day)",d:"If the lich fails a saving throw, it can choose to succeed instead."},{n:"Rejuvenation",d:"If it has a phylactery, a destroyed lich gains a new body in 1d10 days."},{n:"Spellcasting",d:"18th-level spellcaster (spell save DC 20, +12 to hit). Has cantrips and spells from 1st through 9th level."}],actions:[{n:"Paralyzing Touch",d:"Melee Spell Attack: +12 to hit, reach 5 ft. Hit: 10 (3d6) cold. DC 18 Con save or paralyzed for 1 minute."}],legendary:[{n:"Cantrip",d:"The lich casts a cantrip."},{n:"Paralyzing Touch (Costs 2 Actions)",d:"The lich uses Paralyzing Touch."},{n:"Frightening Gaze (Costs 2 Actions)",d:"The lich fixes its gaze on one creature. DC 18 Wis save or frightened for 1 minute."}]},
+  {n:"Orc",cr:"1/2",type:"humanoid",size:"medium",align:"chaotic evil",ac:13,hp:"15 (2d8+6)",spd:"30 ft.",str:16,dex:12,con:16,int:7,wis:11,cha:10,skills:"Intimidation +2",senses:"darkvision 60 ft., passive Perception 10",lang:"Common, Orc",traits:[{n:"Aggressive",d:"As a bonus action, the orc can move up to its speed toward a hostile creature that it can see."}],actions:[{n:"Greataxe",d:"+5 to hit, reach 5 ft. Hit: 9 (1d12+3) slashing."},{n:"Javelin",d:"+5 to hit, range 30/120 ft. Hit: 6 (1d6+3) piercing."}]},
+  {n:"Owlbear",cr:"3",type:"monstrosity",size:"large",align:"unaligned",ac:13,hp:"59 (7d10+21)",spd:"40 ft.",str:20,dex:12,con:17,int:3,wis:12,cha:7,skills:"Perception +3",senses:"darkvision 60 ft., passive Perception 13",lang:"—",traits:[{n:"Keen Sight and Smell",d:"Advantage on Perception checks relying on sight or smell."}],actions:[{n:"Multiattack",d:"Two attacks: one with beak and one with claws."},{n:"Beak",d:"+7 to hit, reach 5 ft. Hit: 10 (1d10+5) piercing."},{n:"Claws",d:"+7 to hit, reach 5 ft. Hit: 14 (2d8+5) slashing."}]},
+  {n:"Skeleton",cr:"1/4",type:"undead",size:"medium",align:"lawful evil",ac:13,hp:"13 (2d8+4)",spd:"30 ft.",str:10,dex:14,con:15,int:6,wis:8,cha:5,senses:"darkvision 60 ft., passive Perception 9",lang:"understands languages it knew in life",traits:[],actions:[{n:"Shortsword",d:"+4 to hit, reach 5 ft. Hit: 5 (1d6+2) piercing."},{n:"Shortbow",d:"+4 to hit, range 80/320 ft. Hit: 5 (1d6+2) piercing."}]},
+  {n:"Tarrasque",cr:"30",type:"monstrosity",size:"gargantuan",align:"unaligned",ac:25,hp:"676 (33d20+330)",spd:"40 ft.",str:30,dex:11,con:30,int:3,wis:11,cha:11,saves:"Int +5, Wis +9, Cha +9",senses:"blindsight 120 ft., passive Perception 10",lang:"—",traits:[{n:"Legendary Resistance (3/Day)",d:"If the tarrasque fails a saving throw, it can choose to succeed instead."},{n:"Magic Resistance",d:"Advantage on saves against spells."},{n:"Reflective Carapace",d:"Any time targeted by magic missile, a line spell, or a spell that requires a ranged attack roll, roll a d6. On a 1–5 unaffected. On a 6, reflected back at the caster."},{n:"Siege Monster",d:"Deals double damage to objects and structures."}],actions:[{n:"Multiattack",d:"Five attacks: one bite, two claws, one horns, one tail. Can use Swallow instead of bite."},{n:"Bite",d:"+19 to hit, reach 10 ft. Hit: 36 (4d12+10) piercing. Grapple (escape DC 20). Can Swallow."},{n:"Tail",d:"+19 to hit, reach 20 ft. Hit: 24 (4d6+10) bludgeoning. DC 20 Str save or knocked prone."}],legendary:[{n:"Attack",d:"One claw or tail attack."},{n:"Move",d:"The tarrasque moves up to half its speed."},{n:"Chomp (Costs 2 Actions)",d:"The tarrasque makes one bite attack or uses Swallow."}]},
+  {n:"Troll",cr:"5",type:"giant",size:"large",align:"chaotic evil",ac:15,hp:"84 (8d10+40)",spd:"30 ft.",str:18,dex:13,con:20,int:7,wis:9,cha:7,skills:"Perception +2",senses:"darkvision 60 ft., passive Perception 12",lang:"Giant",traits:[{n:"Keen Smell",d:"Advantage on Perception checks that rely on smell."},{n:"Regeneration",d:"Regains 10 HP at the start of its turn. Doesn't regenerate if it takes acid or fire damage."}],actions:[{n:"Multiattack",d:"Three attacks: one bite and two claws."},{n:"Bite",d:"+7 to hit, reach 5 ft. Hit: 7 (1d6+4) piercing."},{n:"Claw",d:"+7 to hit, reach 5 ft. Hit: 11 (2d6+4) slashing."}]},
+  {n:"Vampire",cr:"13",type:"undead",size:"medium",align:"lawful evil",ac:16,hp:"144 (17d8+68)",spd:"30 ft.",str:18,dex:18,con:18,int:17,wis:15,cha:18,saves:"Dex +9, Wis +7, Cha +9",skills:"Perception +7, Stealth +9",senses:"darkvision 120 ft., passive Perception 17",lang:"the languages it knew in life",traits:[{n:"Shapechanger",d:"Can polymorph into a Tiny bat, a Medium cloud of mist, or back to its true form."},{n:"Legendary Resistance (3/Day)",d:"If the vampire fails a saving throw, it can choose to succeed instead."},{n:"Regeneration",d:"Regains 20 HP at the start of its turn if it has at least 1 HP and isn't in sunlight or running water."}],actions:[{n:"Multiattack (Vampire Form Only)",d:"Two attacks, only one of which can be a bite."},{n:"Unarmed Strike",d:"+9, reach 5 ft. Hit: 8 (1d8+4) bludgeoning. Grapple (escape DC 18)."},{n:"Bite",d:"+9, reach 5 ft. Hit: 7 (1d6+4) piercing plus 10 (3d6) necrotic. Target's max HP reduced."}],legendary:[{n:"Move",d:"Moves up to speed without provoking opportunity attacks."},{n:"Unarmed Strike",d:"One unarmed strike."},{n:"Bite (Costs 2 Actions)",d:"One bite attack."}]},
+  {n:"Zombie",cr:"1/4",type:"undead",size:"medium",align:"neutral evil",ac:8,hp:"22 (3d8+9)",spd:"20 ft.",str:13,dex:6,con:16,int:3,wis:6,cha:5,saves:"Wis +0",senses:"darkvision 60 ft., passive Perception 8",lang:"understands languages it knew in life",traits:[{n:"Undead Fortitude",d:"If damage reduces the zombie to 0 HP, it can make a Con save (DC 5 + damage taken) to drop to 1 HP instead. Doesn't work against radiant damage or critical hits."}],actions:[{n:"Slam",d:"+3 to hit, reach 5 ft. Hit: 4 (1d6+1) bludgeoning."}]},
+  {n:"Shadow Drake",cr:"4",type:"dragon",size:"medium",align:"neutral evil",ac:15,hp:"52 (8d8+16)",spd:"30 ft., fly 60 ft.",str:14,dex:18,con:14,int:8,wis:12,cha:10,skills:"Stealth +7",senses:"darkvision 120 ft., passive Perception 11",lang:"Draconic",traits:[{n:"Shadow Blend",d:"In dim light or darkness, the drake can Hide as a bonus action."},{n:"Shadow Breath (Recharge 5–6)",d:"15-foot cone of shadow. DC 13 Con save, 18 (4d8) necrotic damage."}],actions:[{n:"Multiattack",d:"Two attacks: one bite and one claw."},{n:"Bite",d:"+6 to hit, reach 5 ft. Hit: 8 (1d8+4) piercing."},{n:"Claw",d:"+6 to hit, reach 5 ft. Hit: 7 (1d6+4) slashing."}],hb:true},
+  {n:"Flame Revenant",cr:"7",type:"undead",size:"medium",align:"chaotic evil",ac:14,hp:"85 (10d8+40)",spd:"30 ft.",str:16,dex:14,con:18,int:6,wis:10,cha:8,senses:"darkvision 60 ft., passive Perception 10",lang:"understands Common",traits:[{n:"Fire Aura",d:"Creatures within 5 ft. take 5 (1d10) fire damage at the start of the revenant's turn."},{n:"Rejuvenation",d:"If destroyed, regains a new body within 24 hours unless its remains are doused in holy water."}],actions:[{n:"Multiattack",d:"Two burning slam attacks."},{n:"Burning Slam",d:"+6 to hit, reach 5 ft. Hit: 10 (2d6+3) bludgeoning plus 7 (2d6) fire."},{n:"Immolation (Recharge 5–6)",d:"20-foot radius. DC 15 Dex, 28 (8d6) fire damage, half on success."}],hb:true},
+  {n:"Void Stalker",cr:"11",type:"aberration",size:"large",align:"chaotic evil",ac:17,hp:"152 (16d10+64)",spd:"40 ft., fly 40 ft. (hover)",str:20,dex:16,con:18,int:16,wis:14,cha:14,saves:"Wis +6, Cha +6",skills:"Perception +6, Stealth +7",senses:"truesight 60 ft., passive Perception 16",lang:"Deep Speech, telepathy 120 ft.",traits:[{n:"Magic Resistance",d:"Advantage on saves against spells."},{n:"Void Step",d:"As a bonus action, teleport up to 30 ft. to an unoccupied space the stalker can see."}],actions:[{n:"Multiattack",d:"Three attacks: two claws and one void lash."},{n:"Claw",d:"+9 to hit, reach 10 ft. Hit: 12 (2d6+5) slashing."},{n:"Void Lash",d:"+9 to hit, reach 15 ft. Hit: 18 (3d8+5) force. DC 16 Str save or pulled 10 ft."},{n:"Collapse Reality (Recharge 5–6)",d:"30-foot radius. DC 16 Int save, 36 (8d8) psychic damage and stunned until end of next turn. Half damage and not stunned on success."}],hb:true}
+];
+
+var allMonsters=SRD_MONSTERS.map(function(m){
+  return{name:m.n,cr:m.cr,type:m.type||'',size:m.size||'medium',align:m.align||'unaligned',ac:m.ac||10,hp:m.hp||'',spd:m.spd||'30 ft.',
+    str:m.str||10,dex:m.dex||10,con:m.con||10,int:m.int||10,wis:m.wis||10,cha:m.cha||10,
+    saves:m.saves||'',skills:m.skills||'',senses:m.senses||'',lang:m.lang||'—',
+    traits:m.traits||[],actions:m.actions||[],legendary:m.legendary||[],source:m.hb?'Homebrew':'SRD'};
+});
+
+/* Populate CR dropdown */
+var crSel=document.getElementById('mp-cr');
+CR_OPTS.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent='CR '+c;crSel.appendChild(o);});
+
+var filters={type:'',size:'',source:''};
+var expandedName=null;
+var encounter=[];
+
+/* ── Stat block renderer ──────────────────────── */
+function renderStatBlock(m){
+  var xp=CR_XP[m.cr]||0;
+  var html='<div class="cr-statblock">';
+  html+='<div class="cr-sb-name">'+esc(m.name)+'</div>';
+  html+='<div class="cr-sb-subtitle">'+cap(m.size)+' '+m.type+', '+m.align+'</div>';
+  html+='<hr class="cr-sb-divider" />';
+  html+='<div class="cr-sb-prop"><span class="cr-sb-prop-label">Armor Class</span> '+m.ac+'</div>';
+  html+='<div class="cr-sb-prop"><span class="cr-sb-prop-label">Hit Points</span> '+esc(m.hp)+'</div>';
+  html+='<div class="cr-sb-prop"><span class="cr-sb-prop-label">Speed</span> '+esc(m.spd)+'</div>';
+  html+='<hr class="cr-sb-divider" />';
+  html+='<div class="cr-sb-abilities">';
+  ['STR','DEX','CON','INT','WIS','CHA'].forEach(function(ab,i){
+    var key=['str','dex','con','int','wis','cha'][i];
+    var val=m[key]||10;
+    html+='<div class="cr-sb-ability"><div class="cr-sb-ability-label">'+ab+'</div><div class="cr-sb-ability-val">'+val+' ('+fmtMod(val)+')</div></div>';
+  });
+  html+='</div>';
+  html+='<hr class="cr-sb-divider" />';
+  if(m.saves) html+='<div class="cr-sb-prop"><span class="cr-sb-prop-label">Saving Throws</span> '+esc(m.saves)+'</div>';
+  if(m.skills) html+='<div class="cr-sb-prop"><span class="cr-sb-prop-label">Skills</span> '+esc(m.skills)+'</div>';
+  if(m.senses) html+='<div class="cr-sb-prop"><span class="cr-sb-prop-label">Senses</span> '+esc(m.senses)+'</div>';
+  if(m.lang) html+='<div class="cr-sb-prop"><span class="cr-sb-prop-label">Languages</span> '+esc(m.lang)+'</div>';
+  html+='<div class="cr-sb-prop"><span class="cr-sb-prop-label">Challenge</span> '+esc(m.cr)+' ('+xp.toLocaleString()+' XP)</div>';
+  if(m.traits&&m.traits.length){
+    html+='<hr class="cr-sb-divider" />';
+    m.traits.forEach(function(t){html+='<div class="cr-sb-trait"><span class="cr-sb-trait-name">'+esc(t.n)+'.</span> '+esc(t.d)+'</div>';});
+  }
+  if(m.actions&&m.actions.length){
+    html+='<div class="cr-sb-section-title">Actions</div>';
+    m.actions.forEach(function(a){html+='<div class="cr-sb-trait"><span class="cr-sb-trait-name">'+esc(a.n)+'.</span> '+esc(a.d)+'</div>';});
+  }
+  if(m.legendary&&m.legendary.length){
+    html+='<div class="cr-sb-section-title">Legendary Actions</div>';
+    html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;font-style:italic;">The creature can take 3 legendary actions, choosing from the options below. Only one can be used at a time and only at the end of another creature\'s turn. Spent legendary actions are regained at the start of each turn.</div>';
+    m.legendary.forEach(function(la){html+='<div class="cr-sb-trait"><span class="cr-sb-trait-name">'+esc(la.n)+'.</span> '+esc(la.d)+'</div>';});
+  }
+  html+='</div>';
+  return html;
+}
+
+/* ── Roster ───────────────────────────────────── */
+function renderRoster(){
+  var el=document.getElementById('roster'), xpEl=document.getElementById('xp-summary');
+  if(!encounter.length){el.style.display='none';xpEl.innerHTML='Total: 0 monsters · 0 XP';return;}
+  el.style.display='';
+  var totalXp=0,totalCount=0;
+  var html='<div class="cr-roster-header">Current Encounter</div>';
+  encounter.forEach(function(m,i){
+    var xp=CR_XP[m.cr]||0,col=crColor(m.cr),rowXp=(m.count||1)*xp;
+    totalXp+=rowXp;totalCount+=(m.count||1);
+    html+='<div class="cr-roster-row" style="border-left:3px solid '+col+'"><div class="cr-roster-info"><span class="cr-roster-name">'+esc(m.name)+'</span><span class="cr-roster-badge" style="background:'+col+'">CR '+esc(m.cr)+'</span></div><div class="cr-roster-controls"><button class="cr-roster-btn" onclick="decMonster('+i+')">−</button><span class="cr-roster-count">'+(m.count||1)+'</span><button class="cr-roster-btn" onclick="incMonster('+i+')">+</button><span class="cr-roster-xp">'+rowXp+' XP</span><button class="cr-roster-btn cr-roster-remove" onclick="removeMonster('+i+')">✕</button></div></div>';
+  });
+  el.innerHTML=html;
+  var mult=totalCount<=1?1:totalCount===2?1.5:totalCount<=6?2:totalCount<=10?2.5:totalCount<=14?3:4;
+  xpEl.innerHTML='Total: '+totalCount+' monster(s) · raw '+totalXp+' XP × '+mult+' = <strong>'+Math.round(totalXp*mult)+' adj XP</strong>';
+}
+function incMonster(i){encounter[i].count=(encounter[i].count||1)+1;renderRoster();}
+function decMonster(i){var c=(encounter[i].count||1)-1;if(c<1)encounter.splice(i,1);else encounter[i].count=c;renderRoster();}
+function removeMonster(i){encounter.splice(i,1);renderRoster();}
+function addMonster(name,cr){var ex=-1;encounter.forEach(function(m,i){if(m.name===name&&m.cr===cr)ex=i;});if(ex>=0)encounter[ex].count=(encounter[ex].count||1)+1;else encounter.push({name:name,cr:cr,count:1});renderRoster();}
+
+/* ── Picker ───────────────────────────────────── */
+function renderGrid(){
+  var q=(document.getElementById('mp-search').value||'').toLowerCase().trim();
+  var crF=document.getElementById('mp-cr').value;
+  var sortV=document.getElementById('mp-sort').value;
+  var listEl=document.getElementById('mp-list');
+  var countEl=document.getElementById('mp-count');
+  var filtered=allMonsters.filter(function(m){
+    if(q&&m.name.toLowerCase().indexOf(q)===-1)return false;
+    if(crF&&m.cr!==crF)return false;
+    if(filters.type&&m.type!==filters.type)return false;
+    if(filters.size&&m.size!==filters.size)return false;
+    if(filters.source&&m.source!==filters.source)return false;
+    return true;
+  });
+  filtered.sort(function(a,b){
+    if(sortV==='cr-asc')return crToNum(a.cr)-crToNum(b.cr)||a.name.localeCompare(b.name);
+    if(sortV==='cr-desc')return crToNum(b.cr)-crToNum(a.cr)||a.name.localeCompare(b.name);
+    if(sortV==='xp')return(CR_XP[b.cr]||0)-(CR_XP[a.cr]||0)||a.name.localeCompare(b.name);
+    return a.name.localeCompare(b.name);
+  });
+  countEl.textContent=filtered.length+' monster'+(filtered.length!==1?'s':'');
+  if(!filtered.length){listEl.innerHTML='<div class="cr-mp-empty"><div class="cr-mp-empty-icon">&#9737;</div><div>No monsters match your filters</div></div>';return;}
+
+  listEl.innerHTML=filtered.map(function(m){
+    var xp=CR_XP[m.cr]||0,col=crColor(m.cr),isOpen=(expandedName===m.name);
+    return '<div class="cr-mp-row">'+
+      '<div class="cr-mp-cr-stripe" style="background:'+col+'"></div>'+
+      '<div class="cr-mp-row-main" data-add-name="'+esc(m.name)+'" data-add-cr="'+esc(m.cr)+'">'+
+        '<span class="cr-mp-badge" style="background:'+col+'">CR '+esc(m.cr)+'</span>'+
+        '<span class="cr-mp-name">'+esc(m.name)+'</span>'+
+        '<span class="cr-mp-meta">'+
+          '<span class="cr-mp-meta-item">'+cap(m.type)+'</span>'+
+          '<span class="cr-mp-meta-item">'+cap(m.size)+'</span>'+
+          '<span class="cr-mp-meta-item">'+xp+' XP</span>'+
+          (m.source==='Homebrew'?'<span class="cr-mp-hb-tag">HB</span>':'')+
+        '</span>'+
+        '<button class="cr-mp-add-btn" data-add-name="'+esc(m.name)+'" data-add-cr="'+esc(m.cr)+'">+ Add</button>'+
+      '</div>'+
+      '<button class="cr-mp-expand-btn'+(isOpen?' open':'')+'" data-expand="'+esc(m.name)+'">&#9654;</button>'+
+    '</div>'+
+    '<div class="cr-statblock-wrap'+(isOpen?' open':'')+'" data-detail="'+esc(m.name)+'">'+
+      renderStatBlock(m)+
+    '</div>';
+  }).join('');
+}
+
+/* Events */
+document.getElementById('mp-search').addEventListener('input',renderGrid);
+document.getElementById('mp-cr').addEventListener('change',renderGrid);
+document.getElementById('mp-sort').addEventListener('change',renderGrid);
+
+document.querySelectorAll('.cr-filter-pill').forEach(function(pill){
+  pill.addEventListener('click',function(){
+    var fKey=this.getAttribute('data-filter'),fVal=this.getAttribute('data-val');
+    filters[fKey]=fVal;
+    this.parentElement.querySelectorAll('.cr-filter-pill[data-filter="'+fKey+'"]').forEach(function(p){p.classList.toggle('active',p.getAttribute('data-val')===fVal);});
+    renderGrid();
+  });
+});
+
+document.getElementById('mp-list').addEventListener('click',function(e){
+  var expBtn=e.target.closest('.cr-mp-expand-btn');
+  if(expBtn){expandedName=(expandedName===expBtn.getAttribute('data-expand'))?null:expBtn.getAttribute('data-expand');renderGrid();return;}
+  var addEl=e.target.closest('[data-add-name]');
+  if(addEl){addMonster(addEl.getAttribute('data-add-name'),addEl.getAttribute('data-add-cr'));return;}
+});
+
+renderGrid();renderRoster();
+</script>
+</body>
+</html>

@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co https://*.supabase.in https://*.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), usb=(), payment=(), serial=(), bluetooth=()" />
+  <title>Character Gallery · Phmurt Studios</title>
+  <meta name="description" content="Browse premade D&D 5e characters ready to play, or explore community-created heroes for inspiration." />
+  <meta property="og:title" content="Character Gallery · Phmurt Studios" />
+  <meta property="og:description" content="Browse premade D&D 5e characters ready to play, or explore community-created heroes for inspiration." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://phmurtstudios.com/gallery.html" />
+  <meta property="og:image" content="https://phmurtstudios.com/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Character Gallery · Phmurt Studios" />
+  <meta name="twitter:description" content="Browse premade D&D 5e characters ready to play, or explore community-created heroes for inspiration." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://zrfmboqoyrqsyckktgpv.supabase.co" />
+  <link rel="dns-prefetch" href="https://js.stripe.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="style.css?v=186" />
+  <script src="theme.js?v=186"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.0" crossorigin="anonymous" integrity="sha384-fm42zLXjam4N3lT5umWgNtBBPMP3Ddrdmr9lnPKtDWzs5Dqy457Yn6+eTvCgRU3n"></script>
+  <script src="supabase-config.js?v=186"></script>
+  <script defer src="stripe-env.js?v=188"></script>
+  <script src="stripe-config.js?v=186"></script>
+  <script src="phmurt-auth.js?v=187"></script>
+  <link rel="canonical" href="https://phmurtstudios.com/gallery.html" />
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"CollectionPage","name":"Premade D&D 5e Characters — Phmurt Studios","url":"https://phmurtstudios.com/gallery.html","description":"40 ready-to-play D&D 5e characters across every class and level, with full character sheets and one-click save.","isPartOf":{"@type":"WebSite","name":"Phmurt Studios","url":"https://phmurtstudios.com/"}}
+  </script>
+  <style>
+    /* ═══════════════════════════════════════════════════
+       GALLERY — REDESIGNED
+       ═══════════════════════════════════════════════════ */
+
+    .gallery-hero {
+      padding: 52px 56px 40px;
+      text-align: center;
+    }
+    .gallery-hero-title {
+      font-family: 'Cinzel', serif;
+      font-size: 44px;
+      font-weight: 400;
+      letter-spacing: 2px;
+      color: var(--text, #f2e8d6);
+      margin-bottom: 8px;
+    }
+    .gallery-hero-sub {
+      font-size: 15px;
+      font-style: italic;
+      color: var(--text-muted, #9a8870);
+      letter-spacing: .5px;
+    }
+
+    /* ─── FILTER BAR ─── */
+    .gal-filters {
+      padding: 20px 56px;
+      border-top: 1px solid var(--border, #2a2a3a);
+      border-bottom: 1px solid var(--border, #2a2a3a);
+      background: var(--bg-mid, #0e0e18);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .gf-group { display: flex; gap: 8px; align-items: center; }
+    .gf-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--text-muted, #9a8870);
+      text-transform: uppercase;
+    }
+    .gf-select, .gf-input {
+      font-family: 'Spectral', serif;
+      font-size: 13px;
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, #2a2a3a);
+      color: var(--text, #f2e8d6);
+      padding: 7px 10px;
+      border-radius: 2px;
+    }
+    .gf-input::placeholder { color: var(--text-muted, #9a8870); }
+    .gf-select:focus, .gf-input:focus {
+      outline: none;
+      border-color: var(--crimson, #d4433a);
+      box-shadow: 0 0 6px rgba(192,57,43,.15);
+    }
+    .gf-search { flex: 1; min-width: 160px; }
+
+    /* ─── RESULTS BAR ─── */
+    .gal-results-bar {
+      padding: 12px 56px;
+      font-size: 12px;
+      color: var(--text-muted, #9a8870);
+      font-style: italic;
+      border-bottom: 1px solid var(--border, #2a2a3a);
+    }
+
+    /* ─── GRID ─── */
+    .gal-section { padding: 48px 56px; }
+    .gal-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    @media (max-width:1200px) { .gal-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width:768px)  { .gal-grid { grid-template-columns: 1fr; } }
+
+    /* ─── CHARACTER CARD ─── */
+    .gc {
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, #2a2a3a);
+      border-left: 4px solid var(--card-accent, var(--crimson, #d4433a));
+      border-radius: 4px;
+      padding: 22px 22px 18px;
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .gc:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,.35);
+      border-color: var(--card-accent, var(--crimson, #d4433a));
+    }
+
+    /* class accent colors */
+    .gc--barbarian  { --card-accent: #d24545; }
+    .gc--bard       { --card-accent: #b895a8; }
+    .gc--cleric     { --card-accent: #f4d03f; }
+    .gc--druid      { --card-accent: #52b788; }
+    .gc--fighter    { --card-accent: #8b7355; }
+    .gc--monk       { --card-accent: #4a90e2; }
+    .gc--paladin    { --card-accent: #f0ad4e; }
+    .gc--ranger     { --card-accent: #66bb6a; }
+    .gc--rogue      { --card-accent: #5a4a7f; }
+    .gc--sorcerer   { --card-accent: #e8605a; }
+    .gc--warlock    { --card-accent: #b574ff; }
+    .gc--wizard     { --card-accent: #58aaff; }
+
+    /* card header */
+    .gc-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .gc-icon {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--card-accent, #d4433a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      background: rgba(0,0,0,.25);
+      color: var(--card-accent, #d4433a);
+    }
+    .gc-name {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: .5px;
+      color: var(--text, #f2e8d6);
+      line-height: 1.2;
+    }
+    .gc-subtitle {
+      font-size: 11px;
+      color: var(--text-muted, #9a8870);
+      margin-top: 3px;
+    }
+
+    /* meta pills */
+    .gc-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .gc-pill {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted, #9a8870);
+      background: var(--bg-mid, #0e0e18);
+      padding: 3px 8px;
+      border-radius: 2px;
+    }
+    .gc-pill--level {
+      color: var(--card-accent, #d4433a);
+      border: 1px solid var(--card-accent, #d4433a);
+      background: transparent;
+    }
+
+    /* ability row */
+    .gc-abs {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      margin-bottom: 14px;
+      padding: 10px 0;
+      border-top: 1px solid var(--border, #2a2a3a);
+      border-bottom: 1px solid var(--border, #2a2a3a);
+    }
+    .gc-ab { text-align: center; }
+    .gc-ab-label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      letter-spacing: 1px;
+      color: var(--text-muted, #9a8870);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .gc-ab-score {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text, #f2e8d6);
+      line-height: 1;
+    }
+    .gc-ab-mod {
+      font-size: 10px;
+      color: var(--text-muted, #9a8870);
+    }
+
+    /* flavor */
+    .gc-flavor {
+      font-size: 12px;
+      font-style: italic;
+      color: var(--text-muted, #9a8870);
+      line-height: 1.5;
+      margin-bottom: 14px;
+      flex: 1;
+    }
+
+    /* combat stats row (for detailed characters) */
+    .gc-combat {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .gc-stat {
+      text-align: center;
+      flex: 1;
+      padding: 6px 4px;
+      background: var(--bg-mid, #0e0e18);
+      border-radius: 2px;
+    }
+    .gc-stat-val {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      color: var(--text, #f2e8d6);
+      font-weight: 500;
+    }
+    .gc-stat-label {
+      font-size: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted, #9a8870);
+    }
+
+    /* buttons */
+    .gc-btns { display: flex; gap: 8px; margin-top: auto; }
+    .gc-btn {
+      flex: 1;
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 9px 8px;
+      border: 1px solid var(--border, #2a2a3a);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all .2s;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .gc-btn--view {
+      background: var(--card-accent, #d4433a);
+      color: #f5f0e8;
+      border-color: var(--card-accent, #d4433a);
+    }
+    .gc-btn--view:hover { opacity: .85; }
+    .gc-btn--add {
+      background: transparent;
+      color: var(--text-muted, #9a8870);
+    }
+    .gc-btn--add:hover {
+      border-color: var(--card-accent, #d4433a);
+      color: var(--text, #f2e8d6);
+    }
+
+    /* ─── FULL SHEET MODAL ─── */
+    .sheet-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(0,0,0,.75);
+      overflow-y: auto;
+      padding: 40px 20px;
+    }
+    .sheet-overlay.open { display: flex; justify-content: center; align-items: flex-start; }
+
+    .sheet-panel {
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, #2a2a3a);
+      border-radius: 6px;
+      max-width: 920px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* sheet header */
+    .sh-header {
+      padding: 28px 32px 20px;
+      border-bottom: 1px solid var(--border, #2a2a3a);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .sh-title {
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--text, #f2e8d6);
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .sh-sub {
+      font-size: 13px;
+      color: var(--text-muted, #9a8870);
+      font-style: italic;
+    }
+    .sh-close {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border, #2a2a3a);
+      border-radius: 50%;
+      background: transparent;
+      color: var(--text-muted, #9a8870);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all .2s;
+    }
+    .sh-close:hover {
+      border-color: var(--crimson, #d4433a);
+      color: var(--text, #f2e8d6);
+    }
+
+    /* sheet combat stats banner */
+    .sh-combat {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border, #2a2a3a);
+      background: var(--bg-mid, #0e0e18);
+    }
+    .sh-combat-stat {
+      flex: 1;
+      text-align: center;
+      padding: 14px 12px;
+      border-right: 1px solid var(--border, #2a2a3a);
+    }
+    .sh-combat-stat:last-child { border-right: none; }
+    .sh-combat-val {
+      font-family: 'Cinzel', serif;
+      font-size: 22px;
+      color: var(--text, #f2e8d6);
+      font-weight: 500;
+    }
+    .sh-combat-label {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted, #9a8870);
+      margin-top: 2px;
+    }
+
+    /* sheet body */
+    .sh-body {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 0;
+    }
+
+    /* sheet left column (abilities + saves + skills) */
+    .sh-left {
+      padding: 24px;
+      border-right: 1px solid var(--border, #2a2a3a);
+    }
+
+    .sh-section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted, #9a8870);
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border, #2a2a3a);
+    }
+
+    /* ability score boxes */
+    .sh-abilities {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .sh-ab-box {
+      text-align: center;
+      padding: 10px 6px 8px;
+      border: 1px solid var(--border, #2a2a3a);
+      border-radius: 4px;
+      background: var(--bg, #08080a);
+    }
+    .sh-ab-score {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text, #f2e8d6);
+      line-height: 1;
+    }
+    .sh-ab-mod {
+      font-size: 13px;
+      color: var(--card-accent, #d4433a);
+      margin: 2px 0;
+    }
+    .sh-ab-name {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted, #9a8870);
+    }
+
+    /* saves list */
+    .sh-saves { margin-bottom: 24px; }
+    .sh-save-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+      font-size: 12px;
+      color: var(--text-dim, #c0b8a0);
+    }
+    .sh-save-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      border: 1px solid var(--text-muted, #9a8870);
+      flex-shrink: 0;
+    }
+    .sh-save-dot.prof {
+      background: var(--card-accent, #d4433a);
+      border-color: var(--card-accent, #d4433a);
+    }
+    .sh-save-bonus {
+      margin-left: auto;
+      font-weight: 500;
+      color: var(--text, #f2e8d6);
+    }
+
+    /* skills list */
+    .sh-skills { margin-bottom: 24px; }
+    .sh-skill-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0;
+      font-size: 11px;
+      color: var(--text-dim, #c0b8a0);
+    }
+    .sh-skill-bonus {
+      margin-left: auto;
+      font-weight: 500;
+      color: var(--text, #f2e8d6);
+      min-width: 24px;
+      text-align: right;
+    }
+
+    /* sheet right column */
+    .sh-right { padding: 24px; }
+
+    /* attacks table */
+    .sh-attacks { margin-bottom: 24px; }
+    .sh-atk-table { width: 100%; border-collapse: collapse; }
+    .sh-atk-table th {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted, #9a8870);
+      text-align: left;
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border, #2a2a3a);
+    }
+    .sh-atk-table td {
+      font-size: 12px;
+      color: var(--text-dim, #c0b8a0);
+      padding: 8px;
+      border-bottom: 1px solid rgba(42,42,58,.4);
+    }
+    .sh-atk-name { color: var(--text, #f2e8d6); font-weight: 500; }
+
+    /* features list */
+    .sh-features { margin-bottom: 24px; }
+    .sh-feat {
+      margin-bottom: 10px;
+      padding-left: 14px;
+      position: relative;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-dim, #c0b8a0);
+    }
+    .sh-feat::before {
+      content: '\25AA';
+      position: absolute;
+      left: 0;
+      color: var(--card-accent, #d4433a);
+    }
+    .sh-feat-name { color: var(--text, #f2e8d6); font-weight: 500; }
+
+    /* equipment list */
+    .sh-equip { margin-bottom: 24px; }
+    .sh-equip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .sh-equip-tag {
+      font-size: 11px;
+      color: var(--text-dim, #c0b8a0);
+      background: var(--bg, #08080a);
+      padding: 4px 10px;
+      border-radius: 2px;
+      border: 1px solid rgba(42,42,58,.4);
+    }
+
+    /* backstory / personality */
+    .sh-footer {
+      padding: 20px 32px 28px;
+      border-top: 1px solid var(--border, #2a2a3a);
+    }
+    .sh-footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .sh-footer-block p {
+      font-size: 13px;
+      color: var(--text-dim, #c0b8a0);
+      line-height: 1.6;
+    }
+
+    /* sheet add button */
+    .sh-add-bar {
+      padding: 16px 32px;
+      border-top: 1px solid var(--border, #2a2a3a);
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      background: var(--bg-mid, #0e0e18);
+    }
+    .sh-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all .2s;
+      border: 1px solid var(--border, #2a2a3a);
+    }
+    .sh-btn--add {
+      background: var(--crimson, #d4433a);
+      color: #f5f0e8;
+      border-color: var(--crimson, #d4433a);
+    }
+    .sh-btn--add:hover { opacity: .85; }
+    .sh-btn--close {
+      background: transparent;
+      color: var(--text-muted, #9a8870);
+    }
+    .sh-btn--close:hover {
+      border-color: var(--text-muted, #9a8870);
+      color: var(--text, #f2e8d6);
+    }
+
+    /* ─── TOAST ─── */
+    .gal-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--crimson, #d4433a);
+      color: var(--text, #f2e8d6);
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-size: 13px;
+      z-index: 9500;
+      transition: transform .3s ease;
+      pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,.5);
+    }
+    .gal-toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ─── COMMUNITY CHARACTERS ─── */
+    .gal-community { padding: 48px 56px 56px; }
+    .gal-community-header { margin-bottom: 32px; }
+    .gal-community-eyebrow {
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 5px;
+      color: var(--crimson, #d4433a); text-transform: uppercase; margin-bottom: 16px;
+    }
+    .gal-community-title {
+      font-size: 36px; font-weight: 300; color: var(--text, #f2e8d6);
+      margin-bottom: 8px; line-height: 1.1;
+    }
+    .gal-community-desc {
+      font-size: 16px; color: var(--text-dim, #cfc0a8); font-style: italic;
+      line-height: 1.7; max-width: 560px;
+    }
+    .gal-community-empty {
+      text-align: center; padding: 48px 24px; color: var(--text-faint, #8a7a62);
+      font-style: italic; font-size: 15px;
+    }
+    .gc--community .gc-author {
+      font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text-faint, #8a7a62); margin-top: 4px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width:768px) {
+      .gallery-hero { padding: 36px 20px 28px; }
+      .gallery-hero-title { font-size: 32px; }
+      .gal-filters { padding: 16px 20px; flex-direction: column; gap: 10px; }
+      .gf-group { width: 100%; }
+      .gf-search { width: 100%; min-width: 0; }
+      .gal-results-bar { padding: 10px 20px; }
+      .gal-section { padding: 32px 20px; }
+      .gal-community { padding: 36px 20px 40px; }
+      .gal-community-title { font-size: 28px; }
+      .gal-grid { gap: 16px; }
+      .sh-body { grid-template-columns: 1fr; }
+      .sh-left { border-right: none; border-bottom: 1px solid var(--border, #2a2a3a); }
+      .sh-header { padding: 20px; }
+      .sh-footer { padding: 16px 20px; }
+      .sh-footer-grid { grid-template-columns: 1fr; }
+      .sh-add-bar { padding: 14px 20px; }
+      .sh-right { padding: 20px; }
+      .sheet-overlay { padding: 20px 10px; }
+    }
+    @media (max-width:480px) {
+      .gc-abs { grid-template-columns: repeat(3,1fr); gap: 6px; }
+      .sh-abilities { grid-template-columns: repeat(2,1fr); }
+      .sh-combat { flex-wrap: wrap; }
+      .sh-combat-stat { min-width: 33%; }
+    }
+    @media (max-width:375px) {
+      .gallery-hero { padding: 28px 14px 20px; }
+      .gallery-hero-title { font-size: 26px; }
+      .gal-filters { padding: 12px 14px; }
+      .gal-section { padding: 24px 14px; }
+      .gc { padding: 16px 14px 14px; }
+      .gc-name { font-size: 16px; }
+      .gc-icon { width: 40px; height: 40px; font-size: 18px; }
+      .gc-btns { flex-direction: column; }
+      .sh-header { flex-direction: column; gap: 12px; }
+    }
+  </style>
+</head>
+<body data-nav-active="Getting Started" data-breadcrumb="Home / Getting Started / Character Gallery" data-footer-copy="Roll Well. Play Weird.">
+  <a href="#main-content" class="ps-skip-nav">Skip to content</a>
+  <div id="ps-site-shell"></div>
+  <div id="ps-page-breadcrumb"></div>
+
+  <!-- HERO -->
+  <div class="gallery-hero">
+    <h1 class="gallery-hero-title">Character Gallery</h1>
+    <p class="gallery-hero-sub">Premade heroes ready to play — grab one and start your adventure</p>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="gal-filters">
+    <div class="gf-group">
+      <label for="filter-class" class="gf-label">Class</label>
+      <select id="filter-class" class="gf-select">
+        <option value="">All</option>
+        <option value="Barbarian">Barbarian</option>
+        <option value="Bard">Bard</option>
+        <option value="Cleric">Cleric</option>
+        <option value="Druid">Druid</option>
+        <option value="Fighter">Fighter</option>
+        <option value="Monk">Monk</option>
+        <option value="Paladin">Paladin</option>
+        <option value="Ranger">Ranger</option>
+        <option value="Rogue">Rogue</option>
+        <option value="Sorcerer">Sorcerer</option>
+        <option value="Warlock">Warlock</option>
+        <option value="Wizard">Wizard</option>
+      </select>
+    </div>
+    <div class="gf-group">
+      <label for="filter-race" class="gf-label">Race</label>
+      <select id="filter-race" class="gf-select">
+        <option value="">All</option>
+        <option value="Human">Human</option>
+        <option value="Variant Human">Variant Human</option>
+        <option value="Dwarf">Dwarf</option>
+        <option value="Elf">Elf</option>
+        <option value="High Elf">High Elf</option>
+        <option value="Wood Elf">Wood Elf</option>
+        <option value="Dark Elf">Dark Elf</option>
+        <option value="Eladrin">Eladrin</option>
+        <option value="Half-Elf">Half-Elf</option>
+        <option value="Half-Orc">Half-Orc</option>
+        <option value="Halfling">Halfling</option>
+        <option value="Lightfoot Halfling">Lightfoot Halfling</option>
+        <option value="Stout Halfling">Stout Halfling</option>
+        <option value="Gnome">Gnome</option>
+        <option value="Rock Gnome">Rock Gnome</option>
+        <option value="Forest Gnome">Forest Gnome</option>
+        <option value="Tiefling">Tiefling</option>
+        <option value="Dragonborn">Dragonborn</option>
+      </select>
+    </div>
+    <div class="gf-group">
+      <label for="filter-level" class="gf-label">Level</label>
+      <select id="filter-level" class="gf-select">
+        <option value="">All</option>
+        <option value="1">1</option>
+        <option value="3">3</option>
+        <option value="5">5</option>
+        <option value="7">7</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+      </select>
+    </div>
+    <div class="gf-group gf-search">
+      <input type="text" id="search-input" class="gf-input" placeholder="Search by name..." />
+    </div>
+    <div class="gf-group">
+      <label for="sort-by" class="gf-label">Sort</label>
+      <select id="sort-by" class="gf-select">
+        <option value="name">Name</option>
+        <option value="class">Class</option>
+        <option value="level">Level</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- RESULTS BAR -->
+  <div class="gal-results-bar" id="results-bar">Showing 40 characters</div>
+
+  <!-- GRID -->
+  <div class="gal-section" id="main-content">
+    <div class="gal-grid" id="character-grid"></div>
+  </div>
+
+  <!-- COMMUNITY CHARACTERS -->
+  <div class="ps-divider" style="margin:48px 0 0;"><div class="ps-div-line"></div><div class="ps-div-ornament"><div class="ps-div-dot"></div><div class="ps-div-gem"></div><div class="ps-div-dot"></div></div><div class="ps-div-line r"></div></div>
+  <div class="gal-community" id="community-section" style="display:none;">
+    <div class="gal-community-header">
+      <div class="gal-community-eyebrow">&#10022; Community</div>
+      <h2 class="gal-community-title">Player-Shared Characters</h2>
+      <p class="gal-community-desc">Characters created and shared by the community. Add any to your roster with one click.</p>
+    </div>
+    <div class="gal-grid" id="community-grid"></div>
+  </div>
+
+  <!-- FULL SHEET MODAL -->
+  <div class="sheet-overlay" id="sheet-overlay">
+    <div class="sheet-panel" id="sheet-panel"></div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="gal-toast" id="gal-toast"></div>
+
+  <script>
+    /* ═══════════════════════════════════════════════════
+       CHARACTER DATA
+       ═══════════════════════════════════════════════════ */
+    var CHARACTERS = [
+      /* ─── LEVEL 3 (one per class) ─── */
+      {
+        name: 'Kael the Ironwolf', class: 'Barbarian', race: 'Human', level: 3,
+        subclass: 'Totem Warrior', icon: '\u26A1',
+        flavor: 'A human warrior who channels the spirit of the wolf in battle.',
+        abilities: { STR: 16, DEX: 12, CON: 15, INT: 10, WIS: 13, CHA: 9 },
+        features: ['Rage \u2014 Enter a frenzy of destruction and damage reduction','Reckless Attack \u2014 Strike with wild abandon and advantage','Totem Spirit (Wolf) \u2014 Allies have advantage on melee attacks against enemies near you'],
+        equipment: ['Greataxe','Hide Armor','Shield','Bedroll','Rope','Backpack'],
+        traits: 'Fierce and loyal, Kael fights alongside his allies with the ferocity of a wild wolf.',
+        backstory: 'Raised by a nomadic tribe, Kael earned his name after surviving a winter alone in the wild. He follows the wolf spirit.'
+      },
+      {
+        name: 'Lydia Whisperwind', class: 'Bard', race: 'Half-Elf', level: 3,
+        subclass: 'College of Lore', icon: '\u266A',
+        flavor: 'A half-elf minstrel who collects secrets and songs from every tavern.',
+        abilities: { CHA: 16, DEX: 14, CON: 12, INT: 13, WIS: 10, STR: 8 },
+        features: ['Bardic Inspiration \u2014 Grant allies bonus dice on rolls','Jack of All Trades \u2014 Add half proficiency to unchecked skills','Cutting Words \u2014 Reduce enemy rolls with sharp insults'],
+        equipment: ['Rapier','Lute','Leather Armor','Diplomat\'s Pack','Ink and Quill'],
+        traits: 'Charming and quick-witted, Lydia can talk her way out of or into any situation.',
+        backstory: 'Born to an elvish mother and human bard, Lydia grew up performing in taverns. Her curiosity drives her to learn every secret she can.'
+      },
+      {
+        name: 'Brother Aldric', class: 'Cleric', race: 'Dwarf', level: 3,
+        subclass: 'Life Domain', icon: '\u2726',
+        flavor: 'A dwarven healer who channels the divine light to mend wounds and smite foes.',
+        abilities: { WIS: 16, CON: 14, STR: 13, CHA: 12, INT: 10, DEX: 9 },
+        features: ['Channel Divinity \u2014 Invoke divine power for healing or damage','Disciple of Life \u2014 Boost all healing spells with bonus HP','Turn Undead \u2014 Force undead to flee with holy power'],
+        equipment: ['Warhammer','Shield','Chain Mail','Holy Symbol','Healer\'s Kit','Backpack'],
+        traits: 'Gruff but compassionate, Aldric heals first and asks questions later.',
+        backstory: 'A former soldier, Aldric turned to healing after witnessing too much death. He now serves a deity of life and mercy.'
+      },
+      {
+        name: 'Willow Thornveil', class: 'Druid', race: 'Wood Elf', level: 3,
+        subclass: 'Circle of the Land', icon: '\u2698',
+        flavor: 'A wood elf druid whose magic flows from the ancient forests she protects.',
+        abilities: { WIS: 16, DEX: 14, CON: 13, INT: 12, CHA: 10, STR: 8 },
+        features: ['Wild Shape \u2014 Transform into beasts for combat and utility','Natural Recovery \u2014 Regain spell slots during a short rest','Druidic \u2014 Speak the secret language of nature'],
+        equipment: ['Quarterstaff','Leather Armor','Druidic Focus','Explorer\'s Pack','Herbalism Kit'],
+        traits: 'Quiet and observant, Willow listens to the wind and speaks for the trees.',
+        backstory: 'Willow was raised in an ancient grove and trained by elder druids. She ventures into civilization to protect the balance of nature.'
+      },
+      {
+        name: 'Ser Garrett Hale', class: 'Fighter', race: 'Human', level: 3,
+        subclass: 'Battle Master', icon: '\u26E8',
+        flavor: 'A disciplined human knight who outmaneuvers foes with tactical brilliance.',
+        abilities: { STR: 16, CON: 14, DEX: 13, INT: 12, WIS: 11, CHA: 10 },
+        features: ['Action Surge \u2014 Take an additional action in combat','Second Wind \u2014 Heal yourself as a bonus action','Combat Superiority \u2014 Use maneuvers to control the battlefield'],
+        equipment: ['Longsword','Shield','Chain Mail','Explorer\'s Pack','Crossbow','Bedroll'],
+        traits: 'Methodical and brave, Garrett believes in discipline and strategy above all.',
+        backstory: 'Trained at a military academy, Garrett now serves as a traveling knight, upholding justice where law fails.'
+      },
+      {
+        name: 'Kai Sunshadow', class: 'Monk', race: 'Elf', level: 3,
+        subclass: 'Way of the Open Hand', icon: '\u229E',
+        flavor: 'An elven monk whose fists strike with the precision of falling rain.',
+        abilities: { DEX: 16, WIS: 14, CON: 13, STR: 12, INT: 10, CHA: 8 },
+        features: ['Martial Arts \u2014 Strike with precision and discipline','Ki \u2014 Channel spiritual energy for special abilities','Open Hand Technique \u2014 Push, knock prone, or deny reactions with each strike'],
+        equipment: ['Quarterstaff','Dagger','Explorer\'s Pack','Bedroll','Rope'],
+        traits: 'Calm and centered, Kai speaks rarely but acts with absolute conviction.',
+        backstory: 'Trained in a remote monastery since childhood, Kai left to seek a relic stolen from his order.'
+      },
+      {
+        name: 'Dame Elara Sunbrand', class: 'Paladin', race: 'Human', level: 3,
+        subclass: 'Oath of Devotion', icon: '\u2694',
+        flavor: 'A human paladin whose faith burns as bright as her blade.',
+        abilities: { STR: 16, CHA: 14, CON: 13, WIS: 12, INT: 10, DEX: 9 },
+        features: ['Lay on Hands \u2014 Heal wounds with divine power','Divine Smite \u2014 Add radiant damage to melee strikes','Sacred Weapon \u2014 Channel divinity into your weapon for bonus attacks'],
+        equipment: ['Longsword','Shield','Chain Mail','Holy Symbol','Explorer\'s Pack'],
+        traits: 'Righteous and compassionate, Elara protects the innocent with unwavering devotion.',
+        backstory: 'Elara swore her oath after a celestial vision. She travels to bring justice and light to the darkest corners of the realm.'
+      },
+      {
+        name: 'Fenris the Wanderer', class: 'Ranger', race: 'Wood Elf', level: 3,
+        subclass: 'Hunter', icon: '\u219D',
+        flavor: 'A wood elf tracker who hunts the most dangerous prey.',
+        abilities: { DEX: 16, WIS: 14, CON: 13, STR: 12, CHA: 10, INT: 8 },
+        features: ['Favored Enemy \u2014 Hunt chosen foes with skill','Natural Explorer \u2014 Master chosen terrain for travel advantages','Colossus Slayer \u2014 Deal extra damage to wounded foes'],
+        equipment: ['Longbow','Shortsword','Leather Armor','Explorer\'s Pack','Bedroll','Rope'],
+        traits: 'Silent and watchful, Fenris feels more at home in the wilderness than in any city.',
+        backstory: 'Fenris patrols the borders of elven lands, tracking threats that emerge from the shadows.'
+      },
+      {
+        name: 'Nyx the Phantom', class: 'Rogue', race: 'Halfling', level: 3,
+        subclass: 'Assassin', icon: '\u2020',
+        flavor: 'A halfling assassin who disappears into shadows and strikes without warning.',
+        abilities: { DEX: 16, INT: 14, CHA: 13, WIS: 12, CON: 10, STR: 8 },
+        features: ['Sneak Attack \u2014 Strike with precision for devastating effect','Cunning Action \u2014 Dash, disengage, or hide as a bonus action','Assassinate \u2014 Deal critical damage to surprised enemies'],
+        equipment: ['Rapier','Shortbow','Leather Armor','Thieves\' Tools','Poison Kit','Backpack'],
+        traits: 'Patient and methodical, Nyx plans every move before striking.',
+        backstory: 'Nyx was trained by a secretive guild. After a job went wrong, she went freelance, selling her skills to those who can afford them.'
+      },
+      {
+        name: 'Ember Ashvane', class: 'Sorcerer', race: 'Tiefling', level: 3,
+        subclass: 'Wild Magic', icon: '\u27E1',
+        flavor: 'A tiefling sorcerer whose chaotic magic sparks unpredictably.',
+        abilities: { CHA: 16, DEX: 14, CON: 13, INT: 12, WIS: 10, STR: 8 },
+        features: ['Wild Magic Surge \u2014 Trigger random magical effects when casting','Tides of Chaos \u2014 Gain advantage on one roll, risking a surge','Font of Magic \u2014 Convert sorcery points into spell slots and vice versa'],
+        equipment: ['Dagger','Light Crossbow','Arcane Focus','Explorer\'s Pack','Component Pouch'],
+        traits: 'Reckless and exuberant, Ember embraces the chaos of her magic.',
+        backstory: 'Ember\'s wild magic first manifested when she accidentally set her village on fire. She now wanders, learning to harness her unpredictable gift.'
+      },
+      {
+        name: 'Corvus Nightpact', class: 'Warlock', race: 'Half-Elf', level: 3,
+        subclass: 'Archfey Patron', icon: '\u25C9',
+        flavor: 'A half-elf warlock bound to a capricious archfey lord.',
+        abilities: { CHA: 16, DEX: 14, CON: 13, INT: 12, WIS: 10, STR: 8 },
+        features: ['Pact Magic \u2014 Channel power granted by your patron','Eldritch Invocations \u2014 Learn supernatural secrets','Fey Presence \u2014 Charm or frighten creatures near you'],
+        equipment: ['Dagger','Light Crossbow','Arcane Focus','Scholar\'s Pack','Component Pouch'],
+        traits: 'Enigmatic and unpredictable, Corvus follows the whims of his fey patron with a knowing smile.',
+        backstory: 'Corvus stumbled into the Feywild as a child and emerged decades later with strange powers and a debt to a powerful lord.'
+      },
+      {
+        name: 'Alaric the Sage', class: 'Wizard', race: 'High Elf', level: 3,
+        subclass: 'Abjuration', icon: '\u2261',
+        flavor: 'A high elf wizard who specializes in protective magic and ancient lore.',
+        abilities: { INT: 16, DEX: 14, CON: 12, WIS: 13, CHA: 10, STR: 8 },
+        features: ['Arcane Ward \u2014 Create a protective shield of abjuration magic','Spellcasting \u2014 Master arcane spells through study','Arcane Recovery \u2014 Regain spells through meditation'],
+        equipment: ['Quarterstaff','Spellbook','Arcane Focus','Scholar\'s Pack','Ink and Quill'],
+        traits: 'Scholarly and cautious, Alaric values knowledge above all and approaches danger with careful preparation.',
+        backstory: 'Alaric has spent centuries studying the arcane arts. He now seeks a lost library said to contain magic from before the dawn of time.'
+      },
+
+      /* ─── LEVEL 1 (one per class) ─── */
+      {
+        name: 'Grimjaw the Furious', class: 'Barbarian', race: 'Half-Orc', level: 1,
+        subclass: 'None', icon: '\u26A1',
+        flavor: 'A half-orc berserker driven by uncontrollable rage.',
+        abilities: { STR: 16, CON: 14, DEX: 13, WIS: 12, INT: 10, CHA: 8 },
+        features: ['Rage \u2014 Enter a battle frenzy for bonus damage and resistance','Unarmored Defense \u2014 Add Constitution to AC without armor'],
+        equipment: ['Greataxe','Handaxe','Javelins','Explorer\'s Pack'],
+        traits: 'Savage and direct, Grimjaw solves most problems with brute force and intimidation.',
+        backstory: 'Cast out from his tribe for his uncontrollable rage, Grimjaw wanders, seeking worthy foes.'
+      },
+      {
+        name: 'Melody Starshine', class: 'Bard', race: 'Lightfoot Halfling', level: 1,
+        subclass: 'None', icon: '\u266A',
+        flavor: 'A cheerful halfling bard whose songs brighten the darkest dungeons.',
+        abilities: { CHA: 15, DEX: 14, CON: 13, INT: 12, WIS: 10, STR: 8 },
+        features: ['Bardic Inspiration \u2014 Grant inspiration for bonus rolls','Spellcasting \u2014 Cast spells through music and performance'],
+        equipment: ['Rapier','Lute','Leather Armor','Diplomat\'s Pack','Dagger'],
+        traits: 'Irrepressibly cheerful, Melody believes every adventure needs a good soundtrack.',
+        backstory: 'Melody left her cozy halfling burrow to see the world and collect stories worth singing about.'
+      },
+      {
+        name: 'Father Dorian Ashbrook', class: 'Cleric', race: 'Human', level: 1,
+        subclass: 'None', icon: '\u2726',
+        flavor: 'A human cleric who channels the light of his deity to heal and protect.',
+        abilities: { WIS: 15, CON: 14, STR: 13, CHA: 12, INT: 10, DEX: 8 },
+        features: ['Spellcasting \u2014 Cast divine spells through prayer','Divine Domain \u2014 Choose a domain and gain its powers'],
+        equipment: ['Mace','Shield','Scale Mail','Holy Symbol','Priest\'s Pack'],
+        traits: 'Devout and gentle, Dorian sees divinity in all living things.',
+        backstory: 'Dorian left his monastery to bring healing and hope to the suffering people of the frontier.'
+      },
+      {
+        name: 'Moss Fernhollow', class: 'Druid', race: 'Forest Gnome', level: 1,
+        subclass: 'None', icon: '\u2698',
+        flavor: 'A gnome druid who speaks to plants and beasts as old friends.',
+        abilities: { WIS: 15, DEX: 14, CON: 13, INT: 12, CHA: 10, STR: 8 },
+        features: ['Spellcasting \u2014 Cast primal spells and rituals','Druidic \u2014 Speak the secret language of nature'],
+        equipment: ['Quarterstaff','Wooden Shield','Leather Armor','Druidic Focus','Explorer\'s Pack'],
+        traits: 'Gentle and curious, Moss prefers the company of animals to most people.',
+        backstory: 'Moss tends a small grove in the forest, venturing out only when nature calls for a champion.'
+      },
+      {
+        name: 'Brigitte Ironfist', class: 'Fighter', race: 'Dwarf', level: 1,
+        subclass: 'None', icon: '\u26E8',
+        flavor: 'A dwarven fighter whose shield arm is legendary among her clan.',
+        abilities: { STR: 15, CON: 14, DEX: 13, WIS: 12, INT: 10, CHA: 8 },
+        features: ['Fighting Style \u2014 Specialization in weapon combat','Second Wind \u2014 Heal yourself as a bonus action'],
+        equipment: ['Longsword','Shield','Chain Mail','Backpack','Bedroll','Rations'],
+        traits: 'Stubborn and reliable, Brigitte never backs down from a fight or a promise.',
+        backstory: 'Brigitte left her clan\'s forge to prove herself in battle and earn a name among the great warriors.'
+      },
+      {
+        name: 'Lotus the Silent', class: 'Monk', race: 'Dark Elf', level: 1,
+        subclass: 'None', icon: '\u229E',
+        flavor: 'A drow monk who channels inner peace despite a troubled past.',
+        abilities: { DEX: 15, WIS: 14, CON: 13, INT: 12, STR: 10, CHA: 8 },
+        features: ['Martial Arts \u2014 Strike with precision and discipline','Unarmored Defense \u2014 Add Wisdom to AC without armor'],
+        equipment: ['Quarterstaff','Dagger','Dart','Explorer\'s Pack'],
+        traits: 'Serene and disciplined, Lotus channels her dark heritage into inner light.',
+        backstory: 'Escaped from the Underdark, Lotus found peace in a human monastery and now walks the path of inner harmony.'
+      },
+      {
+        name: 'Sir Cedric of Thornwall', class: 'Paladin', race: 'Human', level: 1,
+        subclass: 'None', icon: '\u2694',
+        flavor: 'A young knight driven by a vision of divine justice.',
+        abilities: { STR: 15, CHA: 14, CON: 13, WIS: 12, INT: 10, DEX: 8 },
+        features: ['Lay on Hands \u2014 Heal wounds with divine power','Divine Sense \u2014 Detect celestial, fiendish, and undead presences'],
+        equipment: ['Longsword','Shield','Chain Mail','Holy Symbol','Explorer\'s Pack'],
+        traits: 'Idealistic and brave, Cedric aspires to be the hero in every story.',
+        backstory: 'A blacksmith\'s son who received a divine calling, Cedric took up sword and shield to defend the realm.'
+      },
+      {
+        name: 'Arrow Greenleaf', class: 'Ranger', race: 'Wood Elf', level: 1,
+        subclass: 'None', icon: '\u219D',
+        flavor: 'A wood elf ranger who never misses a shot.',
+        abilities: { DEX: 15, WIS: 14, CON: 13, STR: 12, INT: 10, CHA: 8 },
+        features: ['Favored Enemy \u2014 Hunt chosen foes with skill','Natural Explorer \u2014 Master chosen terrain'],
+        equipment: ['Longbow','Shortsword','Leather Armor','Explorer\'s Pack','Quiver'],
+        traits: 'Quiet and perceptive, Arrow trusts nature more than civilization.',
+        backstory: 'Arrow patrols the ancient forest borders, guarding against threats that emerge from the wilds.'
+      },
+      {
+        name: 'Vex Shadowbolt', class: 'Rogue', race: 'Gnome', level: 1,
+        subclass: 'None', icon: '\u2020',
+        flavor: 'A clever gnome who moves through shadows like they\'re old friends.',
+        abilities: { DEX: 15, INT: 14, CHA: 13, WIS: 12, CON: 10, STR: 8 },
+        features: ['Expertise \u2014 Master two skills beyond normal limits','Sneak Attack \u2014 Strike with precision for devastating effect'],
+        equipment: ['Rapier','Hand Crossbow','Leather Armor','Thieves\' Tools','Backpack'],
+        traits: 'Quick-witted and scheming, Vex can talk her way into or out of anything.',
+        backstory: 'A street urchin turned pickpocket, Vex now hires herself out to those with coin and flexible morals.'
+      },
+      {
+        name: 'Zara of the Crimson Flame', class: 'Sorcerer', race: 'Half-Elf', level: 1,
+        subclass: 'None', icon: '\u27E1',
+        flavor: 'A half-elf born with wild magic burning in her blood.',
+        abilities: { CHA: 15, DEX: 14, CON: 13, INT: 12, WIS: 10, STR: 8 },
+        features: ['Sorcerous Origin \u2014 Channel innate magical power','Spellcasting \u2014 Cast spells fueled by raw magic'],
+        equipment: ['Dagger','Light Crossbow','Leather Armor','Component Pouch','Backpack'],
+        traits: 'Impulsive and passionate, Zara acts on instinct and feels emotions intensely.',
+        backstory: 'Orphaned as a child, Zara\'s magical talents manifested under stress, setting her on the path of a sorcerer.'
+      },
+      {
+        name: 'Malachai the Bound', class: 'Warlock', race: 'Tiefling', level: 1,
+        subclass: 'None', icon: '\u25C9',
+        flavor: 'A tiefling who made a pact with powers beyond mortal ken.',
+        abilities: { CHA: 15, DEX: 14, INT: 13, WIS: 12, CON: 10, STR: 8 },
+        features: ['Pact Magic \u2014 Channel power granted by an otherworldly patron','Eldritch Invocations \u2014 Learn supernatural secrets of the cosmos'],
+        equipment: ['Dagger','Light Armor','Arcane Focus','Scholar\'s Pack'],
+        traits: 'Mysterious and calculating, Malachai views others as tools for his ambitions.',
+        backstory: 'Desperate and dying, Malachai bargained with a dark entity for power, never expecting to be bound so completely.'
+      },
+      {
+        name: 'Sylvain the Scholar', class: 'Wizard', race: 'Gnome', level: 1,
+        subclass: 'None', icon: '\u2261',
+        flavor: 'A curious gnome scholar who sees magic as the greatest puzzle.',
+        abilities: { INT: 15, DEX: 14, CON: 13, WIS: 12, CHA: 10, STR: 8 },
+        features: ['Spellcasting \u2014 Master arcane spells through study','Arcane Recovery \u2014 Regain spells through meditation'],
+        equipment: ['Quarterstaff','Light Crossbow','Scholar\'s Pack','Spellbook','Arcane Focus'],
+        traits: 'Meticulous and analytical, Sylvain pursues knowledge with singleminded dedication.',
+        backstory: 'Graduated from a prestigious academy with flying colors, Sylvain now researches magical phenomena in the field.'
+      },
+
+      /* ─── LEVEL 5 (one per class) ─── */
+      {
+        name: 'Gornak Ironjaw', class: 'Barbarian', race: 'Half-Orc', level: 5,
+        subclass: 'Berserker', icon: '\u26A1',
+        flavor: 'A half-orc berserker whose rage is a force of nature.',
+        abilities: { STR: 17, DEX: 11, CON: 16, INT: 9, WIS: 12, CHA: 13 },
+        features: ['Rage \u2014 Enter a frenzy of destruction and damage reduction','Reckless Attack \u2014 Strike with wild abandon and advantage','Frenzy \u2014 Make an extra attack while raging','Extra Attack \u2014 Attack twice when taking the Attack action','Uncanny Dodge \u2014 Halve damage from a seen attack'],
+        equipment: ['Greataxe','Hide Armor','Shield','Bedroll','Rope','Backpack'],
+        traits: 'Wild and unpredictable, Gornak follows his instincts and respects strength above all.',
+        backstory: 'Once a slave, Gornak broke free and now wanders as a mercenary, selling his fury to the highest bidder.'
+      },
+      {
+        name: 'Cassandra the Magnificent', class: 'Bard', race: 'Dark Elf', level: 5,
+        subclass: 'College of Glamour', icon: '\u266A',
+        flavor: 'A drow bard who weaves magic and charm into every word.',
+        abilities: { CHA: 16, DEX: 15, CON: 13, INT: 12, WIS: 11, STR: 9 },
+        features: ['Bardic Inspiration \u2014 Grant inspiration for bonus rolls','Jack of All Trades \u2014 Add half proficiency to all checks','Spell Expertise \u2014 Cast spells as a spellcaster','Mantle of Inspiration \u2014 Use bardic inspiration to heal and assist','Charm of Fey Reinforcement \u2014 Enhance charm magic'],
+        equipment: ['Rapier','Lute','Leather Armor','Lute Case','Fine Clothes','Pouch of Coin'],
+        traits: 'Seductive and manipulative, Cassandra uses charm and beauty as weapons.',
+        backstory: 'Exiled from the underdark for her refusal to serve Lolth, Cassandra found freedom and fame in surface lands.'
+      },
+      {
+        name: 'Sister Kelia Ironheart', class: 'Cleric', race: 'Rock Gnome', level: 5,
+        subclass: 'War Domain', icon: '\u2726',
+        flavor: 'A gnome war priest who channels divine fury into combat.',
+        abilities: { WIS: 16, STR: 15, CON: 14, CHA: 12, INT: 11, DEX: 10 },
+        features: ['Channel Divinity \u2014 Invoke divine power for healing or damage','War Priest \u2014 Make attacks with extra precision','Divine Strike \u2014 Add damage to weapon attacks','Extra Attack \u2014 Attack twice when taking the Attack action','War Domain Spells \u2014 Cast domain-specific spells'],
+        equipment: ['War Hammer','Shield','Plate Armor','Holy Symbol','Bedroll','Backpack'],
+        traits: 'Aggressive and confident, Kelia believes the best defense is overwhelming offense blessed by her deity.',
+        backstory: 'A former blacksmith, Kelia discovered her calling when her forge was blessed by divine fire, and she devoted herself to the war god.'
+      },
+      {
+        name: 'Orin Deeproot', class: 'Druid', race: 'Lightfoot Halfling', level: 5,
+        subclass: 'Circle of the Moon', icon: '\u2698',
+        flavor: 'A halfling druid who shape-shifts into wild beasts.',
+        abilities: { WIS: 16, DEX: 14, CON: 15, INT: 12, CHA: 11, STR: 10 },
+        features: ['Spellcasting \u2014 Cast primal spells and rituals','Wild Shape \u2014 Transform into beasts for combat and utility','Circle Spells \u2014 Cast specific spells tied to your circle','Unlimited Wild Shape \u2014 Transform at will once per turn','Timeless Body \u2014 Age slower as you gain power'],
+        equipment: ['Quarterstaff','Leather Armor','Explorer\'s Pack','Druidic Focus','Bedroll'],
+        traits: 'Calm and patient, Orin speaks with the wisdom of ancient forests and sees humans as temporary visitors.',
+        backstory: 'Born under a blood moon, Orin was raised by the forest itself and learned to wear the skins of beasts.'
+      },
+      {
+        name: 'Thane Stormborn', class: 'Fighter', race: 'Stout Halfling', level: 5,
+        subclass: 'Champion', icon: '\u26E8',
+        flavor: 'A stout halfling fighter whose critical strikes are legendary.',
+        abilities: { STR: 16, CON: 15, DEX: 14, WIS: 12, INT: 11, CHA: 10 },
+        features: ['Fighting Style \u2014 Specialization in weapon combat','Extra Attack \u2014 Attack twice when taking the Attack action','Champion \u2014 Improved critical hit range (19-20)','Second Wind \u2014 Heal yourself as a bonus action','Remarkable Athlete \u2014 Add proficiency to certain ability checks'],
+        equipment: ['Longsword','Shield','Chain Mail','Bedroll','Rope','Backpack'],
+        traits: 'Boisterous and brave, Thane laughs in the face of danger and celebrates victory with gusto.',
+        backstory: 'Too small for halfling expectations, Thane proved himself in mercenary work and now commands respect from all peoples.'
+      },
+      {
+        name: 'Asha of the Eastern Temple', class: 'Monk', race: 'Dark Elf', level: 5,
+        subclass: 'Way of Shadow', icon: '\u229E',
+        flavor: 'A drow monk who moves through darkness like water.',
+        abilities: { DEX: 16, WIS: 15, CON: 13, STR: 12, INT: 11, CHA: 10 },
+        features: ['Martial Arts \u2014 Strike with precision and discipline','Extra Attack \u2014 Attack twice when taking the Attack action','Stunning Strike \u2014 Stun enemies with perfectly placed blows','Shadows Step \u2014 Become invisible and move through darkness','Ki Regeneration \u2014 Restore ki points through meditation'],
+        equipment: ['Quarterstaff','Dagger','Martial Arts Outfit','Bedroll','Rope','Backpack'],
+        traits: 'Disciplined and silent, Asha moves like a shadow and speaks only when necessary.',
+        backstory: 'Escaped from drow enslavement, Asha found refuge in a human monastery where she learned to channel her suffering into strength.'
+      },
+      {
+        name: 'Lord Marcus Brightblade', class: 'Paladin', race: 'Human', level: 5,
+        subclass: 'Oath of the Watchers', icon: '\u2694',
+        flavor: 'A human paladin sworn to guard against outer realms.',
+        abilities: { STR: 16, CHA: 15, CON: 14, WIS: 13, INT: 12, DEX: 11 },
+        features: ['Lay on Hands \u2014 Heal wounds with divine power','Divine Strike \u2014 Add damage to weapon attacks','Extra Attack \u2014 Attack twice when taking the Attack action','Channel Divinity \u2014 Invoke oaths for powerful effects','Watcher\'s Awareness \u2014 Sense extraplanar presences'],
+        equipment: ['Longsword','Shield','Plate Armor','Holy Symbol','Bedroll','Backpack'],
+        traits: 'Vigilant and noble, Marcus sees his duty as paramount and will not compromise his principles.',
+        backstory: 'Marcus once witnessed a planar incursion that took his family, so he swore an oath to protect his world from such horrors.'
+      },
+      {
+        name: 'Sael Trackfinder', class: 'Ranger', race: 'Rock Gnome', level: 5,
+        subclass: 'Fey Wanderer', icon: '\u219D',
+        flavor: 'A gnome ranger blessed by the fey with uncanny luck.',
+        abilities: { DEX: 16, WIS: 15, CHA: 14, CON: 13, INT: 12, STR: 11 },
+        features: ['Favored Enemy \u2014 Hunt chosen foes with skill','Natural Explorer \u2014 Master chosen terrain','Extra Attack \u2014 Attack twice when taking the Attack action','Fey Reinforcements \u2014 Call fey allies for aid','Wanderer\'s Lore \u2014 Add wisdom modifier to knowledge checks'],
+        equipment: ['Longbow','Longsword','Leather Armor','Explorer\'s Pack','Bedroll','Rope'],
+        traits: 'Clever and whimsical, Sael speaks as if sharing ancient secrets and laughs at fey humor only she understands.',
+        backstory: 'Adopted by fey entities as a child, Sael straddles both worlds and hunts creatures that threaten the balance.'
+      },
+      {
+        name: 'Riven Blackthorn', class: 'Rogue', race: 'Halfling', level: 5,
+        subclass: 'Mastermind', icon: '\u2020',
+        flavor: 'A halfling rogue who orchestrates perfect plans from the shadows.',
+        abilities: { DEX: 16, INT: 15, CHA: 14, WIS: 12, CON: 11, STR: 10 },
+        features: ['Expertise \u2014 Master skills beyond normal limits','Sneak Attack \u2014 Strike for devastating damage with precision','Cunning Action \u2014 Take extra actions each turn','Evasion \u2014 Dodge spell effects with agility','Insightful Manipulator \u2014 Read people\'s thoughts from behavior'],
+        equipment: ['Rapier','Hand Crossbow','Leather Armor','Thieves\' Tools','Disguise Kit','Backpack'],
+        traits: 'Calculating and manipulative, Riven sees three moves ahead and orchestrates others like puppets.',
+        backstory: 'Once a street gang leader, Riven now sells her services to nobles and merchants, always keeping her true motives secret.'
+      },
+      {
+        name: 'Vara Flameheart', class: 'Sorcerer', race: 'Dragonborn', level: 5,
+        subclass: 'Draconic Bloodline', icon: '\u27E1',
+        flavor: 'A dragonborn sorcerer whose bloodline is pure dragon fire.',
+        abilities: { CHA: 16, DEX: 14, CON: 15, INT: 12, WIS: 11, STR: 13 },
+        features: ['Sorcerous Spellcasting \u2014 Cast spells from innate magic','Draconic Resilience \u2014 Gain armor and damage resistance','Elemental Affinity \u2014 Add damage to spells of your element','Extra Sorcery Points \u2014 Fuel more powerful spells','Draconic Presence \u2014 Intimidate enemies with draconic majesty'],
+        equipment: ['Dagger','Light Crossbow','Leather Armor','Component Pouch','Bedroll','Backpack'],
+        traits: 'Proud and fierce, Vara speaks with absolute confidence and brooks no contradiction.',
+        backstory: 'Born of a union between human and true dragon, Vara carries her sire\'s power in her blood and seeks to prove her worth.'
+      },
+      {
+        name: 'Thaddeus the Bargained', class: 'Warlock', race: 'Forest Gnome', level: 5,
+        subclass: 'Fiend Pact', icon: '\u25C9',
+        flavor: 'A gnome warlock bound to an infernal patron for forbidden knowledge.',
+        abilities: { CHA: 16, DEX: 14, INT: 15, WIS: 12, CON: 13, STR: 10 },
+        features: ['Pact Magic \u2014 Channel infernal power','Eldritch Invocations \u2014 Learn supernatural secrets','Fiend Patron Spells \u2014 Cast spells granted by your patron','One with Shadows \u2014 Become invisible in darkness','Dark One\'s Blessing \u2014 Gain temporary hit points after killing'],
+        equipment: ['Dagger','Light Crossbow','Leather Armor','Arcane Focus','Bedroll','Backpack'],
+        traits: 'Ambitious and cunning, Thaddeus smiles knowingly and speaks of forbidden truths.',
+        backstory: 'Desperate to save his village, Thaddeus made a pact with an infernal lord, a decision he\'s never regretted.'
+      },
+      {
+        name: 'Meredith Spellweaver', class: 'Wizard', race: 'High Elf', level: 5,
+        subclass: 'Evocation', icon: '\u2261',
+        flavor: 'An elven wizard who weaves elemental forces into devastating spells.',
+        abilities: { INT: 16, DEX: 15, CON: 14, WIS: 13, CHA: 11, STR: 10 },
+        features: ['Spellcasting \u2014 Master arcane spells through study','Arcane Recovery \u2014 Regain spells through meditation','Evocation Specialization \u2014 Specialize in destructive magic','Sculpt Spells \u2014 Shape spell effects to protect allies','Extra Cantrips \u2014 Know more magical tricks than most'],
+        equipment: ['Quarterstaff','Light Crossbow','Scholar\'s Pack','Spellbook','Arcane Focus','Bedroll'],
+        traits: 'Analytical and precise, Meredith views magic as a science to be mastered through rigorous study.',
+        backstory: 'Graduated as valedictorian of her academy, Meredith now documents new magical phenomena and tests experimental spells.'
+      },
+
+      /* ─── UPLOADED CHARACTERS (from PDF sheets) ─── */
+      {
+        name: 'Zarikar Thavios', class: 'Sorcerer', race: 'Tiefling', level: 9,
+        subclass: 'Divine Soul', background: 'Noble', icon: '\u27E1',
+        flavor: 'A tiefling noble whose divine bloodline crackles with celestial sorcery.',
+        abilities: { STR: 13, DEX: 16, CON: 13, INT: 11, WIS: 12, CHA: 20 },
+        ac: 18, hp: 47, speed: 30, profBonus: 4,
+        darkvision: '60 ft', resistances: ['Fire'],
+        saves: { CON: 5, CHA: 9 },
+        skills: [
+          { name: 'Deception', bonus: 9 },
+          { name: 'History', bonus: 4 },
+          { name: 'Intimidation', bonus: 9 },
+          { name: 'Persuasion', bonus: 9 },
+          { name: 'Performance', bonus: 5 },
+          { name: 'Sleight of Hand', bonus: 3 },
+          { name: 'Stealth', bonus: 3 }
+        ],
+        attacks: [
+          { name: 'Dagger', bonus: 7, damage: '1d4+3 piercing' },
+          { name: 'Quarterstaff', bonus: 5, damage: '1d6+1 bludgeoning' },
+          { name: 'Staff of Zeus', bonus: 5, damage: '1d6+1 bludgeoning' },
+          { name: 'Fire Bolt', bonus: 11, damage: '2d10 fire' }
+        ],
+        features: [
+          'Font of Magic \u2014 9 sorcery points to fuel Metamagic and spell slots',
+          'Metamagic \u2014 Empowered Spell, Twinned Spell',
+          'Favored by the Gods \u2014 Add 2d4 to a failed save or missed attack once per rest',
+          'Empowered Healing \u2014 Reroll healing dice for allies within 5 feet'
+        ],
+        equipment: ['Bag of Holding','Ancient Red Dragontooth Necklace','Robes of Mathus','Staff of Zeus','Potion of Speed','Potion of Healing'],
+        languages: 'Common, Elvish, Infernal',
+        traits: 'Commanding and silver-tongued, Zarikar carries himself with the confidence of noble birth and divine favor.',
+        backstory: 'Born into Tiefling nobility, Zarikar discovered his Divine Soul origin when celestial power awoke during a near-death experience. Now he wields both infernal heritage and divine magic, bending fate itself to his will.'
+      },
+      {
+        name: 'Za Hornyeth', class: 'Rogue', race: 'Eladrin', level: 10,
+        subclass: 'Arcane Trickster', background: 'Criminal / Spy', icon: '\u2020',
+        multiclass: 'Rogue 6 / Fighter 4',
+        flavor: 'An eladrin shadow who slips between the planes and strikes from nowhere.',
+        abilities: { STR: 17, DEX: 20, CON: 11, INT: 9, WIS: 13, CHA: 15 },
+        ac: 15, hp: 57, speed: 30, profBonus: 4,
+        darkvision: '60 ft', resistances: [],
+        saves: { DEX: 9, INT: 3 },
+        skills: [
+          { name: 'Acrobatics', bonus: 13 },
+          { name: 'Athletics', bonus: 11 },
+          { name: 'Deception', bonus: 10 },
+          { name: 'Intimidation', bonus: 6 },
+          { name: 'Perception', bonus: 5 },
+          { name: 'Sleight of Hand', bonus: 9 },
+          { name: 'Stealth', bonus: 13 }
+        ],
+        attacks: [
+          { name: 'Birdsong', bonus: 9, damage: '1d8+5 piercing' },
+          { name: 'Meteorite Dagger', bonus: 9, damage: '1d4+7 piercing + 1d12 fire + 1d8 poison' }
+        ],
+        features: [
+          'Sneak Attack \u2014 3d6 extra damage on finesse/ranged attacks with advantage',
+          'Cunning Action \u2014 Dash, Disengage, or Hide as a bonus action',
+          'Expertise \u2014 Double proficiency on chosen skills',
+          'Uncanny Dodge \u2014 Halve damage from a seen attacker as a reaction',
+          'Fighting Style (Dueling) \u2014 +2 damage with one-handed melee weapons',
+          'Second Wind \u2014 Regain 1d10+4 HP as a bonus action',
+          'Action Surge \u2014 Take an additional action once per short rest',
+          'Improved Critical \u2014 Critical hits on 19 or 20',
+          'Fey Step \u2014 Teleport 30 feet as a bonus action once per rest'
+        ],
+        equipment: ['Birdsong (rapier)','Meteorite Dagger','Studded Leather Armor','Thieves\' Tools','Disguise Kit'],
+        languages: 'Common, Elvish, Thieves\' Cant',
+        traits: 'Unpredictable and lethal, Za shifts between charming conversation and deadly precision in an instant.',
+        backstory: 'An eladrin who slipped into the material plane and never looked back. Za carved out a criminal empire before wandering into the adventuring life for the thrill of it.'
+      },
+      {
+        name: 'Relmae Falstaer', class: 'Fighter', race: 'Half-Elf', level: 5,
+        subclass: 'Champion', background: 'Criminal / Spy', icon: '\u26E8',
+        flavor: 'A half-elf blade-for-hire whose sword arm speaks louder than words.',
+        abilities: { STR: 12, DEX: 15, CON: 14, INT: 12, WIS: 12, CHA: 15 },
+        ac: 13, hp: 44, speed: 30, profBonus: 3,
+        darkvision: '60 ft', resistances: [],
+        saves: { STR: 4, CON: 5 },
+        skills: [
+          { name: 'Acrobatics', bonus: 5 },
+          { name: 'Animal Handling', bonus: 1 },
+          { name: 'Deception', bonus: 5 },
+          { name: 'Perception', bonus: 4 },
+          { name: 'Sleight of Hand', bonus: 5 },
+          { name: 'Stealth', bonus: 5 },
+          { name: 'Survival', bonus: 1 }
+        ],
+        attacks: [
+          { name: 'Abaddon Blade of Kings', bonus: 4, damage: '1d8+3 slashing' },
+          { name: 'Double-Bladed Scimitar', bonus: 4, damage: '2d4+1 slashing' },
+          { name: 'Handaxe', bonus: 4, damage: '1d6+3 slashing' },
+          { name: 'Longbow', bonus: 5, damage: '1d8+2 piercing' }
+        ],
+        features: [
+          'Fighting Style (Dueling) \u2014 +2 damage when wielding a one-handed melee weapon',
+          'Second Wind \u2014 Regain 1d10+5 HP as a bonus action',
+          'Action Surge \u2014 Take an additional action once per short rest',
+          'Improved Critical \u2014 Critical hits on 19 or 20',
+          'Extra Attack \u2014 Attack twice when taking the Attack action'
+        ],
+        equipment: ['Abaddon Blade of Kings','Double-Bladed Scimitar','Handaxe','Longbow','Quiver','Leather Armor'],
+        languages: 'Common, Draconic, Elvish',
+        traits: 'Cool under pressure with a sharp tongue, Relmae trusts her blades over promises.',
+        backstory: 'Relmae grew up in the criminal underworld, learning to fight before she could read. She carries the legendary Abaddon Blade of Kings, though she\'ll never tell you how she got it.'
+      },
+      {
+        name: 'Amon Bellendon', class: 'Wizard', race: 'Variant Human', level: 7,
+        subclass: 'School of Evocation', background: 'Folk Hero', icon: '\u2261',
+        flavor: 'A folk hero wizard who channels explosive magic with reckless enthusiasm.',
+        abilities: { STR: 11, DEX: 10, CON: 12, INT: 9, WIS: 14, CHA: 15 },
+        ac: 10, hp: 37, speed: 30, profBonus: 3,
+        saves: { INT: 2, WIS: 5 },
+        skills: [
+          { name: 'Animal Handling', bonus: 5 },
+          { name: 'Arcana', bonus: 2 },
+          { name: 'Deception', bonus: 5 },
+          { name: 'Insight', bonus: 5 },
+          { name: 'Intimidation', bonus: 2 },
+          { name: 'Perception', bonus: 4 },
+          { name: 'Persuasion', bonus: 2 },
+          { name: 'Religion', bonus: 1 },
+          { name: 'Survival', bonus: 5 }
+        ],
+        attacks: [
+          { name: 'Quarterstaff', bonus: 3, damage: '1d6 bludgeoning' }
+        ],
+        features: [
+          'Arcane Recovery \u2014 Regain spell slots during a short rest',
+          'Evocation Savant \u2014 Copy evocation spells at half time and cost',
+          'Sculpt Spells \u2014 Create pockets of safety within evocation spells',
+          'Potent Cantrip \u2014 Cantrips deal half damage on successful saves',
+          'Spellcasting \u2014 INT based, Spell Save DC 10, Attack +2'
+        ],
+        equipment: ['Quarterstaff','Rotten Possum','Hellhound Eyepatch','Best Bat Eyepatch in Existence','Spellbook','Alchemist\'s Supplies','Iron Pot','Shovel'],
+        languages: 'Common, Dwarvish',
+        traits: 'Eccentric and fearless, Amon hoards bizarre trinkets and approaches magic with the enthusiasm of a man who has nothing to lose.',
+        backstory: 'A folk hero from a small farming village, Amon stumbled into wizardry by accident. His unconventional methods and questionable equipment belie a surprising talent for blowing things up.'
+      }
+    ];
+
+    /* ═══════════════════════════════════════════════════
+       UTILITIES
+       ═══════════════════════════════════════════════════ */
+    function esc(t) {
+      if (t == null) return '';
+      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    function abilityMod(score) { return Math.floor((score - 10) / 2); }
+    function fmtMod(score) { var m = abilityMod(score); return m >= 0 ? '+' + m : String(m); }
+
+    var filteredCharacters = CHARACTERS.slice();
+
+    /* ═══════════════════════════════════════════════════
+       RENDER CARDS
+       ═══════════════════════════════════════════════════ */
+    function renderCharacters() {
+      var grid = document.getElementById('character-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      document.getElementById('results-bar').textContent =
+        'Showing ' + filteredCharacters.length + ' of ' + CHARACTERS.length + ' characters';
+
+      filteredCharacters.forEach(function (ch, fi) {
+        // Find actual index in CHARACTERS for modal/save
+        var idx = CHARACTERS.indexOf(ch);
+        var cls = ch.class.toLowerCase().split('/')[0].trim();
+
+        var abHtml = '';
+        var abOrder = ['STR','DEX','CON','INT','WIS','CHA'];
+        abOrder.forEach(function (ab) {
+          var val = ch.abilities[ab] || 10;
+          abHtml += '<div class="gc-ab">' +
+            '<div class="gc-ab-label">' + ab + '</div>' +
+            '<div class="gc-ab-score">' + val + '</div>' +
+            '<div class="gc-ab-mod">' + fmtMod(val) + '</div>' +
+            '</div>';
+        });
+
+        // Combat stats row (only for detailed characters)
+        var combatHtml = '';
+        if (ch.ac != null) {
+          combatHtml = '<div class="gc-combat">' +
+            '<div class="gc-stat"><div class="gc-stat-val">' + esc(ch.ac) + '</div><div class="gc-stat-label">AC</div></div>' +
+            '<div class="gc-stat"><div class="gc-stat-val">' + esc(ch.hp) + '</div><div class="gc-stat-label">HP</div></div>' +
+            '<div class="gc-stat"><div class="gc-stat-val">' + esc(ch.speed) + '</div><div class="gc-stat-label">Speed</div></div>' +
+            '</div>';
+        }
+
+        // Subtitle line
+        var subParts = [ch.class];
+        if (ch.multiclass) subParts = [ch.multiclass];
+        subParts.push(ch.race);
+        if (ch.subclass && ch.subclass !== 'None') subParts.push(ch.subclass);
+        var subtitle = subParts.join(' \u00B7 ');
+
+        var card = document.createElement('div');
+        card.className = 'gc gc--' + cls;
+        card.innerHTML =
+          '<div class="gc-head">' +
+            '<div class="gc-icon">' + esc(ch.icon) + '</div>' +
+            '<div>' +
+              '<div class="gc-name">' + esc(ch.name) + '</div>' +
+              '<div class="gc-subtitle">' + esc(subtitle) + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="gc-meta">' +
+            '<span class="gc-pill gc-pill--level">Lv ' + ch.level + '</span>' +
+            (ch.background ? '<span class="gc-pill">' + esc(ch.background) + '</span>' : '') +
+            (ch.darkvision ? '<span class="gc-pill">Darkvision ' + esc(ch.darkvision) + '</span>' : '') +
+          '</div>' +
+          '<div class="gc-abs">' + abHtml + '</div>' +
+          combatHtml +
+          '<div class="gc-flavor">\u201C' + esc(ch.flavor) + '\u201D</div>' +
+          '<div class="gc-btns">' +
+            '<button class="gc-btn gc-btn--view" onclick="openSheet(' + idx + ');event.stopPropagation()">View Sheet</button>' +
+            '<button class="gc-btn gc-btn--add" onclick="addToChars(' + idx + ');event.stopPropagation()">+ Add to Characters</button>' +
+          '</div>';
+
+        grid.appendChild(card);
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CHARACTER SHEET MODAL
+       ═══════════════════════════════════════════════════ */
+    function openSheet(idx) {
+      var ch = CHARACTERS[idx];
+      if (!ch) return;
+      var cls = ch.class.toLowerCase().split('/')[0].trim();
+      var overlay = document.getElementById('sheet-overlay');
+      var panel = document.getElementById('sheet-panel');
+
+      // Subtitle
+      var subLine = ch.race + ' ' + ch.class;
+      if (ch.multiclass) subLine = ch.race + ' \u2014 ' + ch.multiclass;
+      if (ch.subclass && ch.subclass !== 'None') subLine += ' (' + ch.subclass + ')';
+      subLine += ' \u2014 Level ' + ch.level;
+      if (ch.background) subLine += ' \u2014 ' + ch.background;
+
+      // Ability boxes
+      var abOrder = ['STR','DEX','CON','INT','WIS','CHA'];
+      var abHtml = '';
+      abOrder.forEach(function (ab) {
+        var val = ch.abilities[ab] || 10;
+        abHtml += '<div class="sh-ab-box">' +
+          '<div class="sh-ab-score">' + val + '</div>' +
+          '<div class="sh-ab-mod">' + fmtMod(val) + '</div>' +
+          '<div class="sh-ab-name">' + ab + '</div>' +
+          '</div>';
+      });
+
+      // Saves
+      var savesHtml = '';
+      if (ch.saves) {
+        abOrder.forEach(function (ab) {
+          var hasProf = ch.saves[ab] != null;
+          var bonus = hasProf ? ch.saves[ab] : abilityMod(ch.abilities[ab] || 10);
+          var fmtB = bonus >= 0 ? '+' + bonus : String(bonus);
+          savesHtml += '<div class="sh-save-row">' +
+            '<span class="sh-save-dot' + (hasProf ? ' prof' : '') + '"></span>' +
+            '<span>' + ab + '</span>' +
+            '<span class="sh-save-bonus">' + fmtB + '</span>' +
+            '</div>';
+        });
+      } else {
+        abOrder.forEach(function (ab) {
+          var mod = abilityMod(ch.abilities[ab] || 10);
+          var fmtB = mod >= 0 ? '+' + mod : String(mod);
+          savesHtml += '<div class="sh-save-row">' +
+            '<span class="sh-save-dot"></span>' +
+            '<span>' + ab + '</span>' +
+            '<span class="sh-save-bonus">' + fmtB + '</span>' +
+            '</div>';
+        });
+      }
+
+      // Skills
+      var skillsHtml = '';
+      if (ch.skills && ch.skills.length) {
+        ch.skills.forEach(function (sk) {
+          var fmtB = sk.bonus >= 0 ? '+' + sk.bonus : String(sk.bonus);
+          skillsHtml += '<div class="sh-skill-row">' +
+            '<span class="sh-save-dot prof"></span>' +
+            '<span>' + esc(sk.name) + '</span>' +
+            '<span class="sh-skill-bonus">' + fmtB + '</span>' +
+            '</div>';
+        });
+      } else {
+        skillsHtml = '<div style="font-size:12px;color:var(--text-muted);font-style:italic">No specific skill proficiencies listed</div>';
+      }
+
+      // Combat banner
+      var combatHtml = '';
+      if (ch.ac != null) {
+        var combatStats = [
+          { val: ch.ac, label: 'Armor Class' },
+          { val: ch.hp, label: 'Hit Points' },
+          { val: ch.speed + ' ft', label: 'Speed' },
+          { val: '+' + ch.profBonus, label: 'Proficiency' }
+        ];
+        if (ch.darkvision) combatStats.push({ val: ch.darkvision, label: 'Darkvision' });
+        combatStats.forEach(function (s) {
+          combatHtml += '<div class="sh-combat-stat">' +
+            '<div class="sh-combat-val">' + esc(s.val) + '</div>' +
+            '<div class="sh-combat-label">' + esc(s.label) + '</div>' +
+            '</div>';
+        });
+      }
+
+      // Attacks
+      var atksHtml = '';
+      if (ch.attacks && ch.attacks.length) {
+        var rows = '';
+        ch.attacks.forEach(function (a) {
+          var fmtB = a.bonus >= 0 ? '+' + a.bonus : String(a.bonus);
+          rows += '<tr><td class="sh-atk-name">' + esc(a.name) + '</td>' +
+            '<td>' + fmtB + '</td>' +
+            '<td>' + esc(a.damage) + '</td></tr>';
+        });
+        atksHtml = '<div class="sh-attacks">' +
+          '<div class="sh-section-title">Attacks</div>' +
+          '<table class="sh-atk-table"><thead><tr><th>Weapon</th><th>Hit</th><th>Damage</th></tr></thead>' +
+          '<tbody>' + rows + '</tbody></table></div>';
+      }
+
+      // Features
+      var featsHtml = '';
+      if (ch.features && ch.features.length) {
+        var fItems = '';
+        ch.features.forEach(function (f) {
+          var parts = f.split(' \u2014 ');
+          if (parts.length > 1) {
+            fItems += '<div class="sh-feat"><span class="sh-feat-name">' + esc(parts[0]) + '</span> \u2014 ' + esc(parts.slice(1).join(' \u2014 ')) + '</div>';
+          } else {
+            fItems += '<div class="sh-feat">' + esc(f) + '</div>';
+          }
+        });
+        featsHtml = '<div class="sh-features"><div class="sh-section-title">Features &amp; Traits</div>' + fItems + '</div>';
+      }
+
+      // Equipment
+      var equipHtml = '';
+      if (ch.equipment && ch.equipment.length) {
+        var tags = '';
+        ch.equipment.forEach(function (e) {
+          tags += '<span class="sh-equip-tag">' + esc(e) + '</span>';
+        });
+        equipHtml = '<div class="sh-equip"><div class="sh-section-title">Equipment</div>' +
+          '<div class="sh-equip-list">' + tags + '</div></div>';
+      }
+
+      // Resistances & Languages
+      var extraHtml = '';
+      if (ch.resistances && ch.resistances.length) {
+        extraHtml += '<div style="margin-bottom:16px"><div class="sh-section-title">Resistances</div>' +
+          '<div class="sh-equip-list">';
+        ch.resistances.forEach(function (r) {
+          extraHtml += '<span class="sh-equip-tag">' + esc(r) + '</span>';
+        });
+        extraHtml += '</div></div>';
+      }
+      if (ch.languages) {
+        extraHtml += '<div style="margin-bottom:16px"><div class="sh-section-title">Languages</div>' +
+          '<div style="font-size:12px;color:var(--text-dim,#c0b8a0)">' + esc(ch.languages) + '</div></div>';
+      }
+
+      panel.className = 'sheet-panel gc--' + cls;
+      panel.innerHTML =
+        '<div class="sh-header">' +
+          '<div><div class="sh-title">' + esc(ch.name) + '</div>' +
+          '<div class="sh-sub">' + esc(subLine) + '</div></div>' +
+          '<button class="sh-close" onclick="closeSheet()" aria-label="Close">\u00D7</button>' +
+        '</div>' +
+        (combatHtml ? '<div class="sh-combat">' + combatHtml + '</div>' : '') +
+        '<div class="sh-body">' +
+          '<div class="sh-left">' +
+            '<div class="sh-section-title">Ability Scores</div>' +
+            '<div class="sh-abilities">' + abHtml + '</div>' +
+            '<div class="sh-saves"><div class="sh-section-title">Saving Throws</div>' + savesHtml + '</div>' +
+            '<div class="sh-skills"><div class="sh-section-title">Skills</div>' + skillsHtml + '</div>' +
+          '</div>' +
+          '<div class="sh-right">' +
+            atksHtml +
+            featsHtml +
+            equipHtml +
+            extraHtml +
+          '</div>' +
+        '</div>' +
+        '<div class="sh-footer">' +
+          '<div class="sh-footer-grid">' +
+            '<div class="sh-footer-block"><div class="sh-section-title">Personality</div>' +
+              '<p>' + esc(ch.traits) + '</p></div>' +
+            '<div class="sh-footer-block"><div class="sh-section-title">Backstory</div>' +
+              '<p>' + esc(ch.backstory) + '</p></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="sh-add-bar">' +
+          '<button class="sh-btn sh-btn--close" onclick="closeSheet()">Close</button>' +
+          '<button class="sh-btn sh-btn--add" onclick="addToChars(' + idx + ')">+ Add to My Characters</button>' +
+        '</div>';
+
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSheet() {
+      document.getElementById('sheet-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Close on overlay click
+    document.getElementById('sheet-overlay').addEventListener('click', function (e) {
+      if (e.target === this) closeSheet();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeSheet();
+    });
+
+    /* ═══════════════════════════════════════════════════
+       ADD TO MY CHARACTERS
+       ═══════════════════════════════════════════════════ */
+    function showToast(msg) {
+      var t = document.getElementById('gal-toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function () { t.classList.remove('show'); }, 3000);
+    }
+
+    function addToChars(idx) {
+      var ch = CHARACTERS[idx];
+      if (!ch) return;
+
+      if (typeof PhmurtDB === 'undefined' || !PhmurtDB.getSession) {
+        showToast('Sign in to add characters');
+        return;
+      }
+
+      PhmurtDB.getSession().then(function (session) {
+        if (!session) {
+          if (PhmurtDB.openAuth) PhmurtDB.openAuth();
+          else showToast('Please sign in first');
+          return;
+        }
+
+        var snapshot = {
+          name: ch.name,
+          race: ch.race,
+          class: ch.class,
+          level: ch.level,
+          edition: '5e',
+          abilities: ch.abilities,
+          features: ch.features || [],
+          equipment: ch.equipment || [],
+          traits: ch.traits || '',
+          backstory: ch.backstory || '',
+          subclass: ch.subclass || '',
+          flavor: ch.flavor || '',
+          source: 'gallery'
+        };
+        // Extended data
+        if (ch.ac != null) snapshot.ac = ch.ac;
+        if (ch.hp != null) snapshot.hp = ch.hp;
+        if (ch.speed != null) snapshot.speed = ch.speed;
+        if (ch.profBonus != null) snapshot.profBonus = ch.profBonus;
+        if (ch.saves) snapshot.saves = ch.saves;
+        if (ch.skills) snapshot.skills = ch.skills;
+        if (ch.attacks) snapshot.attacks = ch.attacks;
+        if (ch.resistances) snapshot.resistances = ch.resistances;
+        if (ch.languages) snapshot.languages = ch.languages;
+        if (ch.darkvision) snapshot.darkvision = ch.darkvision;
+        if (ch.background) snapshot.background = ch.background;
+        if (ch.multiclass) snapshot.multiclass = ch.multiclass;
+
+        PhmurtDB.saveCharacter(snapshot).then(function (result) {
+          if (result && result.success) {
+            showToast(ch.name + ' added to your characters!');
+          } else {
+            var err = (result && result.error) ? result.error : 'Could not save character';
+            showToast(err);
+          }
+        }).catch(function () {
+          showToast('Error saving character');
+        });
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════
+       FILTER / SORT
+       ═══════════════════════════════════════════════════ */
+    function filterCharacters() {
+      var classF = document.getElementById('filter-class').value;
+      var raceF = document.getElementById('filter-race').value;
+      var levelF = document.getElementById('filter-level').value;
+      var search = document.getElementById('search-input').value.toLowerCase();
+      var sortBy = document.getElementById('sort-by').value;
+
+      filteredCharacters = CHARACTERS.filter(function (ch) {
+        if (classF && ch.class !== classF) return false;
+        if (raceF && ch.race !== raceF) return false;
+        if (levelF && ch.level !== parseInt(levelF, 10)) return false;
+        if (search && ch.name.toLowerCase().indexOf(search) === -1 &&
+            ch.class.toLowerCase().indexOf(search) === -1 &&
+            ch.race.toLowerCase().indexOf(search) === -1) return false;
+        return true;
+      });
+
+      if (sortBy === 'name') {
+        filteredCharacters.sort(function (a, b) { return a.name.localeCompare(b.name); });
+      } else if (sortBy === 'class') {
+        filteredCharacters.sort(function (a, b) { return a.class.localeCompare(b.class); });
+      } else if (sortBy === 'level') {
+        filteredCharacters.sort(function (a, b) { return a.level - b.level; });
+      }
+
+      renderCharacters();
+    }
+
+    // Event listeners
+    ['filter-class','filter-race','filter-level','sort-by'].forEach(function (id) {
+      document.getElementById(id).addEventListener('change', filterCharacters);
+    });
+    document.getElementById('search-input').addEventListener('input', filterCharacters);
+
+    /* ═══════════════════════════════════════════════════
+       COMMUNITY CHARACTERS (loaded from Supabase)
+       ═══════════════════════════════════════════════════ */
+    function loadCommunityCharacters() {
+      if (typeof window.__supabase === 'undefined' && typeof window.supabase === 'undefined') return;
+      var sb = window.__supabase || window.supabase;
+      if (!sb || !sb.from) return;
+
+      sb.from('characters')
+        .select('id, name, race, class, level, builder_type, data, owner_id, is_public')
+        .eq('is_public', true)
+        .order('created_at', { ascending: false })
+        .limit(24)
+        .then(function (res) {
+          if (res.error || !res.data || !res.data.length) return;
+          renderCommunityCharacters(res.data);
+        });
+    }
+
+    function renderCommunityCharacters(chars) {
+      var section = document.getElementById('community-section');
+      var grid = document.getElementById('community-grid');
+      if (!section || !grid || !chars.length) return;
+
+      section.style.display = 'block';
+      grid.innerHTML = '';
+
+      chars.forEach(function (row) {
+        var name = esc(row.name || 'Unnamed');
+        var race = esc(row.race || '');
+        var cls = esc(row.class || row.class_ || '');
+        var level = row.level || 1;
+        var clsKey = (row.class || '').toLowerCase().split('/')[0].trim();
+        var data = row.data || {};
+
+        // Build ability scores if available
+        var abHtml = '';
+        var abilities = data.abilities || data.stats || null;
+        if (abilities) {
+          ['STR','DEX','CON','INT','WIS','CHA'].forEach(function (ab) {
+            var val = abilities[ab] || abilities[ab.toLowerCase()] || 10;
+            abHtml += '<div class="gc-ab">' +
+              '<div class="gc-ab-label">' + ab + '</div>' +
+              '<div class="gc-ab-score">' + val + '</div>' +
+              '<div class="gc-ab-mod">' + fmtMod(val) + '</div>' +
+              '</div>';
+          });
+        }
+
+        var card = document.createElement('div');
+        card.className = 'gc gc--' + clsKey + ' gc--community';
+        card.innerHTML =
+          '<div class="gc-head">' +
+            '<div class="gc-icon">' + (data.icon || '\u2694') + '</div>' +
+            '<div>' +
+              '<div class="gc-name">' + name + '</div>' +
+              '<div class="gc-subtitle">' + [cls, race].filter(Boolean).join(' \u00B7 ') + '</div>' +
+              '<div class="gc-author">by ' + esc(data._authorName || data.authorName || 'Adventurer') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="gc-meta">' +
+            '<span class="gc-pill gc-pill--level">Lv ' + level + '</span>' +
+            (data.subclass ? '<span class="gc-pill">' + esc(data.subclass) + '</span>' : '') +
+          '</div>' +
+          (abHtml ? '<div class="gc-abs">' + abHtml + '</div>' : '') +
+          (data.flavor ? '<div class="gc-flavor">\u201C' + esc(data.flavor) + '\u201D</div>' : '') +
+          '<div class="gc-btns">' +
+            '<button class="gc-btn gc-btn--add" data-community-id="' + esc(row.id) + '">+ Add to Characters</button>' +
+          '</div>';
+
+        // Bind add button
+        card.querySelector('.gc-btn--add').addEventListener('click', function (e) {
+          e.stopPropagation();
+          addCommunityChar(row);
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    function addCommunityChar(row) {
+      if (typeof PhmurtDB === 'undefined' || !PhmurtDB.getSession) {
+        showToast('Sign in to add characters');
+        return;
+      }
+      var session = PhmurtDB.getSession();
+      if (!session) {
+        if (PhmurtDB.openAuth) PhmurtDB.openAuth();
+        else showToast('Please sign in first');
+        return;
+      }
+      var data = row.data || {};
+      var snapshot = {
+        name: row.name,
+        race: row.race,
+        class: row.class || row.class_,
+        level: row.level,
+        edition: row.builder_type || '5e',
+        abilities: data.abilities || data.stats || {},
+        features: data.features || [],
+        equipment: data.equipment || [],
+        subclass: data.subclass || '',
+        flavor: data.flavor || '',
+        source: 'community-gallery'
+      };
+      PhmurtDB.saveCharacter(snapshot).then(function (res) {
+        if (res && res.id) showToast(snapshot.name + ' added!');
+        else showToast('Could not save — try again');
+      }).catch(function () { showToast('Save failed'); });
+    }
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', function () {
+      renderCharacters();
+      loadCommunityCharacters();
+    });
+  </script>
+
+  <script src="phmurt-shell.js?v=186" defer></script>
+</body>
+</html>

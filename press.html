@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co https://*.supabase.in https://*.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Press &amp; Media Kit · Phmurt Studios</title>
+  <meta name="description" content="Press kit and media resources for Phmurt Studios — studio fact sheet, brand assets, screenshots, boilerplate copy, and press contact." />
+  <meta property="og:title" content="Press &amp; Media Kit · Phmurt Studios" />
+  <meta property="og:description" content="Press kit and media resources for Phmurt Studios — studio fact sheet, brand assets, screenshots, boilerplate copy, and press contact." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://phmurtstudios.com/press.html" />
+  <meta property="og:image" content="https://phmurtstudios.com/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Press &amp; Media Kit · Phmurt Studios" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="style.css?v=185" />
+  <script defer src="theme.js?v=185"></script>
+  <link rel="canonical" href="https://phmurtstudios.com/press.html" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Phmurt Studios",
+    "url": "https://phmurtstudios.com/",
+    "logo": "https://phmurtstudios.com/logo.png",
+    "description": "Phmurt Studios is an independent tabletop game studio building homebrew classes, adventures, and digital tools for D&D 5e and OGL-compatible systems.",
+    "foundingDate": "2025",
+    "sameAs": [
+      "https://discord.gg/GSvCXfehmK",
+      "https://www.instagram.com/phmurt_studios/",
+      "https://www.youtube.com/@PhmurtStudios"
+    ]
+  }
+  </script>
+
+  <style>
+    .pk-wrap { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    .pk-hero { text-align: center; margin-bottom: 56px; }
+    .pk-hero-eyebrow {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 5px;
+      text-transform: uppercase; color: var(--crimson, #d4433a); margin-bottom: 12px;
+    }
+    .pk-hero-title {
+      font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 700;
+      color: var(--text, #f2e8d6); margin: 0 0 14px;
+    }
+    .pk-hero-subtitle {
+      font-family: 'Spectral', serif; font-size: 1.1rem; line-height: 1.6;
+      color: var(--text-muted, #9a8870); max-width: 600px; margin: 0 auto;
+    }
+
+    .pk-section { margin-bottom: 48px; }
+    .pk-section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--crimson, #d4433a);
+      margin: 0 0 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border, rgba(255,255,255,0.11));
+    }
+
+    /* FACT SHEET */
+    .pk-facts {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 14px 24px;
+      font-family: 'Spectral', serif;
+      font-size: 15px; line-height: 1.6;
+    }
+    .pk-fact-label {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text-faint, #7a6a55);
+      padding-top: 2px;
+    }
+    .pk-fact-value { color: var(--text, #f2e8d6); }
+    .pk-fact-value a { color: var(--crimson, #d4433a); text-decoration: none; }
+    .pk-fact-value a:hover { text-decoration: underline; }
+
+    /* BOILERPLATE */
+    .pk-boilerplate {
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 8px;
+      padding: 24px;
+      font-family: 'Spectral', serif;
+      font-size: 15px; line-height: 1.7;
+      color: var(--text, #f2e8d6);
+    }
+    .pk-boilerplate p { margin: 0 0 14px; }
+    .pk-boilerplate p:last-child { margin-bottom: 0; }
+    .pk-boilerplate-length {
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--crimson, #d4433a);
+      margin-bottom: 10px;
+    }
+    .pk-boilerplate + .pk-boilerplate { margin-top: 18px; }
+
+    /* PRODUCTS */
+    .pk-products { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .pk-product {
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 8px;
+      padding: 22px;
+    }
+    .pk-product-name {
+      font-family: 'Cinzel', serif; font-size: 1.05rem; font-weight: 600;
+      color: var(--text, #f2e8d6); margin: 0 0 6px;
+    }
+    .pk-product-tag {
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--crimson, #d4433a);
+      margin-bottom: 10px;
+    }
+    .pk-product-desc {
+      font-family: 'Spectral', serif; font-size: 14px; line-height: 1.55;
+      color: var(--text-muted, #9a8870); margin: 0;
+    }
+
+    /* ASSETS */
+    .pk-assets { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+    .pk-asset {
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 8px;
+      padding: 18px;
+      text-align: center;
+      display: block;
+      text-decoration: none;
+      transition: border-color .2s, transform .2s;
+    }
+    .pk-asset:hover {
+      border-color: var(--crimson, #d4433a);
+      transform: translateY(-2px);
+    }
+    .pk-asset-preview {
+      width: 72px; height: 72px; margin: 0 auto 12px;
+      background: #0b0b14;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+    }
+    .pk-asset-preview img { width: 100%; height: 100%; object-fit: contain; }
+    .pk-asset-name {
+      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--text, #f2e8d6);
+      margin-bottom: 4px;
+    }
+    .pk-asset-meta {
+      font-family: 'Spectral', serif; font-size: 12px;
+      color: var(--text-faint, #7a6a55); font-style: italic;
+    }
+
+    /* BRAND COLORS */
+    .pk-colors { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+    .pk-color {
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 8px;
+      padding: 14px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .pk-color-swatch {
+      width: 40px; height: 40px; border-radius: 6px;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .pk-color-info { min-width: 0; }
+    .pk-color-name {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--text, #f2e8d6);
+      margin-bottom: 2px;
+    }
+    .pk-color-hex {
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+      font-size: 12px; color: var(--text-muted, #9a8870);
+    }
+
+    /* QUOTES */
+    .pk-quotes-placeholder {
+      background: var(--bg-card, #141420);
+      border: 1px dashed var(--border, rgba(255,255,255,0.22));
+      border-radius: 8px;
+      padding: 28px 24px;
+      text-align: center;
+      font-family: 'Spectral', serif; font-style: italic;
+      font-size: 14px; color: var(--text-muted, #9a8870);
+    }
+
+    /* CONTACT */
+    .pk-contact {
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 8px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .pk-contact-label {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text-faint, #7a6a55);
+      margin-bottom: 6px;
+    }
+    .pk-contact-value {
+      font-family: 'Cinzel', serif; font-size: 1.1rem;
+      color: var(--crimson, #d4433a); text-decoration: none;
+      word-break: break-all;
+    }
+    .pk-contact-value:hover { text-decoration: underline; }
+    .pk-contact-note {
+      font-family: 'Spectral', serif; font-style: italic;
+      font-size: 13px; color: var(--text-muted, #9a8870);
+      margin-top: 12px; margin-bottom: 0;
+    }
+
+    /* MILESTONES */
+    .pk-timeline { position: relative; padding-left: 20px; }
+    .pk-timeline::before {
+      content: ''; position: absolute;
+      left: 4px; top: 6px; bottom: 6px;
+      width: 1px;
+      background: var(--border, rgba(255,255,255,0.22));
+    }
+    .pk-milestone {
+      position: relative;
+      margin-bottom: 18px;
+      font-family: 'Spectral', serif;
+      font-size: 14px; line-height: 1.55;
+      color: var(--text, #f2e8d6);
+    }
+    .pk-milestone::before {
+      content: ''; position: absolute;
+      left: -20px; top: 8px;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--crimson, #d4433a);
+    }
+    .pk-milestone-date {
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text-faint, #7a6a55);
+      margin-bottom: 2px;
+    }
+
+    @media (max-width: 640px) {
+      .pk-hero-title { font-size: 1.6rem; }
+      .pk-facts { grid-template-columns: 1fr; gap: 4px 0; }
+      .pk-fact-label { padding-top: 10px; }
+    }
+  </style>
+</head>
+<body data-nav-active="Home" data-footer-copy="Roll Well. Play Weird." data-breadcrumb="Home|index.html;Press &amp; Media Kit">
+  <a href="#main-content" class="ps-skip-nav">Skip to content</a>
+  <div id="ps-site-shell"></div>
+  <div id="ps-page-breadcrumb"></div>
+
+  <main id="main-content">
+    <div class="pk-wrap">
+
+      <div class="pk-hero">
+        <div class="pk-hero-eyebrow">For Press &amp; Creators</div>
+        <h1 class="pk-hero-title">Press &amp; Media Kit</h1>
+        <p class="pk-hero-subtitle">Everything you need to write about, review, or feature Phmurt Studios. Feel free to use any of the assets below without asking &mdash; and email us if you need anything that isn't here.</p>
+      </div>
+
+      <!-- FACT SHEET -->
+      <section class="pk-section">
+        <h2 class="pk-section-title">Fact Sheet</h2>
+        <div class="pk-facts">
+          <div class="pk-fact-label">Studio</div>
+          <div class="pk-fact-value">Phmurt Studios</div>
+
+          <div class="pk-fact-label">Founded</div>
+          <div class="pk-fact-value">2025</div>
+
+          <div class="pk-fact-label">Based In</div>
+          <div class="pk-fact-value">United States (remote team)</div>
+
+          <div class="pk-fact-label">Team Size</div>
+          <div class="pk-fact-value">Small (fewer than 10)</div>
+
+          <div class="pk-fact-label">Focus</div>
+          <div class="pk-fact-value">Tabletop roleplaying games &mdash; homebrew classes, adventures, and digital tools for D&amp;D 5e and OGL-compatible systems</div>
+
+          <div class="pk-fact-label">Website</div>
+          <div class="pk-fact-value"><a href="https://phmurtstudios.com/">phmurtstudios.com</a></div>
+
+          <div class="pk-fact-label">Press Contact</div>
+          <div class="pk-fact-value"><a href="mailto:press@phmurtstudios.com">press@phmurtstudios.com</a></div>
+
+          <div class="pk-fact-label">Community</div>
+          <div class="pk-fact-value"><a href="https://discord.gg/GSvCXfehmK" target="_blank" rel="noopener noreferrer">Discord</a></div>
+
+          <div class="pk-fact-label">Social</div>
+          <div class="pk-fact-value">
+            <a href="https://www.instagram.com/phmurt_studios/" target="_blank" rel="noopener noreferrer">Instagram</a> &middot;
+            <a href="https://www.youtube.com/@PhmurtStudios" target="_blank" rel="noopener noreferrer">YouTube</a>
+          </div>
+
+          <div class="pk-fact-label">Pricing</div>
+          <div class="pk-fact-value">Free tier + Pro ($5/mo) + Party Pass ($9.99/mo) + Lifetime ($50, limited to 200 slots)</div>
+
+          <div class="pk-fact-label">Platforms</div>
+          <div class="pk-fact-value">Web (browser), PDF downloads. Mobile app in development.</div>
+        </div>
+      </section>
+
+      <!-- BOILERPLATE -->
+      <section class="pk-section">
+        <h2 class="pk-section-title">Boilerplate Copy</h2>
+
+        <div class="pk-boilerplate">
+          <div class="pk-boilerplate-length">Short &mdash; 1 Sentence</div>
+          <p>Phmurt Studios is an independent tabletop game studio building homebrew classes, adventures, and digital tools for D&amp;D 5e and OGL-compatible systems.</p>
+        </div>
+
+        <div class="pk-boilerplate">
+          <div class="pk-boilerplate-length">Medium &mdash; 1 Paragraph</div>
+          <p>Phmurt Studios is a small independent tabletop game studio. We make homebrew classes (starting with the Soup Savant), digital tools (a character builder, a campaign tracker, 13 generators, and an expanding compendium of homebrew content), and adventures for D&amp;D 5e and OGL-compatible systems. Every team member runs a home game, and everything we ship is tested at real tables before it reaches the site.</p>
+        </div>
+
+        <div class="pk-boilerplate">
+          <div class="pk-boilerplate-length">Long &mdash; 2 Paragraphs</div>
+          <p>Phmurt Studios is an independent tabletop game studio founded in 2025. We build homebrew classes, campaign tools, and adventures for D&amp;D 5e and OGL-compatible systems. The studio's public releases include the Soup Savant &mdash; a full 20-level homebrew class with three subclasses &mdash; the Legendary compendium of homebrew races and subclasses, a 13-generator toolkit covering NPCs, monsters, taverns, treasure, and more, and a character builder supporting both 5e and 3.5e.</p>
+          <p>Beyond individual tools, Phmurt runs a deep campaign management layer featuring timelines, NPC relationships, faction tracking, kingdom management, downtime systems, and integrated homebrew content. The studio operates on a free-first model &mdash; most tools are free, with a Pro tier for cloud sync and unlimited characters, a Party Pass for shared campaigns, and a limited Lifetime option capped at 200 slots.</p>
+        </div>
+      </section>
+
+      <!-- PRODUCTS -->
+      <section class="pk-section">
+        <h2 class="pk-section-title">Flagship Products</h2>
+        <div class="pk-products">
+
+          <div class="pk-product">
+            <div class="pk-product-tag">Homebrew Class</div>
+            <div class="pk-product-name">The Soup Savant</div>
+            <p class="pk-product-desc">A 20-level D&amp;D 5e homebrew class that channels divine magic through cooking. Three subclasses, custom spell list, and full ingredient and recipe systems. Free.</p>
+          </div>
+
+          <div class="pk-product">
+            <div class="pk-product-tag">Compendium</div>
+            <div class="pk-product-name">Legendary</div>
+            <p class="pk-product-desc">A growing, filterable library of homebrew races, subclasses, feats, and magic items &mdash; all free and copy-pasteable into real character sheets.</p>
+          </div>
+
+          <div class="pk-product">
+            <div class="pk-product-tag">Tools</div>
+            <div class="pk-product-name">13 Generators</div>
+            <p class="pk-product-desc">NPCs, monsters, taverns, encounters, treasure, plot hooks, spells, wild magic, potions, weather, flavor, maps, and loot shops. All free. All work offline.</p>
+          </div>
+
+          <div class="pk-product">
+            <div class="pk-product-tag">Tool</div>
+            <div class="pk-product-name">Character Builder</div>
+            <p class="pk-product-desc">Opinionated, readable character creation for both 5e and 3.5e. Saves locally by default, cloud sync with a Pro account.</p>
+          </div>
+
+          <div class="pk-product">
+            <div class="pk-product-tag">Campaign Suite</div>
+            <div class="pk-product-name">Campaign Engine</div>
+            <p class="pk-product-desc">Timelines, NPC relationships, factions, quests, downtime, kingdoms, intrigue, hexcrawls, and crafting systems &mdash; all integrated.</p>
+          </div>
+
+          <div class="pk-product">
+            <div class="pk-product-tag">In Development</div>
+            <div class="pk-product-name">The Runewright</div>
+            <p class="pk-product-desc">Our second full homebrew class. Currently in late-stage playtest. See the <a href="roadmap.html" style="color:var(--crimson,#d4433a);">roadmap</a> for status.</p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- BRAND ASSETS -->
+      <section class="pk-section">
+        <h2 class="pk-section-title">Brand Assets</h2>
+        <p style="font-family:'Spectral',serif;font-size:14px;color:var(--text-muted,#9a8870);margin:0 0 18px;font-style:italic;">Click any asset to open the full-size file. You're welcome to use these for any coverage, review, or feature &mdash; no permission needed.</p>
+
+        <div class="pk-assets">
+
+          <a class="pk-asset" href="logo.png" target="_blank" rel="noopener">
+            <div class="pk-asset-preview"><img src="logo.png" alt="Phmurt Studios logo" /></div>
+            <div class="pk-asset-name">Primary Logo</div>
+            <div class="pk-asset-meta">PNG &middot; full color</div>
+          </a>
+
+          <a class="pk-asset" href="android-chrome-512x512.png" target="_blank" rel="noopener">
+            <div class="pk-asset-preview"><img src="android-chrome-512x512.png" alt="Phmurt Studios app icon" /></div>
+            <div class="pk-asset-name">App Icon</div>
+            <div class="pk-asset-meta">PNG &middot; 512&times;512</div>
+          </a>
+
+          <a class="pk-asset" href="apple-touch-icon.png" target="_blank" rel="noopener">
+            <div class="pk-asset-preview"><img src="apple-touch-icon.png" alt="Phmurt Studios touch icon" /></div>
+            <div class="pk-asset-name">Touch Icon</div>
+            <div class="pk-asset-meta">PNG &middot; 180&times;180</div>
+          </a>
+
+          <a class="pk-asset" href="favicon-32x32.png" target="_blank" rel="noopener">
+            <div class="pk-asset-preview"><img src="favicon-32x32.png" alt="Phmurt Studios favicon" /></div>
+            <div class="pk-asset-name">Favicon</div>
+            <div class="pk-asset-meta">PNG &middot; 32&times;32</div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- BRAND COLORS -->
+      <section class="pk-section">
+        <h2 class="pk-section-title">Brand Colors</h2>
+        <div class="pk-colors">
+
+          <div class="pk-color">
+            <div class="pk-color-swatch" style="background:#d4433a;"></div>
+            <div class="pk-color-info">
+              <div class="pk-color-name">Crimson</div>
+              <div class="pk-color-hex">#D4433A</div>
+            </div>
+          </div>
+
+          <div class="pk-color">
+            <div class="pk-color-swatch" style="background:#c9a84c;"></div>
+            <div class="pk-color-info">
+              <div class="pk-color-name">Gold</div>
+              <div class="pk-color-hex">#C9A84C</div>
+            </div>
+          </div>
+
+          <div class="pk-color">
+            <div class="pk-color-swatch" style="background:#f2e8d6;"></div>
+            <div class="pk-color-info">
+              <div class="pk-color-name">Parchment</div>
+              <div class="pk-color-hex">#F2E8D6</div>
+            </div>
+          </div>
+
+          <div class="pk-color">
+            <div class="pk-color-swatch" style="background:#141420;"></div>
+            <div class="pk-color-info">
+              <div class="pk-color-name">Night</div>
+              <div class="pk-color-hex">#141420</div>
+            </div>
+          </div>
+
+          <div class="pk-color">
+            <div class="pk-color-swatch" style="background:#0b0b14;"></div>
+            <div class="pk-color-info">
+              <div class="pk-color-name">Void</div>
+              <div class="pk-color-hex">#0B0B14</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- FONTS -->
+      <section class="pk-section">
+        <h2 class="pk-section-title">Typography</h2>
+        <div class="pk-facts">
+          <div class="pk-fact-label">Display</div>
+          <div class="pk-fact-value" style="font-family:'Cinzel',serif;font-size:1.2rem;">Cinzel &mdash; <span style="font-weight:700;">The Phmurt Blog</span></div>
+
+          <div class="pk-fact-label">Body</div>
+          <div class="pk-fact-value" style="font-family:'Spectral',serif;">Spectral &mdash; Weighted serif for long-form reading.</div>
+        </div>
+      </section>
+
+      <!-- MILESTONES -->
+      <section class="pk-section">
+        <h2 class="pk-section-title">Recent Milestones</h2>
+        <div class="pk-timeline">
+
+          <div class="pk-milestone">
+            <div class="pk-milestone-date">April 2026</div>
+            Public launch of the Phmurt Blog, Roadmap, and Lifetime Pass landing page. The Lifetime tier is capped at 200 slots.
+          </div>
+
+          <div class="pk-milestone">
+            <div class="pk-milestone-date">April 2026</div>
+            Getting Started onboarding flow and DM/Player learning guides shipped.
+          </div>
+
+          <div class="pk-milestone">
+            <div class="pk-milestone-date">March 2026</div>
+            Campaign suite expanded with kingdom management, hexcrawl, downtime, and intrigue systems.
+          </div>
+
+          <div class="pk-milestone">
+            <div class="pk-milestone-date">March 2026</div>
+            Gallery hit 40 published character showcases; 13th generator (loot shops) shipped.
+          </div>
+
+          <div class="pk-milestone">
+            <div class="pk-milestone-date">2025</div>
+            Phmurt Studios founded. Soup Savant class, Legendary compendium, and core generators released.
+          </div>
+
+        </div>
+      </section>
+
+      <!-- QUOTES -->
+      <section class="pk-section">
+        <h2 class="pk-section-title">Press &amp; Community Quotes</h2>
+        <div class="pk-quotes-placeholder">
+          We're early. If you're a tabletop creator or journalist who has written about us, tell us and we'll feature the quote here with a link back.
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section class="pk-section">
+        <h2 class="pk-section-title">Press Contact</h2>
+        <div class="pk-contact">
+          <div class="pk-contact-label">Direct inquiries to</div>
+          <a class="pk-contact-value" href="mailto:press@phmurtstudios.com">press@phmurtstudios.com</a>
+          <p class="pk-contact-note">Typical response time: 1&ndash;3 business days. For faster conversations with the team, join our <a href="https://discord.gg/GSvCXfehmK" target="_blank" rel="noopener noreferrer" style="color:var(--crimson,#d4433a);">Discord</a>.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script defer src="phmurt-shell.js?v=187"></script>
+</body>
+</html>

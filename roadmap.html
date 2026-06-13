@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co https://*.supabase.in https://*.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), usb=(), payment=(), serial=(), bluetooth=()" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Roadmap &middot; Phmurt Studios</title>
+  <meta name="description" content="What we've shipped, what's in development, and what's coming next at Phmurt Studios. A living roadmap for our independent TTRPG studio and platform." />
+  <meta property="og:title" content="Roadmap · Phmurt Studios" />
+  <meta property="og:description" content="What we've shipped, what's in development, and what's coming next at Phmurt Studios." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://phmurtstudios.com/roadmap.html" />
+  <meta property="og:image" content="https://phmurtstudios.com/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Roadmap · Phmurt Studios" />
+  <meta name="twitter:description" content="What we've shipped, what's in development, and what's coming next." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="style.css?v=185" />
+  <script defer src="theme.js?v=185"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.0" crossorigin="anonymous" integrity="sha384-fm42zLXjam4N3lT5umWgNtBBPMP3Ddrdmr9lnPKtDWzs5Dqy457Yn6+eTvCgRU3n"></script>
+  <script defer src="supabase-config.js?v=185"></script>
+  <script defer src="phmurt-auth.js?v=187"></script>
+  <link rel="canonical" href="https://phmurtstudios.com/roadmap.html" />
+  <style>
+    .rm-wrap { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+    .rm-hero { text-align: center; margin-bottom: 56px; }
+    .rm-hero-eyebrow {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 5px;
+      text-transform: uppercase; color: var(--crimson, #d4433a); margin-bottom: 12px;
+    }
+    .rm-hero-title {
+      font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 700;
+      color: var(--text, #f2e8d6); margin: 0 0 14px;
+    }
+    .rm-hero-subtitle {
+      font-family: 'Spectral', serif; font-size: 1.1rem; line-height: 1.6;
+      color: var(--text-muted, #9a8870); max-width: 620px; margin: 0 auto;
+    }
+    .rm-last-updated {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text-faint, #7a6a55); margin-top: 18px;
+    }
+
+    .rm-section { margin: 0 0 56px; }
+    .rm-section-header { display: flex; align-items: center; gap: 14px; margin: 0 0 22px; }
+    .rm-section-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .rm-section-dot.shipped { background: #5ee09a; box-shadow: 0 0 10px rgba(94,224,154,.35); }
+    .rm-section-dot.building { background: #c9a84c; box-shadow: 0 0 10px rgba(201,168,76,.35); }
+    .rm-section-dot.planned { background: var(--crimson, #d4433a); box-shadow: 0 0 10px rgba(212,67,58,.35); }
+    .rm-section-title {
+      font-family: 'Cinzel', serif; font-size: 14px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase; color: var(--text, #f2e8d6); margin: 0;
+    }
+    .rm-section-sub {
+      font-family: 'Spectral', serif; font-style: italic; font-size: 14px;
+      color: var(--text-muted, #9a8870); margin-left: auto;
+    }
+
+    .rm-items { display: flex; flex-direction: column; gap: 12px; }
+    .rm-item {
+      display: flex; gap: 18px; align-items: flex-start;
+      background: var(--bg-card, #141420); border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 8px; padding: 18px 22px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .rm-item:hover { border-color: rgba(255,255,255,.18); }
+    .rm-item-mark {
+      font-family: 'Cinzel', serif; font-size: 16px; line-height: 1; flex-shrink: 0;
+      min-width: 28px; text-align: center; padding-top: 2px;
+    }
+    .rm-item-mark.shipped { color: #5ee09a; }
+    .rm-item-mark.building { color: #c9a84c; }
+    .rm-item-mark.planned { color: var(--crimson, #d4433a); }
+    .rm-item-body { flex: 1; }
+    .rm-item-title {
+      font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
+      letter-spacing: 1.5px; color: var(--text, #f2e8d6); margin: 0 0 6px;
+    }
+    .rm-item-desc {
+      font-family: 'Spectral', serif; font-size: 14px; line-height: 1.55;
+      color: var(--text-muted, #9a8870); margin: 0;
+    }
+    .rm-item-tag {
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text-faint, #7a6a55);
+      padding: 3px 8px; border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 3px; margin-top: 8px; display: inline-block;
+    }
+
+    .rm-follow {
+      text-align: center; padding: 36px 24px; margin-top: 16px;
+      background: linear-gradient(135deg, var(--bg-card, #141420) 0%, rgba(212,67,58,.06) 100%);
+      border: 1px solid var(--crimson, #d4433a); border-radius: 8px;
+    }
+    .rm-follow-title {
+      font-family: 'Cinzel', serif; font-size: 18px; font-weight: 600;
+      color: var(--text, #f2e8d6); margin: 0 0 10px;
+    }
+    .rm-follow-desc {
+      font-family: 'Spectral', serif; font-size: 15px; color: var(--text-muted, #9a8870);
+      margin: 0 0 22px;
+    }
+    .rm-follow-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .rm-follow-link {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--text, #f2e8d6); text-decoration: none;
+      padding: 10px 20px; border: 1px solid var(--border, rgba(255,255,255,0.22));
+      border-radius: 4px; transition: border-color .2s, color .2s;
+    }
+    .rm-follow-link:hover { border-color: var(--crimson, #d4433a); color: var(--crimson, #d4433a); }
+
+    .rm-note {
+      font-family: 'Spectral', serif; font-style: italic; font-size: 13px;
+      color: var(--text-faint, #7a6a55); text-align: center; margin: 24px auto 0;
+      max-width: 560px; line-height: 1.55;
+    }
+
+    @media (max-width: 640px) {
+      .rm-hero-title { font-size: 1.6rem; }
+      .rm-section-header { flex-wrap: wrap; }
+      .rm-section-sub { margin-left: 0; width: 100%; }
+      .rm-item { flex-direction: column; gap: 8px; padding: 16px 18px; }
+    }
+  </style>
+</head>
+<body data-nav-active="Home" data-footer-copy="Roll Well. Play Weird." data-breadcrumb="Home|index.html;Roadmap">
+  <a href="#main-content" class="ps-skip-nav">Skip to content</a>
+  <div id="ps-site-shell"></div>
+  <div id="ps-page-breadcrumb"></div>
+
+  <main id="main-content">
+    <div class="rm-wrap">
+
+      <div class="rm-hero">
+        <div class="rm-hero-eyebrow">The Road Ahead</div>
+        <h1 class="rm-hero-title">Roadmap</h1>
+        <p class="rm-hero-subtitle">A running log of what we've shipped, what we're building right now, and what's waiting in the wings. We're a small studio moving fast &mdash; this page is a promise that the work is real.</p>
+        <div class="rm-last-updated">Last updated April 2026</div>
+      </div>
+
+      <!-- ─── Recently Shipped ─── -->
+      <section class="rm-section">
+        <div class="rm-section-header">
+          <span class="rm-section-dot shipped" aria-hidden="true"></span>
+          <h2 class="rm-section-title">Recently Shipped</h2>
+          <span class="rm-section-sub">Live on the site today</span>
+        </div>
+        <div class="rm-items">
+          <div class="rm-item">
+            <div class="rm-item-mark shipped" aria-hidden="true">&#10003;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">The Soup Savant</div>
+              <p class="rm-item-desc">A full 20-level D&amp;D 5e class built around weaponizing broth, healing with bisque, and running a traveling culinary empire. <a href="soup-savant.html" style="color:var(--crimson,#d4433a);">Read the class &rarr;</a></p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark shipped" aria-hidden="true">&#10003;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">Legendary Soups Supplement</div>
+              <p class="rm-item-desc">Recipes forged from the remains of the mightiest creatures in existence &mdash; monster-ingredient magic for tables that want their cooking to have stakes. <a href="legendary.html" style="color:var(--crimson,#d4433a);">Open the supplement &rarr;</a></p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark shipped" aria-hidden="true">&#10003;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">Campaign Manager with Multiplayer</div>
+              <p class="rm-item-desc">Dashboard, timeline, world-building, encounter builder, initiative tracker, quick notes, shared invites, party roster. A full DM cockpit that syncs to the cloud across devices and players.</p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark shipped" aria-hidden="true">&#10003;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">Character Builder (5e &amp; 3.5e) + PDF Export</div>
+              <p class="rm-item-desc">Guided wizard flow, live previews, interactive character sheets, and a one-click PDF export for every character you build.</p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark shipped" aria-hidden="true">&#10003;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">Homebrew Workshop &amp; Grimoire</div>
+              <p class="rm-item-desc">Create your own races, classes, backgrounds, subclasses, feats, items, spells, and monsters. Publish to the community &mdash; other DMs can collect and remix your work.</p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark shipped" aria-hidden="true">&#10003;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">13 Random Generators</div>
+              <p class="rm-item-desc">NPCs, taverns, plot hooks, encounters, treasure, weather, wild magic, potions, spells, flavor text, loot shops, fantasy maps, and a monster creator.</p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark shipped" aria-hidden="true">&#10003;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">Interactive Learn-to-Play &amp; Learn-to-DM Guides</div>
+              <p class="rm-item-desc">Step-by-step tutorials that teach dice, combat, magic, session prep, and improv, with hands-on practice built in.</p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark shipped" aria-hidden="true">&#10003;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">Accounts, Pro Subscriptions &amp; Party Pass</div>
+              <p class="rm-item-desc">Secure Supabase-backed accounts, Stripe billing for Pro and Party Pass, a 3-day grace window on failed payments, full data-export and delete-my-account support, and transactional email for receipts and dunning.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── In Development ─── -->
+      <section class="rm-section">
+        <div class="rm-section-header">
+          <span class="rm-section-dot building" aria-hidden="true"></span>
+          <h2 class="rm-section-title">In Development</h2>
+          <span class="rm-section-sub">Actively being built right now</span>
+        </div>
+        <div class="rm-items">
+          <div class="rm-item">
+            <div class="rm-item-mark building" aria-hidden="true">&#9733;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">The Runewright &mdash; Full Class</div>
+              <p class="rm-item-desc">An artificer variant who carves living magic into stone, metal, and bone. Magic that endures long after the caster is gone.</p>
+              <span class="rm-item-tag">D&amp;D 5e &middot; Full Class</span>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark building" aria-hidden="true">&#9733;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">Ashen Crown &mdash; Original RPG</div>
+              <p class="rm-item-desc">A standalone tabletop RPG set in the dying age of a fallen empire. Grim, political, mortal. A complete system built from the ground up &mdash; not a 5e variant.</p>
+              <span class="rm-item-tag">Original System</span>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark building" aria-hidden="true">&#9733;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">Advanced Campaign Engines</div>
+              <p class="rm-item-desc">Hexcrawl, faction war, downtime, religion, plague, heist, intrigue, prophecy, and puzzle modules for the Campaign Manager &mdash; deep simulation for DMs who want living worlds, not just adventure trackers.</p>
+              <span class="rm-item-tag">Pro Features</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── On the Horizon ─── -->
+      <section class="rm-section">
+        <div class="rm-section-header">
+          <span class="rm-section-dot planned" aria-hidden="true"></span>
+          <h2 class="rm-section-title">On the Horizon</h2>
+          <span class="rm-section-sub">Planned, not yet started</span>
+        </div>
+        <div class="rm-items">
+          <div class="rm-item">
+            <div class="rm-item-mark planned" aria-hidden="true">&#9671;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">More Classes &amp; Supplements</div>
+              <p class="rm-item-desc">New homebrew classes and compatible supplements are always in the pipeline. Keep an eye on the <a href="grimoire.html" style="color:var(--crimson,#d4433a);">Grimoire</a> for releases.</p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark planned" aria-hidden="true">&#9671;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">Battle Map &amp; Virtual Tabletop</div>
+              <p class="rm-item-desc">A full battle map engine with token sync, fog of war, and one-click encounter-to-map handoff is in design. Expect an early access in the coming months.</p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark planned" aria-hidden="true">&#9671;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">Kingdom &amp; Faction War Engine</div>
+              <p class="rm-item-desc">Deep domain-level play: running kingdoms, managing economies, and simulating faction wars across a living campaign world.</p>
+            </div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-item-mark planned" aria-hidden="true">&#9671;</div>
+            <div class="rm-item-body">
+              <div class="rm-item-title">Mobile App</div>
+              <p class="rm-item-desc">A native mobile companion for character sheets and dice rolling at the table. No promised timeline yet &mdash; we want the web experience locked in first.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Follow Along ─── -->
+      <div class="rm-follow">
+        <div class="rm-follow-title">Follow the Build</div>
+        <p class="rm-follow-desc">We publish dev updates, previews, and sneak peeks across a few channels. Pick whichever you like best.</p>
+        <div class="rm-follow-links">
+          <a class="rm-follow-link" href="https://discord.gg/GSvCXfehmK" target="_blank" rel="noopener noreferrer">Discord</a>
+          <a class="rm-follow-link" href="https://www.instagram.com/phmurt_studios/" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a class="rm-follow-link" href="https://www.youtube.com/@PhmurtStudios" target="_blank" rel="noopener noreferrer">YouTube</a>
+          <a class="rm-follow-link" href="mailto:contact@phmurtstudios.com">Email</a>
+        </div>
+      </div>
+
+      <p class="rm-note">Every item on this page is subject to change. We're an indie studio &mdash; priorities shift when playtests tell us to shift. We'll update this roadmap as the wind blows.</p>
+
+    </div>
+  </main>
+
+  <script defer src="phmurt-shell.js?v=187"></script>
+</body>
+</html>

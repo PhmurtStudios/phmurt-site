@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co https://*.supabase.in https://*.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'none'; object-src 'none';" />
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), usb=(), payment=(), serial=(), bluetooth=()" />
+  <title>Pricing · Phmurt Studios</title>
+  <meta name="description" content="Compare Phmurt Studios Free and Pro plans. Unlock unlimited characters, campaigns, generators, and advanced DM tools." />
+  <meta property="og:title" content="Pricing · Phmurt Studios" />
+  <meta property="og:description" content="Compare Phmurt Studios Free and Pro plans. Unlock unlimited characters, campaigns, generators, and advanced DM tools." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://phmurtstudios.com/pricing.html" />
+  <meta property="og:image" content="https://phmurtstudios.com/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Pricing · Phmurt Studios" />
+  <meta name="twitter:description" content="Compare Phmurt Studios Free and Pro plans." />
+  <link rel="canonical" href="https://phmurtstudios.com/pricing.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="stylesheet" href="style.css?v=185" />
+  <script src="theme.js?v=185"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.0" crossorigin="anonymous" integrity="sha384-fm42zLXjam4N3lT5umWgNtBBPMP3Ddrdmr9lnPKtDWzs5Dqy457Yn6+eTvCgRU3n"></script>
+  <script src="supabase-config.js?v=185"></script>
+  <script src="stripe-env.js?v=188"></script>
+  <script src="stripe-config.js?v=185"></script>
+  <script src="phmurt-auth.js?v=187"></script>
+
+  <style>
+    /* pricing page layout */
+    .pricing-mascot {
+      width: 100px;
+      height: auto;
+      margin: 0 auto 20px;
+      display: block;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25));
+      animation: mascotFloat 3s ease-in-out infinite;
+    }
+    @keyframes mascotFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .pricing-hero {
+      text-align: center;
+      padding: 80px 24px 40px;
+    }
+    .pricing-hero h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 2.4rem;
+      margin: 0 0 12px;
+      color: var(--gold, #c9a84c);
+    }
+    .pricing-hero p {
+      color: var(--text-secondary, #aaa);
+      font-size: 1.1rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* billing toggle */
+    .billing-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 28px 0 8px;
+      font-size: .95rem;
+    }
+    .billing-toggle span { color: var(--text-secondary, #aaa); }
+    .billing-toggle span.active { color: var(--text-primary, #eee); font-weight: 600; }
+    .billing-switch {
+      width: 48px; height: 26px;
+      background: var(--border, #333);
+      border-radius: 13px;
+      position: relative;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .billing-switch.yearly { background: var(--crimson, #d4433a); }
+    .billing-switch::after {
+      content: '';
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+      top: 3px; left: 3px;
+      transition: transform .2s;
+    }
+    .billing-switch.yearly::after { transform: translateX(22px); }
+    .billing-save {
+      background: var(--crimson, #d4433a);
+      color: #fff;
+      font-size: .75rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    /* plan cards */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+      max-width: 1400px;
+      margin: 32px auto 64px;
+      padding: 0 24px;
+    }
+    .plan-card {
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--crimson-border, #333);
+      border-radius: 8px;
+      padding: 36px 28px 32px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .plan-card.pro {
+      border-color: var(--crimson, #d4433a);
+      box-shadow: 0 0 20px rgba(212, 67, 58, .15);
+    }
+    .plan-card.pro::before {
+      content: 'MOST POPULAR';
+      position: absolute;
+      top: -12px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--crimson, #d4433a);
+      color: #fff;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      padding: 3px 14px;
+      border-radius: 10px;
+    }
+    .plan-card.lifetime {
+      border-color: #c9a84c;
+      box-shadow: 0 0 30px rgba(201, 168, 76, .2);
+      background: linear-gradient(135deg, var(--bg-card, #141420) 0%, rgba(201, 168, 76, .03) 100%);
+    }
+    .plan-card.lifetime::before {
+      content: 'LIMITED';
+      position: absolute;
+      top: -12px; left: 50%;
+      transform: translateX(-50%);
+      background: #c9a84c;
+      color: #0a0a0a;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      padding: 3px 14px;
+      border-radius: 10px;
+    }
+    .plan-card.lifetime .plan-name {
+      color: #c9a84c;
+    }
+    .plan-card.lifetime .plan-urgency {
+      color: #c9a84c;
+      font-size: .8rem;
+      font-weight: 600;
+      margin: 0 0 12px;
+      letter-spacing: .05em;
+    }
+    .plan-card.lifetime .plan-counter {
+      color: var(--text-secondary, #aaa);
+      font-size: .85rem;
+      margin: 0 0 16px;
+    }
+    .plan-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      margin: 0 0 6px;
+      color: var(--text-primary, #eee);
+    }
+    .plan-desc {
+      color: var(--text-secondary, #aaa);
+      font-size: .9rem;
+      margin: 0 0 20px;
+      line-height: 1.45;
+    }
+    .plan-price {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-primary, #eee);
+      margin: 0 0 2px;
+    }
+    .plan-price .period {
+      font-size: .9rem;
+      font-weight: 400;
+      color: var(--text-secondary, #aaa);
+    }
+    .plan-price-note {
+      color: var(--text-secondary, #aaa);
+      font-size: .8rem;
+      margin: 0 0 24px;
+      min-height: 18px;
+    }
+    .plan-cta {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      border: none;
+      margin-bottom: 24px;
+      text-decoration: none;
+    }
+    .plan-cta.free-cta {
+      background: transparent;
+      border: 1px solid var(--border, #444);
+      color: var(--text-primary, #eee);
+    }
+    .plan-cta.pro-cta {
+      background: var(--crimson, #d4433a);
+      color: #fff;
+    }
+    .plan-cta.pro-cta:hover { opacity: .9; }
+    .plan-cta.party-cta {
+      background: var(--crimson, #d4433a);
+      color: #fff;
+    }
+    .plan-cta.party-cta:hover { opacity: .9; }
+    .plan-cta.lifetime-cta {
+      background: #c9a84c;
+      color: #0a0a0a;
+      font-weight: 700;
+    }
+    .plan-cta.lifetime-cta:hover { opacity: .85; }
+    .plan-cta.active-cta {
+      background: transparent;
+      border: 1px solid var(--crimson, #d4433a);
+      color: var(--crimson, #d4433a);
+      cursor: default;
+    }
+
+    /* Feature list */
+    .plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex: 1;
+    }
+    .plan-features li {
+      padding: 7px 0;
+      font-size: .9rem;
+      color: var(--text-primary, #ddd);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.4;
+    }
+    .plan-features li::before {
+      content: '✓';
+      color: #22c55e;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .plan-features li.locked {
+      color: var(--text-secondary, #666);
+    }
+    .plan-features li.locked::before {
+      content: '—';
+      color: var(--text-secondary, #555);
+    }
+
+    /* faq section */
+    .pricing-faq {
+      max-width: 640px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+    .pricing-faq h2 {
+      font-family: 'Cinzel', serif;
+      text-align: center;
+      margin: 0 0 28px;
+      color: var(--text-primary, #eee);
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border, #333);
+      padding: 18px 0;
+    }
+    .faq-q {
+      font-weight: 600;
+      color: var(--text-primary, #eee);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .faq-q::after { content: '+'; font-size: 1.2rem; color: var(--text-secondary, #888); }
+    .faq-q.open::after { content: '−'; }
+    .faq-a {
+      color: var(--text-secondary, #aaa);
+      font-size: .9rem;
+      line-height: 1.6;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .25s ease, margin .25s ease;
+      margin-top: 0;
+    }
+    .faq-q.open + .faq-a { max-height: 400px; margin-top: 12px; }
+
+    @media (max-width: 700px) {
+      .pricing-hero h1 { font-size: 1.8rem; }
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <!--
+    SEO: schema.org Product with Offers for Pro (monthly + yearly) and
+    Lifetime. Prices below should stay in sync with pricing.html visible
+    UI and with phmurt-auth.js getTierConfig() defaults.
+    Search engines treat this as the canonical source of pricing metadata.
+  -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Phmurt Studios Pro",
+    "description": "Subscription for the Phmurt Studios tabletop RPG platform. Unlimited characters, unlimited campaigns, every generator, advanced campaign tabs, and world-building tools.",
+    "brand": { "@type": "Brand", "name": "Phmurt Studios" },
+    "image": "https://phmurtstudios.com/logo.png",
+    "url": "https://phmurtstudios.com/pricing.html",
+    "category": "Tabletop RPG software",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Pro Monthly",
+        "price": "5.00",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "url": "https://phmurtstudios.com/pricing.html?plan=monthly",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "5.00",
+          "priceCurrency": "USD",
+          "billingDuration": "P1M",
+          "unitText": "MONTH"
+        }
+      },
+      {
+        "@type": "Offer",
+        "name": "Pro Yearly",
+        "price": "50.00",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "url": "https://phmurtstudios.com/pricing.html?plan=yearly",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "50.00",
+          "priceCurrency": "USD",
+          "billingDuration": "P1Y",
+          "unitText": "YEAR"
+        }
+      },
+      {
+        "@type": "Offer",
+        "name": "Lifetime Pass (early supporter, limited to 200)",
+        "price": "50.00",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/LimitedAvailability",
+        "url": "https://phmurtstudios.com/pricing.html",
+        "eligibleQuantity": {
+          "@type": "QuantitativeValue",
+          "maxValue": 200,
+          "unitCode": "C62"
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-nav-active="" data-footer-copy="Roll Well. Play Weird." data-breadcrumb="Home|index.html;Pricing">
+
+  <a href="#main-content" class="ps-skip-nav">Skip to content</a>
+  <div id="ps-site-shell"></div>
+  <div id="ps-page-breadcrumb"></div>
+
+  
+  <section class="pricing-hero" id="main-content">
+    <img src="owlbear-purple.png" alt="Phmurt Studios Owlbear Mascot" class="pricing-mascot" />
+    <h1>Choose Your Path</h1>
+    <p>Every adventurer starts somewhere. Upgrade to Pro when you're ready for the full arsenal.</p>
+
+    <div class="billing-toggle">
+      <span class="active" id="lbl-monthly">Monthly</span>
+      <div class="billing-switch" id="billing-switch" role="switch" aria-checked="false" aria-label="Toggle between monthly and yearly billing" tabindex="0"></div>
+      <span id="lbl-yearly">Yearly</span>
+      <span class="billing-save">Save $10</span>
+    </div>
+  </section>
+
+  <!-- Plan cards -->
+  <section class="pricing-grid">
+
+    <!-- Free plan -->
+    <div class="plan-card">
+      <h2 class="plan-name">Free</h2>
+      <p class="plan-desc">Everything you need to build a character and run a campaign.</p>
+      <div class="plan-price">$0 <span class="period">/ forever</span></div>
+      <p class="plan-price-note">&nbsp;</p>
+      <a href="character-builder.html" class="plan-cta free-cta" id="free-cta">Get Started</a>
+      <ul class="plan-features">
+        <li>Up to 3 characters</li>
+        <li>1 campaign</li>
+        <li>Character Builder (5e &amp; 3.5e)</li>
+        <li>Interactive Character Sheets</li>
+        <li>Dice Roller</li>
+        <li>Learn to Play Guides</li>
+        <li>Character Gallery</li>
+        <li>Basic Campaign Management</li>
+        <li class="locked">Unlimited Characters &amp; Campaigns</li>
+        <li class="locked">Random Generators</li>
+        <li class="locked">Advanced Campaign Tabs</li>
+        <li class="locked">World Building Tools</li>
+        <li class="locked">Priority Support</li>
+      </ul>
+    </div>
+
+    <!-- Pro plan -->
+    <div class="plan-card pro">
+      <h2 class="plan-name">Phmurt Studios Pro</h2>
+      <p class="plan-desc">Unlimited power for serious players and DMs.</p>
+      <div class="plan-price" id="pro-price">$5 <span class="period">/ month</span></div>
+      <p class="plan-price-note" id="pro-note">&nbsp;</p>
+      <button class="plan-cta pro-cta" id="pro-cta">Subscribe Now</button>
+      <ul class="plan-features">
+        <li>Unlimited characters</li>
+        <li>Unlimited campaigns</li>
+        <li>Everything in Free</li>
+        <li>Name, Loot, Encounter &amp; Quest Generators</li>
+        <li>Advanced Campaign Tabs (Heist, Intrigue, Prophecy, Puzzles)</li>
+        <li>Downtime &amp; Religion Systems</li>
+        <li>Hexcrawl &amp; World Atlas</li>
+        <li>Economy &amp; Faction War Engines</li>
+        <li>Battle Map &amp; Living World</li>
+        <li>Priority Support</li>
+      </ul>
+    </div>
+
+    <!-- Party Pass plan (hidden for now) -->
+    <div class="plan-card" id="party-card" style="display:none;">
+      <h2 class="plan-name">Party Pass</h2>
+      <p class="plan-desc">One DM + up to 5 players sharing one workspace.</p>
+      <div class="plan-price" id="party-price">$9.99 <span class="period">/ month</span></div>
+      <p class="plan-price-note" id="party-note">That's ~$1.67/person per month</p>
+      <button class="plan-cta party-cta" id="party-cta">Get Party Pass</button>
+      <ul class="plan-features">
+        <li>1 DM + up to 5 players (6 accounts)</li>
+        <li>Shared campaign workspace</li>
+        <li>All Pro features for everyone</li>
+        <li>Unlimited characters &amp; campaigns</li>
+        <li>All generators &amp; tools</li>
+        <li>Advanced Campaign Tabs</li>
+        <li>World Building Tools</li>
+        <li>Priority Support</li>
+      </ul>
+    </div>
+
+    <!-- Lifetime Pass plan -->
+    <div class="plan-card lifetime">
+      <h2 class="plan-name">Lifetime Pass</h2>
+      <p class="plan-desc">Everything Pro offers &mdash; plus exclusive content access, forever. One payment, no subscriptions.</p>
+      <div class="plan-price">$50 <span class="period">one time</span></div>
+      <p class="plan-urgency">Early Supporter Edition — Limited to first 200 members</p>
+      <p class="plan-counter" id="lifetime-counter">199 of 200 remaining</p>
+      <button class="plan-cta lifetime-cta" id="lifetime-cta">Claim Lifetime Access</button>
+      <ul class="plan-features">
+        <li>All Pro features forever</li>
+        <li>Access to all published content — free &amp; premium, past &amp; future</li>
+        <li>No recurring charges, ever</li>
+        <li>Unlimited characters &amp; campaigns</li>
+        <li>All generators (Name, Loot, Encounter, Quest)</li>
+        <li>Advanced Campaign Tabs</li>
+        <li>World Building &amp; Economy Engines</li>
+        <li>Hexcrawl &amp; Battle Map</li>
+        <li>Priority Support</li>
+      </ul>
+    </div>
+
+  </section>
+
+  <!-- FAQ -->
+  <section class="pricing-faq">
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">Can I try Pro features before subscribing?</div>
+      <div class="faq-a">The free tier gives you full access to the character builder, character sheets, dice roller, and basic campaign management so you can get a feel for the platform before upgrading.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can I cancel anytime?</div>
+      <div class="faq-a">Yes — cancel from your account menu at any time. You'll keep Pro access through the end of your billing period, then revert to the free tier. No cancellation fees.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What happens to my characters if I cancel?</div>
+      <div class="faq-a">Your characters and campaigns are never deleted. On the free tier you can still view and edit your first 3 characters and 1 campaign. The rest stay safe in your account and become accessible again if you re-subscribe.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is my payment secure?</div>
+      <div class="faq-a">All payments are handled by Stripe. Phmurt Studios never sees or stores your card details.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Can I switch between monthly and yearly?</div>
+      <div class="faq-a">Yes — manage your billing cycle from your subscription settings. Switch at any time and we'll prorate the difference.</div>
+    </div>
+    <!-- Party Pass FAQ hidden for now -->
+    <!--
+    <div class="faq-item">
+      <div class="faq-q">How does the Party Pass work?</div>
+      <div class="faq-a">One person purchases the Party Pass and invites up to 5 other players. Everyone gets a full Pro account with access to the shared campaign workspace. The DM can manage who's in the party from the settings.</div>
+    </div>
+    -->
+    <div class="faq-item">
+      <div class="faq-q">What happens after 200 Lifetime Passes sell out?</div>
+      <div class="faq-a">The Lifetime Pass is an early supporter offer limited to the first 200 members. Once sold out, this offer won't return at this price. Lifetime members keep access to every piece of content we ever publish — free and premium — forever. You'll still be able to subscribe to Pro, Party Pass, or other plans after it sells out.</div>
+    </div>
+    <!-- Party Pass upgrade FAQ hidden for now -->
+    <!--
+    <div class="faq-item">
+      <div class="faq-q">Can I upgrade from Pro to Party Pass?</div>
+      <div class="faq-a">Yes — upgrade at any time from your account settings. We'll prorate the difference between your current plan and the new plan, so you'll only pay for what you're gaining.</div>
+    </div>
+    -->
+  </section>
+
+  <div id="ps-site-footer"></div>
+  <script src="phmurt-shell.js?v=187"></script>
+  <noscript>
+    <p style="padding: 20px; text-align: center; color: #e74c3c; font-family: sans-serif;">
+      This site requires JavaScript to function properly. Please enable JavaScript in your browser settings.
+    </p>
+  </noscript>
+
+  <script>
+  (function () {
+    /* billing toggle logic */
+    var yearly = false;
+    var sw = document.getElementById('billing-switch');
+    var lblM = document.getElementById('lbl-monthly');
+    var lblY = document.getElementById('lbl-yearly');
+    var priceEl = document.getElementById('pro-price');
+    var noteEl = document.getElementById('pro-note');
+    var ctaEl = document.getElementById('pro-cta');
+    var freeCtaEl = document.getElementById('free-cta');
+    var partyPriceEl = document.getElementById('party-price');
+    var partyNoteEl = document.getElementById('party-note');
+    var partyCtaEl = document.getElementById('party-cta');
+    var lifetimeCtaEl = document.getElementById('lifetime-cta');
+
+    /* ── Extract numeric+period from a tier-config price string ──
+       Accepts forms like "$5/mo", "$5 / month", "$50/yr".
+       Returns { amount: "$5", period: "/ month" } with sensible fallback. */
+    function _parseTierPrice(raw, defaultAmount, defaultPeriod) {
+      if (!raw || typeof raw !== 'string') {
+        return { amount: defaultAmount, period: defaultPeriod };
+      }
+      // Match leading amount (with optional decimals + currency symbol)
+      var m = raw.match(/^\s*(\$?[0-9]+(?:\.[0-9]+)?)\s*\/?\s*(.*)$/);
+      if (!m) return { amount: defaultAmount, period: defaultPeriod };
+      var amt = m[1];
+      var per = (m[2] || '').trim().toLowerCase();
+      var fullPeriod;
+      if (per === 'mo' || per === 'month' || per === 'monthly' || per === 'm') fullPeriod = '/ month';
+      else if (per === 'yr' || per === 'year' || per === 'yearly' || per === 'y') fullPeriod = '/ year';
+      else if (per) fullPeriod = '/ ' + per;
+      else fullPeriod = defaultPeriod;
+      return { amount: amt, period: fullPeriod };
+    }
+
+    function _getProPrices() {
+      var tier = null;
+      try {
+        if (typeof PhmurtDB !== 'undefined' && typeof PhmurtDB.getTierConfig === 'function') {
+          tier = PhmurtDB.getTierConfig();
+        }
+      } catch (e) { tier = null; }
+      var monthlyRaw = tier && tier.pro && tier.pro.price ? tier.pro.price.monthly : null;
+      var yearlyRaw  = tier && tier.pro && tier.pro.price ? tier.pro.price.yearly  : null;
+      var savingsRaw = tier && tier.pro && tier.pro.price ? tier.pro.price.yearlySavings : null;
+      return {
+        monthly: _parseTierPrice(monthlyRaw, '$5', '/ month'),
+        yearly:  _parseTierPrice(yearlyRaw,  '$50', '/ year'),
+        savings: (typeof savingsRaw === 'string' && savingsRaw) ? savingsRaw : 'Save $10',
+      };
+    }
+
+    /* Update the billing-save badge in the toggle to reflect dynamic savings */
+    function _updateBillingSaveLabel() {
+      var prices = _getProPrices();
+      var badge = document.querySelector('.billing-save');
+      if (badge) badge.textContent = prices.savings;
+    }
+
+    function updatePricing() {
+      var prices = _getProPrices();
+      if (yearly) {
+        sw.classList.add('yearly');
+        sw.setAttribute('aria-checked', 'true');
+        lblM.classList.remove('active');
+        lblY.classList.add('active');
+        // SECURITY: Clear and rebuild to prevent duplicate spans
+        while (priceEl.firstChild) { priceEl.removeChild(priceEl.firstChild); }
+        priceEl.appendChild(document.createTextNode(prices.yearly.amount + ' '));
+        var span = document.createElement('span');
+        span.className = 'period';
+        span.textContent = prices.yearly.period;
+        priceEl.appendChild(span);
+        noteEl.textContent = prices.savings + ' vs monthly';
+
+        // Update Party Pass pricing
+        while (partyPriceEl.firstChild) { partyPriceEl.removeChild(partyPriceEl.firstChild); }
+        partyPriceEl.appendChild(document.createTextNode('$99 '));
+        var partySpan = document.createElement('span');
+        partySpan.className = 'period';
+        partySpan.textContent = '/ year';
+        partyPriceEl.appendChild(partySpan);
+        partyNoteEl.textContent = 'That\'s ~$1.38/person per month';
+      } else {
+        sw.classList.remove('yearly');
+        sw.setAttribute('aria-checked', 'false');
+        lblM.classList.add('active');
+        lblY.classList.remove('active');
+        // SECURITY: Clear and rebuild to prevent duplicate spans
+        while (priceEl.firstChild) { priceEl.removeChild(priceEl.firstChild); }
+        priceEl.appendChild(document.createTextNode(prices.monthly.amount + ' '));
+        var span = document.createElement('span');
+        span.className = 'period';
+        span.textContent = prices.monthly.period;
+        priceEl.appendChild(span);
+        noteEl.textContent = '';
+
+        // Update Party Pass pricing
+        while (partyPriceEl.firstChild) { partyPriceEl.removeChild(partyPriceEl.firstChild); }
+        partyPriceEl.appendChild(document.createTextNode('$9.99 '));
+        var partySpan = document.createElement('span');
+        partySpan.className = 'period';
+        partySpan.textContent = '/ month';
+        partyPriceEl.appendChild(partySpan);
+        partyNoteEl.textContent = 'That\'s ~$1.67/person per month';
+      }
+      _updateBillingSaveLabel();
+    }
+
+    /* Re-render when auth/site_settings refresh finishes (so DB-set prices take over) */
+    window.addEventListener('phmurt-auth-change', function () { updatePricing(); });
+
+    /* ── Auto-select plan from query param (e.g. ?plan=yearly) ─────── */
+    var pricingOrigin = 'direct';
+    try {
+      var urlParams = new URLSearchParams(window.location.search);
+      var planParam = urlParams.get('plan');
+      // SECURITY: Validate plan parameter is in allowed set
+      if (planParam === 'yearly') { yearly = true; updatePricing(); pricingOrigin = 'url-param'; }
+      else if (planParam === 'monthly') { yearly = false; updatePricing(); pricingOrigin = 'url-param'; }
+      // Referrer-based attribution: distinguish deep-link from gate-modal.
+      if (pricingOrigin === 'direct' && document.referrer) {
+        try {
+          var refHost = new URL(document.referrer).hostname;
+          if (refHost === location.hostname) pricingOrigin = 'internal';
+        } catch (e2) { /* ignore */ }
+      }
+    } catch (e) { /* URLSearchParams not supported — ignore */ }
+
+    /* ── Funnel analytics: record pricing-page view ─────────────────── */
+    try {
+      if (typeof PhmurtDB !== 'undefined' && typeof PhmurtDB.logEvent === 'function') {
+        PhmurtDB.logEvent('pricing-page-viewed', { from: pricingOrigin });
+      }
+    } catch (e) { /* ignore */ }
+
+    sw.addEventListener('click', function () { yearly = !yearly; updatePricing(); });
+    sw.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); yearly = !yearly; updatePricing(); }
+    });
+
+    /* lifetime slot counter (live from supabase) */
+    (function loadLifetimeSlots() {
+      var counterEl = document.getElementById('lifetime-counter');
+      var MAX_LIFETIME = 200;
+      try {
+        if (typeof phmurtSupabase !== 'undefined' && phmurtSupabase) {
+          phmurtSupabase.from('profiles')
+            .select('id', { count: 'exact', head: true })
+            .eq('subscription_tier', 'lifetime')
+            .eq('subscription_status', 'active')
+            .then(function (res) {
+              var sold = (res && res.count != null) ? res.count : 0;
+              var remaining = Math.max(0, MAX_LIFETIME - sold);
+              if (counterEl) {
+                counterEl.textContent = remaining + ' of ' + MAX_LIFETIME + ' remaining';
+                if (remaining === 0) {
+                  counterEl.textContent = 'SOLD OUT';
+                  counterEl.style.color = '#ef4444';
+                  counterEl.style.fontWeight = '700';
+                  // Replace the disabled CTA with a small waitlist capture
+                  // form so interested users can still leave their email.
+                  _renderWaitlistCapture();
+                }
+              }
+            });
+        }
+      } catch (e) { /* Supabase not loaded yet — keep hardcoded fallback */ }
+    })();
+
+    /* ── Lifetime waitlist capture ───────────────────────────────────
+       Swaps the disabled "Claim" button for a minimal email-capture
+       form. The form is backed by the lifetime_waitlist_join RPC which
+       is SECURITY DEFINER and only accepts inserts when all 200 slots
+       are in fact sold (double-checks server-side). */
+    function _renderWaitlistCapture() {
+      if (!lifetimeCtaEl) return;
+      if (document.getElementById('phmurt-waitlist-form')) return; // already rendered
+
+      var wrap = document.createElement('div');
+      wrap.id = 'phmurt-waitlist-form';
+      wrap.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin:0 0 8px;';
+      wrap.innerHTML =
+        '<label for="phmurt-waitlist-email" style="font-family:Cinzel,serif;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:#c9a84c;">Join the waitlist</label>' +
+        '<input type="email" id="phmurt-waitlist-email" placeholder="you@example.com" autocomplete="email" ' +
+          'style="padding:10px 12px;border-radius:4px;background:rgba(10,10,10,0.6);border:1px solid #c9a84c55;color:var(--text,#e7dcc6);font-family:Spectral,serif;font-size:.95rem;" />' +
+        '<button type="button" id="phmurt-waitlist-submit" class="plan-cta" ' +
+          'style="background:#c9a84c;color:#0a0a0a;">Notify Me If A Slot Opens</button>' +
+        '<p id="phmurt-waitlist-help" style="font-size:.75rem;color:var(--text-secondary,#aaa);margin:0;">We&rsquo;ll only email you if a Lifetime Pass slot opens up. No newsletter, no spam.</p>';
+
+      // Replace the CTA button with the form, in place.
+      if (lifetimeCtaEl.parentNode) {
+        lifetimeCtaEl.parentNode.replaceChild(wrap, lifetimeCtaEl);
+      }
+
+      var emailIn = document.getElementById('phmurt-waitlist-email');
+      var submit  = document.getElementById('phmurt-waitlist-submit');
+      if (!emailIn || !submit) return;
+
+      function _submit() {
+        var email = (emailIn.value || '').trim();
+        // Lightweight client-side shape check; server re-validates.
+        if (!/^\S+@\S+\.\S+$/.test(email) || email.length < 5 || email.length > 254) {
+          showToast('Please enter a valid email address.', 'error');
+          try { emailIn.focus(); } catch (e) {}
+          return;
+        }
+
+        // Must be signed in — RPC is EXECUTE-granted to authenticated only.
+        if (typeof PhmurtDB === 'undefined' || !PhmurtDB.getSession || !PhmurtDB.getSession()) {
+          showToast('Please sign in first to join the waitlist.', 'error');
+          return;
+        }
+        if (typeof phmurtSupabase === 'undefined' || !phmurtSupabase) {
+          showToast('Could not reach the waitlist service. Please try again.', 'error');
+          return;
+        }
+
+        submit.disabled = true;
+        submit.textContent = 'Submitting\u2026';
+
+        phmurtSupabase.rpc('lifetime_waitlist_join', { p_email: email })
+          .then(function (res) {
+            if (res && res.error) {
+              // Server rejected (e.g. slots re-opened, invalid email)
+              showToast(res.error.message || 'Could not join waitlist.', 'error');
+              submit.disabled = false;
+              submit.textContent = 'Notify Me If A Slot Opens';
+              return;
+            }
+            // Success — disable form and show success state. Because
+            // the RPC is ON CONFLICT DO NOTHING, duplicates show the
+            // same success message without leaking that the email was
+            // already on the list.
+            showToast('You\u2019re on the list! We\u2019ll email you if a slot opens up.', 'success');
+            emailIn.disabled = true;
+            submit.disabled = true;
+            submit.textContent = 'On the Waitlist';
+            try { PhmurtDB.logEvent('lifetime-waitlist-joined', {}); } catch (e) {}
+          })
+          .catch(function (err) {
+            showToast((err && err.message) ? err.message : 'Could not join waitlist.', 'error');
+            submit.disabled = false;
+            submit.textContent = 'Notify Me If A Slot Opens';
+          });
+      }
+
+      submit.addEventListener('click', _submit);
+      emailIn.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); _submit(); }
+      });
+    }
+
+    /* inline toast helper */
+    function showToast(msg, type) {
+      var old = document.getElementById('phmurt-toast');
+      if (old) old.remove();
+      var t = document.createElement('div');
+      t.id = 'phmurt-toast';
+      var bg = type === 'success' ? 'rgba(34,197,94,0.15)' : type === 'error' ? 'rgba(239,68,68,0.15)' : 'rgba(212,67,58,0.10)';
+      var border = type === 'success' ? 'rgba(34,197,94,0.4)' : type === 'error' ? 'rgba(239,68,68,0.4)' : 'rgba(212,67,58,0.25)';
+      var color = type === 'success' ? '#5ee09a' : type === 'error' ? '#ef4444' : '#d4c4a8';
+      t.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:10001;padding:14px 28px;border-radius:8px;font-family:Spectral,serif;font-size:15px;color:' + color + ';background:' + bg + ';border:1px solid ' + border + ';backdrop-filter:blur(12px);box-shadow:0 4px 24px rgba(0,0,0,0.3);animation:phmurt-toast-in 0.3s ease;max-width:480px;text-align:center;';
+      t.textContent = msg;
+      // Add animation keyframes if not already added
+      if (!document.getElementById('phmurt-toast-style')) {
+        var s = document.createElement('style');
+        s.id = 'phmurt-toast-style';
+        s.textContent = '@keyframes phmurt-toast-in{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+        document.head.appendChild(s);
+      }
+      document.body.appendChild(t);
+      setTimeout(function () { t.style.transition = 'opacity 0.4s'; t.style.opacity = '0'; setTimeout(function () { t.remove(); }, 400); }, 5000);
+    }
+
+    /* handle return from stripe */
+    try {
+      var returnParams = new URLSearchParams(window.location.search);
+      var subStatus = returnParams.get('subscription');
+      if (subStatus === 'success') {
+        showToast('Welcome to Pro! Your subscription is active.', 'success');
+        try { history.replaceState(null, '', window.location.pathname); } catch (e) {}
+        // Force-refresh session from database so UI updates to show "Manage Subscription"
+        // Retry a few times with delay — Stripe webhook may not have processed yet
+        (function refreshAfterCheckout(attempt) {
+          if (attempt > 5) return; // give up after ~30s
+          var delay = attempt === 0 ? 1000 : 5000;
+          setTimeout(function () {
+            if (typeof PhmurtDB !== 'undefined' && PhmurtDB.refreshSession) {
+              PhmurtDB.refreshSession().then(function (sess) {
+                if (sess && sess.isSubscribed) {
+                  // Session updated — trigger UI refresh
+                  window.dispatchEvent(new Event('phmurt-auth-change'));
+                } else {
+                  // Webhook may not have processed yet, retry
+                  refreshAfterCheckout(attempt + 1);
+                }
+              }).catch(function () { refreshAfterCheckout(attempt + 1); });
+            }
+          }, delay);
+        })(0);
+      } else if (subStatus === 'canceled') {
+        showToast('Checkout canceled. No charge was made.', 'info');
+        try { history.replaceState(null, '', window.location.pathname); } catch (e) {}
+      }
+    } catch (e) {}
+
+    /* subscribe button helper function */
+    var isCheckoutInProgress = false; // SECURITY: Prevent double-clicks during checkout
+    var originalProText = ctaEl.textContent;
+    var originalPartyText = partyCtaEl.textContent;
+    var originalLifetimeText = lifetimeCtaEl.textContent;
+
+    function handleCheckout(button, originalText, planType) {
+      return function () {
+        if (isCheckoutInProgress) return;
+        if (typeof PhmurtDB === 'undefined') {
+          showToast('Please sign in first to subscribe.', 'error');
+          return;
+        }
+        var sess = PhmurtDB.getSession();
+        if (!sess || !sess.userId) {
+          window.dispatchEvent(new CustomEvent('phmurt-show-auth', { detail: { tab: 'login' } }));
+          return;
+        }
+        // Block lifetime checkout if sold out
+        if (planType === 'lifetime' && lifetimeCtaEl && lifetimeCtaEl.disabled) {
+          showToast('All 200 Lifetime slots have been claimed.', 'error');
+          return;
+        }
+        if (sess.isSubscribed && planType !== 'lifetime') {
+          button.textContent = 'Opening\u2026';
+          button.disabled = true;
+          // SECURITY (V-055): Use origin + pathname only to prevent open redirect via query params
+          PhmurtDB.manageSubscription(window.location.origin + window.location.pathname).catch(function (err) {
+            console.error('Billing portal error:', err);
+            showToast('Could not open billing portal. Please try again.', 'error');
+            button.textContent = 'Manage Subscription';
+            button.disabled = false;
+          });
+          return;
+        }
+        isCheckoutInProgress = true;
+        button.textContent = 'Connecting\u2026';
+        button.disabled = true;
+
+        var interval;
+        if (planType === 'pro') {
+          interval = yearly ? 'yearly' : 'monthly';
+        } else if (planType === 'party') {
+          interval = yearly ? 'party_yearly' : 'party_monthly';
+        } else if (planType === 'lifetime') {
+          interval = 'lifetime';
+        }
+
+        // SECURITY (V-055): Use origin + pathname only to prevent open redirect
+        PhmurtDB.startSubscription(window.location.origin + window.location.pathname, interval).catch(function (err) {
+          isCheckoutInProgress = false;
+          button.textContent = originalText;
+          button.disabled = false;
+          console.error('Checkout error:', err);
+          var msg = (err && err.message && err.message !== 'Checkout request failed.') ? err.message : 'Could not start checkout. Please try again.';
+          showToast(msg, 'error');
+        });
+      };
+    }
+
+    // Attach handlers to all CTA buttons
+    ctaEl.addEventListener('click', handleCheckout(ctaEl, originalProText, 'pro'));
+    partyCtaEl.addEventListener('click', handleCheckout(partyCtaEl, originalPartyText, 'party'));
+    lifetimeCtaEl.addEventListener('click', handleCheckout(lifetimeCtaEl, originalLifetimeText, 'lifetime'));
+
+    /* adjust ctas if user is already subscribed */
+    function updateForAuth() {
+      if (typeof PhmurtDB === 'undefined') return;
+      var sess = PhmurtDB.getSession();
+      if (sess && sess.userId) {
+        // Determine current subscription type
+        var subType = sess.subscriptionType || null; // 'pro', 'party', 'lifetime', or null for free
+
+        if (subType === 'pro') {
+          ctaEl.textContent = 'Manage Subscription';
+          ctaEl.className = 'plan-cta active-cta';
+          partyCtaEl.textContent = 'Upgrade to Party Pass';
+          partyCtaEl.className = 'plan-cta party-cta';
+          lifetimeCtaEl.textContent = 'Upgrade to Lifetime';
+          lifetimeCtaEl.className = 'plan-cta lifetime-cta';
+          freeCtaEl.textContent = 'Current: Pro';
+          freeCtaEl.className = 'plan-cta free-cta';
+          freeCtaEl.removeAttribute('href');
+        } else if (subType === 'party') {
+          ctaEl.textContent = 'Downgrade to Pro';
+          ctaEl.className = 'plan-cta pro-cta';
+          partyCtaEl.textContent = 'Manage Subscription';
+          partyCtaEl.className = 'plan-cta active-cta';
+          lifetimeCtaEl.textContent = 'Upgrade to Lifetime';
+          lifetimeCtaEl.className = 'plan-cta lifetime-cta';
+          freeCtaEl.textContent = 'Current: Party Pass';
+          freeCtaEl.className = 'plan-cta free-cta';
+          freeCtaEl.removeAttribute('href');
+        } else if (subType === 'lifetime') {
+          ctaEl.textContent = 'Current Plan';
+          ctaEl.className = 'plan-cta active-cta';
+          partyCtaEl.textContent = 'Current Plan';
+          partyCtaEl.className = 'plan-cta active-cta';
+          lifetimeCtaEl.textContent = 'Current: Lifetime';
+          lifetimeCtaEl.className = 'plan-cta active-cta';
+          freeCtaEl.textContent = 'Current: Lifetime';
+          freeCtaEl.className = 'plan-cta free-cta';
+          freeCtaEl.removeAttribute('href');
+        } else {
+          // Free tier
+          freeCtaEl.textContent = 'Current Plan';
+          freeCtaEl.className = 'plan-cta active-cta';
+          freeCtaEl.removeAttribute('href');
+        }
+      }
+    }
+    window.addEventListener('phmurt-auth-change', updateForAuth);
+    /* Run once in case auth already resolved */
+    setTimeout(updateForAuth, 500);
+
+    /* ── Auto-trigger checkout if user arrived from upgrade modal ──── */
+    try {
+      var _autoCheckout = new URLSearchParams(window.location.search).get('plan');
+      // SECURITY: Only auto-checkout if plan is valid
+      if (_autoCheckout === 'monthly' || _autoCheckout === 'yearly' || _autoCheckout === 'party_monthly' || _autoCheckout === 'party_yearly' || _autoCheckout === 'lifetime') {
+        // Wait for auth to be ready, then auto-trigger checkout
+        var _autoTriggered = false;
+        function _tryAutoCheckout() {
+          if (_autoTriggered) return;
+          if (isCheckoutInProgress) return; // SECURITY: Don't trigger if already in progress
+          if (typeof PhmurtDB === 'undefined') return;
+          var s = PhmurtDB.getSession();
+          if (!s || !s.userId) return; // Not signed in yet — wait
+          _autoTriggered = true;
+          // Clean the URL so refreshing doesn't re-trigger
+          try { history.replaceState(null, '', window.location.pathname); } catch (e) {}
+          // Dispatch event instead of click to avoid double-triggering
+          isCheckoutInProgress = true;
+          // SECURITY: Validate plan before passing to API
+          var plan = _autoCheckout; // Use the param directly since we validated it above
+          // SECURITY (V-055): Use origin + pathname only to prevent open redirect
+          PhmurtDB.startSubscription(window.location.origin + window.location.pathname, plan).catch(function (err) {
+            isCheckoutInProgress = false;
+            ctaEl.textContent = originalProText;
+            ctaEl.disabled = false;
+            console.error('Auto-checkout failed:', err);
+            var msg = (err && err.message && err.message !== 'Checkout request failed.') ? err.message : 'Checkout failed. Please try again.';
+            showToast(msg, 'error');
+          });
+        }
+        window.addEventListener('phmurt-auth-change', _tryAutoCheckout);
+        setTimeout(_tryAutoCheckout, 1000);
+      }
+    } catch (e) { /* ignore */ }
+
+    /* faq accordion */
+    document.querySelectorAll('.faq-q').forEach(function (q) {
+      // SECURITY: Ensure proper keyboard accessibility
+      q.setAttribute('role', 'button');
+      if (!q.getAttribute('tabindex')) {
+        q.setAttribute('tabindex', '0');
+      }
+
+      function toggleFaq() {
+        q.classList.toggle('open');
+      }
+
+      q.addEventListener('click', toggleFaq);
+      q.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleFaq();
+        }
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
