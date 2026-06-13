@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co https://*.supabase.in https://*.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Welcome to Phmurt Studios · Blog</title>
+  <meta name="description" content="What we're building, why we're building it, and what you can expect from the Phmurt Studios blog. An indie studio's opening salvo and a rough map of where we're headed." />
+  <meta property="og:title" content="Welcome to Phmurt Studios" />
+  <meta property="og:description" content="What we're building, why we're building it, and what you can expect from the Phmurt Studios blog." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://phmurtstudios.com/blog-welcome.html" />
+  <meta property="og:image" content="https://phmurtstudios.com/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Welcome to Phmurt Studios" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="style.css?v=185" />
+  <script defer src="theme.js?v=185"></script>
+  <link rel="canonical" href="https://phmurtstudios.com/blog-welcome.html" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Welcome to Phmurt Studios",
+    "description": "What we're building, why we're building it, and what you can expect from the Phmurt Studios blog.",
+    "author": { "@type": "Organization", "name": "Phmurt Studios", "url": "https://phmurtstudios.com/" },
+    "publisher": { "@type": "Organization", "name": "Phmurt Studios", "logo": { "@type": "ImageObject", "url": "https://phmurtstudios.com/logo.png" } },
+    "datePublished": "2026-04-18",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://phmurtstudios.com/blog-welcome.html" }
+  }
+  </script>
+
+  <style>
+    .bw-wrap { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    .bw-back {
+      display: inline-block;
+      font-family: 'Cinzel', serif;
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text-muted, #9a8870);
+      text-decoration: none;
+      margin-bottom: 32px;
+      transition: color .2s;
+    }
+    .bw-back:hover { color: var(--crimson, #d4433a); }
+
+    .bw-meta {
+      display: flex; gap: 14px; align-items: center; margin-bottom: 16px;
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .bw-meta-type { color: var(--crimson, #d4433a); font-weight: 600; }
+    .bw-meta-date { color: var(--text-faint, #7a6a55); }
+    .bw-meta-author { color: var(--text-faint, #7a6a55); }
+
+    .bw-title {
+      font-family: 'Cinzel', serif;
+      font-size: 2.4rem; font-weight: 700; line-height: 1.15;
+      color: var(--text, #f2e8d6);
+      margin: 0 0 18px;
+    }
+    .bw-deck {
+      font-family: 'Spectral', serif; font-style: italic;
+      font-size: 1.15rem; line-height: 1.55;
+      color: var(--text-muted, #9a8870);
+      margin: 0 0 40px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border, rgba(255,255,255,0.11));
+    }
+
+    .bw-body {
+      font-family: 'Spectral', serif;
+      font-size: 1.05rem; line-height: 1.75;
+      color: var(--text, #f2e8d6);
+    }
+    .bw-body p { margin: 0 0 20px; }
+    .bw-body h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem; font-weight: 600;
+      color: var(--text, #f2e8d6);
+      margin: 44px 0 18px;
+      letter-spacing: 1px;
+    }
+    .bw-body h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem; font-weight: 600;
+      color: var(--crimson, #d4433a);
+      margin: 28px 0 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .bw-body a {
+      color: var(--crimson, #d4433a);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+    .bw-body a:hover { color: #e55a51; }
+    .bw-body ul { margin: 0 0 20px; padding-left: 22px; }
+    .bw-body li { margin-bottom: 8px; }
+    .bw-body strong { color: #c9a84c; font-weight: 600; }
+
+    .bw-pullquote {
+      font-family: 'Spectral', serif; font-style: italic;
+      font-size: 1.15rem; line-height: 1.6;
+      color: var(--text, #f2e8d6);
+      padding: 20px 24px;
+      margin: 28px 0;
+      border-left: 3px solid var(--crimson, #d4433a);
+      background: var(--bg-card, #141420);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .bw-cta {
+      margin-top: 56px; padding: 28px 24px;
+      text-align: center;
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 8px;
+    }
+    .bw-cta-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text, #f2e8d6);
+      margin: 0 0 8px;
+    }
+    .bw-cta-desc {
+      font-family: 'Spectral', serif; font-style: italic;
+      font-size: 14px; color: var(--text-muted, #9a8870);
+      margin: 0 0 16px;
+    }
+    .bw-cta-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .bw-cta-link {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text-muted, #9a8870);
+      text-decoration: none; padding: 8px 16px;
+      border: 1px solid var(--border, rgba(255,255,255,0.22));
+      border-radius: 4px;
+      transition: border-color .2s, color .2s;
+    }
+    .bw-cta-link:hover {
+      border-color: var(--crimson, #d4433a);
+      color: var(--crimson, #d4433a);
+    }
+    .bw-cta-link.primary {
+      border-color: var(--crimson, #d4433a);
+      color: var(--crimson, #d4433a);
+    }
+
+    @media (max-width: 640px) {
+      .bw-title { font-size: 1.8rem; }
+      .bw-deck { font-size: 1rem; }
+      .bw-body { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body data-nav-active="Home" data-footer-copy="Roll Well. Play Weird." data-breadcrumb="Home|index.html;Blog|blog.html;Welcome to Phmurt Studios">
+  <a href="#main-content" class="ps-skip-nav">Skip to content</a>
+  <div id="ps-site-shell"></div>
+  <div id="ps-page-breadcrumb"></div>
+
+  <main id="main-content">
+    <article class="bw-wrap">
+
+      <a class="bw-back" href="blog.html">&larr; Back to Blog</a>
+
+      <div class="bw-meta">
+        <span class="bw-meta-type">Studio Note</span>
+        <span class="bw-meta-date">April 18, 2026</span>
+        <span class="bw-meta-author">&mdash; Phmurt Studios</span>
+      </div>
+
+      <h1 class="bw-title">Welcome to Phmurt Studios</h1>
+      <p class="bw-deck">An indie studio's opening salvo &mdash; what we're building, why we're building it, and a rough map of where we're headed.</p>
+
+      <div class="bw-body">
+
+        <p>Hi. If you're reading this, you've found us earlier than most people will.</p>
+
+        <p>Phmurt Studios is a small independent tabletop game company. We make tools, homebrew rules, and adventures for Dungeons &amp; Dragons 5e and similar OGL-compatible systems. Some of that work lives inside your browser as generators, a character builder, and a campaign tracker. Some of it lives as PDFs you print out, scribble on, and hand across a table.</p>
+
+        <p>We're opening this blog on day one of something that's been under construction for a while, and we want the record to start now rather than later.</p>
+
+        <h2>Who we are</h2>
+
+        <p>We're a very small team &mdash; currently a few designers, a developer, and a rotating cast of playtest groups spread across way too many time zones. Everyone on the team runs a home game. That's not incidental. Most of what we build starts as "I needed this thing at my table last Tuesday and nothing on the market did quite what I wanted."</p>
+
+        <p>We care about:</p>
+
+        <ul>
+          <li><strong>Weirdness with teeth.</strong> A soup chef who channels divine magic through broth is funny. A soup chef who also has a real build path, real choices at every tier, and real interactions with the rest of the game is interesting.</li>
+          <li><strong>Honest tools.</strong> A generator that spits out "a tavern" is not useful. A generator that tells you who owns the place, what they're hiding, what's on the menu, and why the fighter in the corner won't look up &mdash; that's a thing you can play.</li>
+          <li><strong>Respect for the DM's time.</strong> Every tool we ship has to be usable in under a minute, mid-session, without breaking your train of thought. If you have to read a manual to use it, we failed.</li>
+        </ul>
+
+        <h2>What's here now</h2>
+
+        <p>As of today, the site has a handful of things we're proud of and a handful of things we're still working on in public.</p>
+
+        <p><strong>The Soup Savant</strong> is our first published class, free on the site. It's a full 20-level build with three subclasses, its own spell list, and a small ecosystem of ingredients, recipes, and magic items. It started as a joke at a Session 0 and turned out to be one of the most internally-consistent classes we've ever designed. If you want to see where we're aiming as a studio, start there.</p>
+
+        <p><strong>Legendary</strong> is our compendium of homebrew races, subclasses, feats, and magic items. It's meant to be browsable, filterable, and copy-pasteable into a real character sheet.</p>
+
+        <p><strong>Generators</strong> (13 of them, at last count) cover NPCs, monsters, taverns, encounters, treasure, plot hooks, spells, wild magic, potions, weather, flavor, maps, and loot shops. They're all free. They all work offline once loaded. They all try to produce something you could actually use tonight.</p>
+
+        <p><strong>The Character Builder</strong> supports 5e and 3.5e. It saves locally by default and to the cloud if you sign in. It's opinionated about readability &mdash; you should be able to hand the output to a player and have them understand their sheet without a tutorial.</p>
+
+        <p><strong>The Campaign tools</strong> are the deepest part of the site and the most experimental. Timelines, NPC relationships, factions, quest logs, downtime, kingdom management, intrigue, hexcrawls, crafting, economics, plagues, prophecies. Some of these are fully cooked. Some are marked "in playtest" for a reason.</p>
+
+        <h2>Why a blog</h2>
+
+        <p>Three reasons.</p>
+
+        <h3>One &mdash; design transparency</h3>
+
+        <p>When you buy a homebrew class, you usually don't get to see the design notes. You get the final artifact, polished and confident, and you have no idea how many cuts it took to get there. We want to show the cuts. When the Soup Savant's level 11 feature went through six versions before it stopped breaking things, that's a story worth telling, and it's a story that makes <em>your</em> homebrew better.</p>
+
+        <div class="bw-pullquote">The goal isn't to make Phmurt look good. The goal is to give you a real look at how small-studio design actually works so you can steal what's useful.</div>
+
+        <h3>Two &mdash; DM tips that don't suck</h3>
+
+        <p>There are a lot of DM advice posts out there. A non-trivial percentage of them are advice that works in theory and breaks in practice, because they were written by people who haven't actually run a game in a while. We want the opposite: short, specific, field-tested notes from people who ran a session last weekend and tried something that worked (or didn't).</p>
+
+        <h3>Three &mdash; honest playtest reports</h3>
+
+        <p>When we playtest something internally and it breaks, we want to say so. When a community playtester finds an exploit we missed, we want to credit them and talk about the fix. Patch notes for tabletop content are rare. We think they shouldn't be.</p>
+
+        <h2>What to expect</h2>
+
+        <p>No posting schedule yet. We'd rather skip a week than publish filler. That said, the rough cadence we're aiming for:</p>
+
+        <ul>
+          <li><strong>Design diaries</strong> when we ship something new, or when we revise something existing. Expect math, expect cut features, expect screenshots.</li>
+          <li><strong>DM field notes</strong> whenever something noteworthy happens at a home table. Short. Specific. No "top 10" anything.</li>
+          <li><strong>Studio notes</strong> like this one, when we have something bigger to say about where we're headed.</li>
+          <li><strong>Playtest reports</strong> when we run focused tests of upcoming content. These will usually include data, reader-submitted builds, and a list of things we're still arguing about internally.</li>
+        </ul>
+
+        <h2>What we're not going to do</h2>
+
+        <p>We're not going to chase news cycles. We're not going to write reaction takes about other publishers. We're not going to announce things we haven't actually started. We're not going to turn this into an advertisement disguised as a blog.</p>
+
+        <p>When we have something to sell, we'll tell you plainly. The rest of the time, we'll try to make this the blog we wish existed when we were learning how to design for the tabletop.</p>
+
+        <h2>Where we're headed</h2>
+
+        <p>The short version: more classes, more campaign tools, a real map editor, and eventually a mobile-shaped version of the site so you can pull it up at the table on a phone without squinting. The <a href="roadmap.html">public roadmap</a> has the current list.</p>
+
+        <p>Longer term, we'd like to publish a proper adventure path. Not a module &mdash; something structural, something that uses the tools on this site the way we think they're supposed to be used. That's a bigger project than a blog post, so we'll come back to it.</p>
+
+        <h2>Thanks for being early</h2>
+
+        <p>If you're one of the people reading this in April 2026, thank you. You're the reason any of this exists in the first place. Drop into the <a href="https://discord.gg/GSvCXfehmK" target="_blank" rel="noopener noreferrer">Discord</a> and say hi &mdash; we read everything, we respond to most of it, and we take playtester feedback seriously enough that you'll probably see your notes show up in a patch somewhere.</p>
+
+        <p>More soon.</p>
+
+        <p style="text-align: right; font-style: italic; color: var(--text-muted, #9a8870); margin-top: 40px;">&mdash; The Phmurt Team</p>
+
+      </div>
+
+      <div class="bw-cta">
+        <div class="bw-cta-title">Join the Table</div>
+        <p class="bw-cta-desc">Discord is where updates drop first, and where playtest feedback actually changes the game.</p>
+        <div class="bw-cta-links">
+          <a class="bw-cta-link primary" href="https://discord.gg/GSvCXfehmK" target="_blank" rel="noopener noreferrer">Join Discord</a>
+          <a class="bw-cta-link" href="blog.html">Back to Blog</a>
+          <a class="bw-cta-link" href="roadmap.html">See Roadmap</a>
+        </div>
+      </div>
+
+    </article>
+  </main>
+
+  <script defer src="phmurt-shell.js?v=187"></script>
+</body>
+</html>

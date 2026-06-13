@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en" data-nav-active="about" data-footer-copy="Roll Well. Play Weird.">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-Content-Type-Options" content="nosniff" />
+<meta name="referrer" content="strict-origin" />
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), usb=(), payment=(), serial=(), bluetooth=()">
+<title>Admin Dashboard – Phmurt Studios</title>
+<!-- NOTE: unsafe-eval is required by @babel/standalone to compile JSX at runtime.
+     unsafe-inline is used for inline event handlers in this admin-only page.
+     This is acceptable for admin-only pages but represents a security tradeoff.
+     RECOMMENDATION: Migrate to nonce-based CSP and extract event handlers to script blocks
+     for better XSS protection in future releases. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co https://*.supabase.in https://*.stripe.com; frame-ancestors 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'; object-src 'none';">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Spectral:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="manifest" href="site.webmanifest">
+<!-- Supabase must load FIRST so phmurtSupabase is defined before anything else -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.0" crossorigin="anonymous" integrity="sha384-fm42zLXjam4N3lT5umWgNtBBPMP3Ddrdmr9lnPKtDWzs5Dqy457Yn6+eTvCgRU3n"></script>
+<script src="supabase-config.js?v=185"></script>
+<script src="stripe-env.js?v=188"></script>
+  <script src="stripe-config.js?v=185"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin="anonymous" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin="anonymous" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin="anonymous" integrity="sha384-dqDn4UOhYWNxmtwnMX6yC3WtZZ6Li8rF6rLB7cu0i/R7btvb+p+kObgEHto7VsJK"></script>
+<script src="theme.js?v=185"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   ADMIN GATE  —  Self-contained two-factor access control
+   ═══════════════════════════════════════════════════════════════════
+   Stage 1 — Key image upload (UI deterrent, not a security boundary)
+   Stage 2 — Admin account sign-in via Supabase (the REAL access control)
+
+   Security model: Stage 1 keeps casual visitors out. Stage 2 (Supabase
+   auth + is_admin DB check) is the actual security gate. Even if Stage 1
+   is bypassed, no access is granted without valid admin credentials.
+
+   FIRST-TIME SETUP:
+     EXPECTED_HASH is 'SETUP'. Upload the image → the computed hash
+     is displayed. Copy it, replace 'SETUP' below, push and redeploy.
+     After that, every visitor must upload the exact same image.
+   ═══════════════════════════════════════════════════════════════════ */
+(function () {
+
+  /* ── Config ──────────────────────────────────────────────────────── */
+  // NOTE (V-C1): The image hash is stored in plain text. This is intentional.
+  // Image verification is a UI-level deterrent only — NOT a security boundary.
+  // The real access control is Stage 2: Supabase auth + server-side is_admin check.
+  // Knowing the hash does not grant admin access without valid Supabase credentials.
+  var EXPECTED_HASH = '1100000000000000100000001001110010011100101000000000010000000110';
+  var IMG_OK_KEY    = 'phmurt_admin_img_ok'; // sessionStorage flag
+  var ADMIN_ATTEMPTS_KEY = 'phmurt_admin_signin_attempts_v1';
+  var IMG_ATTEMPTS_KEY = 'phmurt_admin_img_attempts_v1'; // SECURITY (V-009): Rate limiting for image verification
+  var IMG_LOCKOUT_KEY = 'phmurt_admin_img_lockout_until'; // SECURITY (V-009): Lockout timestamp
+
+  /* ── Hide page immediately so nothing flashes ───────────────────── */
+  document.documentElement.style.visibility = 'hidden';
+
+  /* ── Helpers: cookie read/write (mirrors phmurt-auth.js) ──────── */
+  function getCookie(name) {
+    try {
+      var prefix = name + '=';
+      var parts = document.cookie.split(';');
+      for (var i = 0; i < parts.length; i++) {
+        var c = parts[i].replace(/^\s+/, '');
+        if (c.indexOf(prefix) === 0) return decodeURIComponent(c.substring(prefix.length));
+      }
+    } catch (e) {}
+    return null;
+  }
+  function setCookie(name, value, days) {
+    try {
+      var expires = '';
+      if (days) {
+        var d = new Date();
+        d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+        expires = '; expires=' + d.toUTCString();
+      }
+      document.cookie = name + '=' + encodeURIComponent(value || '') + expires + '; path=/; SameSite=Strict; Secure';
+    } catch (e) {}
+  }
+
+  /* ── Helpers: storage ───────────────────────────────────────────── */
+  function getSession() {
+    // Try localStorage first, fall back to cookie backup
+    try {
+      var raw = localStorage.getItem('phmurt_auth_session');
+      if (raw) { var p = JSON.parse(raw); if (p && p.userId) return p; }
+    } catch (e) {}
+    try {
+      var cr = getCookie('phmurt_sess');
+      if (cr) { var cp = JSON.parse(cr); if (cp && cp.userId) { try { localStorage.setItem('phmurt_auth_session', cr); } catch(e) {} return cp; } }
+    } catch (e) {}
+    return null;
+  }
+  function isAdminSession(s) {
+    if (!s) return false;
+    return s.isAdmin === true || s.isSuperuser === true;
+  }
+
+  function setSession(user) {
+    var s = { userId: user.userId, name: user.name, email: user.email,
+              displayName: user.name,
+              isAdmin: user.isAdmin === true,
+              isSuperuser: user.isSuperuser === true };
+    var json = JSON.stringify(s);
+    try { localStorage.setItem('phmurt_auth_session', json); } catch (e) {}
+    setCookie('phmurt_sess', json, 30);  // 30-day cookie backup
+    try { window.dispatchEvent(new Event('phmurt-auth-change')); } catch(e) {}
+    return s;
+  }
+
+  /* ── Helpers: perceptual dHash ──────────────────────────────────── */
+  function computeDHash(imgEl) {
+    var W = 9, H = 8;
+    var cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    var ctx = cv.getContext('2d');
+    ctx.drawImage(imgEl, 0, 0, W, H);
+    var px = ctx.getImageData(0, 0, W, H).data;
+    var hash = '';
+    for (var r = 0; r < H; r++) {
+      for (var c = 0; c < W - 1; c++) {
+        var i1 = (r * W + c) * 4, i2 = i1 + 4;
+        var g1 = 0.299*px[i1]   + 0.587*px[i1+1] + 0.114*px[i1+2];
+        var g2 = 0.299*px[i2]   + 0.587*px[i2+1] + 0.114*px[i2+2];
+        hash += g1 > g2 ? '1' : '0';
+      }
+    }
+    return hash;
+  }
+  function hammingDist(a, b) {
+    var d = 0;
+    for (var i = 0; i < a.length; i++) { if (a[i] !== b[i]) d++; }
+    return d;
+  }
+
+  /* ── CSS shorthand ──────────────────────────────────────────────── */
+  var C = {
+    label:  'font-family:Cinzel,serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#8c7d6e;display:block;margin-bottom:6px;',
+    input:  'width:100%;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);color:#f5ede0;font-family:Spectral,serif;font-size:14px;border-radius:3px;box-sizing:border-box;outline:none;',
+    btn:    'width:100%;padding:12px;background:var(--crimson);color:#f5f0e8;border:none;font-family:Cinzel,serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:3px;margin-top:8px;',
+    err:    'font-family:Spectral,serif;font-size:13px;color:var(--crimson);background:rgba(212,67,58,0.08);border-radius:3px;padding:10px 12px;margin-bottom:14px;display:none;',
+    ok:     'font-family:Spectral,serif;font-size:13px;color:#5ee09a;',
+    field:  'margin-bottom:14px;'
+  };
+
+  /* ══════════════════════════════════════════════════════════════════
+     GATE OVERLAY — built once, stages swapped inside it
+  ══════════════════════════════════════════════════════════════════ */
+  function showGate() {
+    document.documentElement.style.visibility = 'visible';
+
+    var gate = document.createElement('div');
+    gate.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a10;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Cinzel,serif;color:#f5ede0;';
+    document.body.appendChild(gate);
+
+    // Shared gate state — must be in showGate() scope so both
+    // renderImageStage() and renderAuthStage() can access it.
+    var _gate1Passed = false;
+
+    /* ── STAGE 1: Image upload ──────────────────────────────────────── */
+    function renderImageStage() {
+      document.documentElement.style.visibility = ''; // Ensure page is visible for the gate overlay
+      var isSetup = EXPECTED_HASH === 'SETUP';
+      gate.innerHTML =
+        '<div style="max-width:460px;width:100%;text-align:center;">' +
+          '<div style="font-size:10px;letter-spacing:3px;color:#574843;text-transform:uppercase;margin-bottom:20px;">' +
+            (isSetup ? 'First-Time Setup' : 'Admin Access — Step 1 of 2') +
+          '</div>' +
+          '<h2 style="font-size:24px;font-weight:400;color:var(--crimson);margin:0 0 10px;letter-spacing:1px;">Key Image Required</h2>' +
+          '<p style="font-family:Spectral,serif;font-size:15px;color:#8c7d6e;line-height:1.6;margin:0 0 32px;">' +
+            (isSetup ? 'No key image is set yet. Upload yours now to register it.' : 'Upload the image you were given to proceed.') +
+          '</p>' +
+
+          '<label id="ag-img-label" style="display:flex;flex-direction:column;align-items:center;gap:10px;border:1px dashed rgba(212,67,58,0.3);border-radius:6px;padding:36px 24px;cursor:pointer;transition:border-color .2s;">' +
+            '<span style="font-size:36px;">⊞</span>' +
+            '<span style="font-size:13px;color:#8c7d6e;font-family:Spectral,serif;">Click or drag image here</span>' +
+            '<input type="file" id="ag-img-input" accept="image/*" style="display:none;" />' +
+          '</label>' +
+
+          '<div id="ag-img-status" style="margin-top:18px;min-height:36px;font-family:Spectral,serif;font-size:14px;"></div>' +
+
+          (isSetup ?
+            '<div id="ag-hash-wrap" style="display:none;margin-top:16px;text-align:left;">' +
+              '<p style="font-size:12px;color:#8c7d6e;margin:0 0 8px;font-family:Spectral,serif;">Your hash — paste into <code>EXPECTED_HASH</code> and redeploy:</p>' +
+              '<code id="ag-hash-val" style="display:block;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.09);border-radius:4px;padding:10px;font-size:11px;word-break:break-all;color:var(--crimson);cursor:pointer;" title="Click to copy"></code>' +
+              '<button id="ag-hash-continue" style="' + C.btn + 'margin-top:12px;">Continue to Sign In →</button>' +
+            '</div>'
+          : '') +
+        '</div>';
+
+      var input  = document.getElementById('ag-img-input');
+      var label  = document.getElementById('ag-img-label');
+      var status = document.getElementById('ag-img-status');
+
+      function setStatus(msg, color) {
+        status.textContent = msg;
+        status.style.color = color || '#f5ede0';
+      }
+
+      /* SECURITY (V-009): Rate limiting for image verification */
+      // SECURITY: Use closure variables for rate limiting (cannot be cleared from DevTools)
+      var _imgAttemptsCount = 0;
+      var _imgLockoutTime = 0;
+      try { _imgAttemptsCount = parseInt(sessionStorage.getItem(IMG_ATTEMPTS_KEY) || '0', 10); } catch(e) {}
+      try { _imgLockoutTime = parseInt(sessionStorage.getItem(IMG_LOCKOUT_KEY) || '0', 10); } catch(e) {}
+
+      function getImageAttempts() {
+        try {
+          return parseInt(sessionStorage.getItem(IMG_ATTEMPTS_KEY) || '0', 10);
+        } catch (e) { return 0; }
+      }
+      function getImageLockoutUntil() {
+        try {
+          return parseInt(sessionStorage.getItem(IMG_LOCKOUT_KEY) || '0', 10);
+        } catch (e) { return 0; }
+      }
+      function incrementImageAttempts() {
+        var current = getImageAttempts();
+        sessionStorage.setItem(IMG_ATTEMPTS_KEY, String(current + 1));
+        _imgAttemptsCount = current + 1;  // Also update closure variable
+      }
+      function setImageLockout() {
+        var lockoutTime = Date.now() + 60000; // 60 seconds
+        sessionStorage.setItem(IMG_LOCKOUT_KEY, String(lockoutTime));
+        sessionStorage.setItem(IMG_ATTEMPTS_KEY, '0');
+        _imgLockoutTime = lockoutTime;  // Update closure variable
+        _imgAttemptsCount = 0;  // Update closure variable
+      }
+      function clearImageAttempts() {
+        try { sessionStorage.removeItem(IMG_ATTEMPTS_KEY); sessionStorage.removeItem(IMG_LOCKOUT_KEY); } catch (e) {}
+        _imgAttemptsCount = 0;  // Reset closure variable
+        _imgLockoutTime = 0;  // Reset closure variable
+      }
+
+      function processImage(file) {
+        if (!file || !file.type.startsWith('image/')) { setStatus('Please upload an image file.', 'var(--crimson)'); return; }
+
+        /* SECURITY (V-009): Check lockout before processing — check both closure variable AND sessionStorage */
+        var lockoutFromStorage = 0;
+        try { lockoutFromStorage = parseInt(sessionStorage.getItem(IMG_LOCKOUT_KEY) || '0', 10); } catch(e) {}
+        if (Date.now() < Math.max(_imgLockoutTime, lockoutFromStorage)) {
+          var effectiveLockout = Math.max(_imgLockoutTime, lockoutFromStorage);
+          var secondsRemaining = Math.ceil((effectiveLockout - Date.now()) / 1000);
+          setStatus('Too many attempts. Please wait ' + secondsRemaining + ' seconds.', 'var(--crimson)');
+          return;
+        }
+
+        setStatus('Analysing…', '#8c7d6e');
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var img = new Image();
+          img.onload = function () {
+            var hash = computeDHash(img);
+            if (isSetup) {
+              /* Setup mode — display hash, let admin continue */
+              var wrap = document.getElementById('ag-hash-wrap');
+              var val  = document.getElementById('ag-hash-val');
+              val.textContent = hash;
+              wrap.style.display = 'block';
+              label.style.display = 'none';
+              setStatus('Hash computed. Copy it into the code, then redeploy.', '#5ee09a');
+              val.addEventListener('click', function () {
+                navigator.clipboard.writeText(hash).then(function () {
+                  val.textContent = '✓ Copied!';
+                  setTimeout(function () { val.textContent = hash; }, 2000);
+                }).catch(function(err) {
+                  console.warn('Clipboard copy failed:', err);
+                });
+              });
+              document.getElementById('ag-hash-continue').addEventListener('click', function () {
+                sessionStorage.setItem(IMG_OK_KEY, 'true');
+                renderAuthStage();
+              });
+            } else {
+              /* Normal mode — verify hash */
+              var dist = hammingDist(hash, EXPECTED_HASH);
+              // SECURITY (V-009): Reduced hamming distance tolerance from 6 to 3 for tighter image matching
+              if (dist <= 3) {
+                clearImageAttempts(); // Reset attempts on success
+                _gate1Passed = true; // Mark image gate as legitimately passed
+                setStatus('✓ Image verified.', '#5ee09a');
+                sessionStorage.setItem(IMG_OK_KEY, 'true');
+                setTimeout(renderAuthStage, 700);
+              } else {
+                /* SECURITY (V-009): Track failed attempts and enforce lockout */
+                incrementImageAttempts();
+                var attempts = getImageAttempts();
+                if (attempts >= 5) {
+                  setImageLockout();
+                  setStatus('Too many failed attempts. Locked for 60 seconds.', 'var(--crimson)');
+                } else {
+                  setStatus('✗ Wrong image. Try again. (' + attempts + '/5 attempts)', 'var(--crimson)');
+                }
+                input.value = '';
+              }
+            }
+          };
+          img.onerror = function () { setStatus('Could not read image.', 'var(--crimson)'); };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      input.addEventListener('change', function () { if (input.files[0]) processImage(input.files[0]); });
+      label.addEventListener('dragover', function (e) { e.preventDefault(); label.style.borderColor = 'var(--crimson)'; });
+      label.addEventListener('dragleave', function () { label.style.borderColor = 'rgba(212,67,58,0.3)'; });
+      label.addEventListener('drop', function (e) {
+        e.preventDefault(); label.style.borderColor = 'rgba(212,67,58,0.3)';
+        if (e.dataTransfer.files[0]) processImage(e.dataTransfer.files[0]);
+      });
+    }
+
+    /* ── STAGE 2: Sign in ────────────────────────────────────────────── */
+    function renderAuthStage() {
+      document.documentElement.style.visibility = ''; // Ensure page is visible for the gate overlay
+
+      // SECURITY (V-010): Verify image gate was actually passed, not just loaded from sessionStorage
+      // On page reload, _gate1Passed is lost, but we must re-verify against sessionStorage
+      var imgOkFlag = false;
+      try { imgOkFlag = sessionStorage.getItem(IMG_OK_KEY) === 'true'; } catch(e) {}
+      if (!imgOkFlag && !_gate1Passed) {
+        // Both memory and session storage show image gate wasn't passed
+        // Redirect back to image stage
+        renderImageStage();
+        return;
+      }
+
+      var mode = 'in'; // 'in' | 'up'
+      gate.innerHTML =
+        '<div style="max-width:400px;width:100%;">' +
+          '<div style="font-size:10px;letter-spacing:3px;color:#574843;text-transform:uppercase;margin-bottom:20px;text-align:center;">Admin Access — Step 2 of 2</div>' +
+          '<h2 style="font-size:22px;font-weight:400;color:var(--crimson);margin:0 0 24px;letter-spacing:1px;text-align:center;">Sign In</h2>' +
+
+          /* Tabs */
+          '<div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.09);margin-bottom:22px;">' +
+            '<button id="ag-tab-in" style="flex:1;padding:9px;background:transparent;border:none;border-bottom:2px solid var(--crimson);color:var(--crimson);font-family:Cinzel,serif;font-size:11px;letter-spacing:1.5px;cursor:pointer;">Sign In</button>' +
+            '<button id="ag-tab-up" style="flex:1;padding:9px;background:transparent;border:none;border-bottom:2px solid transparent;color:#8c7d6e;font-family:Cinzel,serif;font-size:11px;letter-spacing:1.5px;cursor:pointer;">Sign Up Disabled</button>' +
+          '</div>' +
+
+          '<div id="ag-err" style="' + C.err + '"></div>' +
+
+          /* Sign-in panel */
+          '<div id="ag-panel-in">' +
+            '<div style="' + C.field + '"><label style="' + C.label + '">Email Address</label><input id="ag-in-email" type="email" autocomplete="email" placeholder="you@example.com" style="' + C.input + '" /></div>' +
+            '<div style="' + C.field + '"><label style="' + C.label + '">Password</label><input id="ag-in-pass" type="password" autocomplete="current-password" placeholder="••••••••" style="' + C.input + '" /></div>' +
+            '<button id="ag-in-submit" style="' + C.btn + '">Sign In</button>' +
+          '</div>' +
+
+          /* Create account panel */
+          '<div id="ag-panel-up" style="display:none;">' +
+            '<div style="' + C.field + '"><label style="' + C.label + '">Display Name</label><input id="ag-up-name" type="text" autocomplete="name" placeholder="Your adventurer name" style="' + C.input + '" /></div>' +
+            '<div style="' + C.field + '"><label style="' + C.label + '">Email Address</label><input id="ag-up-email" type="email" autocomplete="email" placeholder="you@example.com" style="' + C.input + '" /></div>' +
+            '<div style="' + C.field + '"><label style="' + C.label + '">Password</label><input id="ag-up-pass" type="password" autocomplete="new-password" placeholder="Min. 8 characters" style="' + C.input + '" /></div>' +
+            '<div style="' + C.field + '"><label style="' + C.label + '">Confirm Password</label><input id="ag-up-pass2" type="password" autocomplete="new-password" placeholder="Repeat password" style="' + C.input + '" /></div>' +
+            '<button id="ag-up-submit" style="' + C.btn + '">Sign Up Disabled</button>' +
+          '</div>' +
+
+          '<p style="font-family:Spectral,serif;font-size:12px;color:#574843;text-align:center;margin-top:20px;">Only registered admin accounts can proceed.</p>' +
+        '</div>';
+
+      function showErr(msg) {
+        var el = document.getElementById('ag-err');
+        el.textContent = msg; el.style.display = msg ? 'block' : 'none';
+      }
+      function setLoading(id, on) {
+        var b = document.getElementById(id);
+        if (b) { b.disabled = on; b.style.opacity = on ? '0.6' : '1'; }
+      }
+      function readAttempts() {
+        try {
+          var raw = sessionStorage.getItem(ADMIN_ATTEMPTS_KEY);
+          var arr = raw ? JSON.parse(raw) : [];
+          return Array.isArray(arr) ? arr : [];
+        } catch (_) { return []; }
+      }
+      function pruneAttempts(arr) {
+        var now = Date.now();
+        return arr.filter(function (t) { return (now - t) < (10 * 60 * 1000); });
+      }
+      function writeAttempts(arr) {
+        try { sessionStorage.setItem(ADMIN_ATTEMPTS_KEY, JSON.stringify(arr)); } catch (_) {}
+      }
+      function getLockMsRemaining() {
+        var arr = pruneAttempts(readAttempts());
+        writeAttempts(arr);
+        if (arr.length < 8) return 0;
+        var oldest = arr[0];
+        var remaining = (10 * 60 * 1000) - (Date.now() - oldest);
+        return Math.max(0, remaining);
+      }
+      function registerAttempt() {
+        var arr = pruneAttempts(readAttempts());
+        arr.push(Date.now());
+        writeAttempts(arr);
+      }
+      function clearAttempts() {
+        try { sessionStorage.removeItem(ADMIN_ATTEMPTS_KEY); } catch (_) {}
+      }
+      // Gate tracking — closure variables prevent trivial console bypass of grantAccess().
+      // _gate1Passed lives in showGate() scope (shared with renderImageStage).
+      // _gate2Passed = Supabase admin check (real security).
+      var _gate2Passed = false;
+
+      function grantAccess() {
+        // Both gates must have been passed in sequence
+        if (!_gate1Passed || !_gate2Passed) {
+          console.error('[Security] Access denied: gate sequence violation.');
+          return;
+        }
+        clearAttempts();
+        gate.innerHTML = '<div style="text-align:center;"><div style="font-size:28px;margin-bottom:16px;">✓</div><p style="font-family:Spectral,serif;color:#5ee09a;font-size:16px;">Access granted. Welcome.</p></div>';
+        document.documentElement.style.visibility = '';
+        setTimeout(function () { gate.remove(); loadAdminDashboard(); }, 900);
+      }
+      function afterSignIn(session) {
+        if (!isAdminSession(session)) {
+          showErr('This account does not have admin privileges.');
+          setLoading('ag-in-submit', false);
+          setLoading('ag-up-submit', false);
+          return;
+        }
+        _gate2Passed = true;
+        grantAccess();
+      }
+
+      /* Tab switching */
+      document.getElementById('ag-tab-in').addEventListener('click', function () {
+        mode = 'in'; showErr('');
+        document.getElementById('ag-panel-in').style.display = 'block';
+        document.getElementById('ag-panel-up').style.display = 'none';
+        document.getElementById('ag-tab-in').style.cssText += 'color:var(--crimson);border-bottom-color:var(--crimson);';
+        document.getElementById('ag-tab-up').style.cssText += 'color:#8c7d6e;border-bottom-color:transparent;';
+        document.getElementById('ag-in-email').focus();
+      });
+      document.getElementById('ag-tab-up').addEventListener('click', function () {
+        mode = 'up'; showErr('');
+        document.getElementById('ag-panel-in').style.display = 'none';
+        document.getElementById('ag-panel-up').style.display = 'block';
+        document.getElementById('ag-tab-in').style.cssText += 'color:#8c7d6e;border-bottom-color:transparent;';
+        document.getElementById('ag-tab-up').style.cssText += 'color:var(--crimson);border-bottom-color:var(--crimson);';
+        document.getElementById('ag-up-name').focus();
+      });
+
+      /* Sign In */
+      function tryLocalSignIn() {
+        showErr('Local fallback auth is disabled for admin security. Configure Supabase and sign in with your admin account.');
+        setLoading('ag-in-submit', false);
+      }
+
+      document.getElementById('ag-in-submit').addEventListener('click', function () {
+        showErr('');
+        var lockMs = getLockMsRemaining();
+        if (lockMs > 0) {
+          showErr('Too many sign-in attempts. Try again in ' + Math.ceil(lockMs / 1000) + ' seconds.');
+          return;
+        }
+        var email = (document.getElementById('ag-in-email').value || '').trim().toLowerCase();
+        var pass  = document.getElementById('ag-in-pass').value;
+        if (!email) { showErr('Email is required.'); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('Please enter a valid email address.'); return; }
+        if (!pass)  { showErr('Password is required.'); return; }
+        registerAttempt();
+        setLoading('ag-in-submit', true);
+
+        var sbClient = (typeof phmurtSupabase !== 'undefined') ? phmurtSupabase : null;
+        if (sbClient) {
+          /* Try Supabase auth first */
+          sbClient.auth.signInWithPassword({ email: email, password: pass })
+            .then(function (result) {
+              if (result.error) {
+                showErr(result.error.message || 'Sign in failed.');
+                setLoading('ag-in-submit', false);
+                return;
+              }
+              var user = result.data && result.data.user;
+              if (!user) { showErr('Sign in failed. Try again.'); setLoading('ag-in-submit', false); return; }
+              /* Require role flags from profiles table (no email allowlist bypass). */
+              sbClient.from('profiles').select('*').eq('id', user.id).maybeSingle()
+                .then(function (pr) {
+                  var isAdm = !!(pr.data && (pr.data.is_admin || pr.data.is_superuser));
+                  if (!isAdm) {
+                    showErr('This account does not have admin privileges.');
+                    setLoading('ag-in-submit', false);
+                    return;
+                  }
+                  /* Write a compatible session so the rest of the gate recognises it */
+                  var dispName = (pr.data && pr.data.name) || (user.user_metadata && user.user_metadata.name) || email.split('@')[0];
+                  setSession({ userId: user.id, name: dispName, email: email, isAdmin: !!(pr.data && pr.data.is_admin), isSuperuser: !!(pr.data && pr.data.is_superuser) });
+                  _gate2Passed = true;
+                  grantAccess();
+                })
+                .catch(function () {
+                  showErr('Could not verify admin status. Try again.');
+                  setLoading('ag-in-submit', false);
+                });
+            })
+            .catch(function () { showErr('Sign in failed. Try again.'); setLoading('ag-in-submit', false); });
+        } else {
+          tryLocalSignIn();
+        }
+      });
+
+      /* Create Account */
+      document.getElementById('ag-up-submit').addEventListener('click', function () {
+        showErr('Account creation is disabled in the admin portal. Create accounts via the main site sign-up flow.');
+      });
+
+      /* Enter key */
+      gate.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        if (mode === 'in') document.getElementById('ag-in-submit').click();
+        else               document.getElementById('ag-up-submit').click();
+      });
+
+      setTimeout(function () { var el = document.getElementById('ag-in-email'); if (el) el.focus(); }, 80);
+    }
+
+    /* ── Decide which stage to start on ──────────────────────────────── */
+    if (sessionStorage.getItem(IMG_OK_KEY) === 'true') {
+      _gate1Passed = true; // Image was verified earlier in this session
+      /* NOTE (V-C1): sessionStorage flag can be set manually via DevTools.
+         This is acceptable because image verification is only a UI deterrent.
+         The real security gate is Supabase auth + is_admin DB check below.
+         Even if someone sets this flag manually, they cannot bypass Stage 2.
+      */
+      var sbClient = (typeof phmurtSupabase !== 'undefined') ? phmurtSupabase : null;
+      if (sbClient) {
+        sbClient.auth.getSession().then(function (r) {
+          var sess = r.data && r.data.session;
+          if (sess && sess.user) {
+            sbClient.from('profiles').select('*').eq('id', sess.user.id).maybeSingle()
+              .then(function (pr) {
+                // SECURITY (V-009): Verify is_admin from server database, not just image check
+                if (pr.data && (pr.data.is_admin || pr.data.is_superuser)) {
+                  // Both factors satisfied: image verified + admin status confirmed
+                  _gate2Passed = true;
+                  gate.remove();
+                  document.documentElement.style.visibility = '';
+                  loadAdminDashboard();
+                  return;
+                }
+                // Image verified but not admin — show sign-in form
+                renderAuthStage();
+              })
+              .catch(function () {
+                // Cannot verify admin status — require sign-in to establish identity
+                renderAuthStage();
+              });
+          } else {
+            // No existing session — require sign-in
+            renderAuthStage();
+          }
+        }).catch(function () {
+          // Supabase unavailable — fall back to sign-in
+          renderAuthStage();
+        });
+      } else {
+        // Supabase not initialized — require sign-in
+        renderAuthStage();
+      }
+    } else {
+      renderImageStage();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', showGate);
+
+})();
+</script>
+<style>
+/* ═══════════════════════════════
+   ADMIN DASHBOARD STYLES
+   Uses the same CSS variables as the main site
+   ═══════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0a10;--bg-nav:#08080e;--bg-card:rgba(255,255,255,0.02);--bg-hover:rgba(255,255,255,0.04);
+  --bg-mid:rgba(255,255,255,0.015);--text:#f2e8d6;--text-dim:#c8bfb0;--text-muted:#8c7d6e;
+  --text-faint:#574843;--accent:var(--crimson);--accent-dim:#a08230;
+  --accent-soft:rgba(212,67,58,0.1);--accent-border:rgba(212,67,58,0.3);
+  --green:#5ee09a;--green-soft:rgba(94,224,154,0.08);--green-border:rgba(94,224,154,0.25);
+  --border:rgba(255,255,255,0.06);--border-mid:rgba(255,255,255,0.04);
+  --bg-input:rgba(255,255,255,0.03);--border-subtle:rgba(255,255,255,0.05);
+  --success:#5ee09a;--warning:#e8940a;--danger:#ef4444;--info:#58aaff;
+  /* Legacy alias */
+  --crimson:var(--crimson);--crimson-dim:#a08230;--crimson-soft:rgba(212,67,58,0.1);--crimson-border:rgba(212,67,58,0.3);
+}
+html.light-mode{
+  --bg:#f0e7d4;--bg-nav:#f9f2e4;--bg-card:rgba(20,9,2,0.03);--bg-hover:rgba(20,9,2,0.06);
+  --bg-mid:rgba(20,9,2,0.02);--text:#140902;--text-dim:#342010;--text-muted:#6a4028;
+  --text-faint:#9a6845;--accent:#8b6a1e;--accent-dim:#6b5018;
+  --accent-soft:rgba(139,106,30,0.1);--accent-border:rgba(139,106,30,0.3);
+  --green:#2e8b57;--green-soft:rgba(46,139,87,0.08);--green-border:rgba(46,139,87,0.25);
+  --border:rgba(20,9,2,0.12);--border-mid:rgba(20,9,2,0.06);
+  --bg-input:rgba(20,9,2,0.04);--border-subtle:rgba(20,9,2,0.08);
+  --crimson:#8b6a1e;--crimson-dim:#6b5018;--crimson-soft:rgba(139,106,30,0.1);--crimson-border:rgba(139,106,30,0.3);
+}
+html{scroll-behavior:smooth;background:var(--bg);}
+body{background:var(--bg);color:var(--text);font-family:'Spectral',Georgia,serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+::selection{background:var(--accent);color:#f5f0e8;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+/* Layout */
+.admin-layout{display:flex;min-height:100vh;}
+.admin-sidebar{width:260px;background:rgba(10,10,16,0.92);backdrop-filter:blur(20px) saturate(1.1);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform 0.3s ease;}
+.admin-main{flex:1;margin-left:260px;min-height:100vh;}
+.admin-topbar{height:56px;background:rgba(10,10,16,0.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:90;}
+.admin-content{padding:32px;}
+
+/* Sidebar */
+.sidebar-brand{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.sidebar-brand h1{font-family:'Cinzel',serif;font-size:15px;font-weight:600;letter-spacing:1px;color:var(--accent);}
+.sidebar-brand .brand-sub{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);font-family:'Cinzel',serif;}
+.sidebar-nav{flex:1;padding:16px 0;overflow-y:auto;}
+.sidebar-section{padding:0 12px;margin-bottom:8px;}
+.sidebar-section-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(212,67,58,0.4);padding:8px 12px 4px;display:block;font-weight:600;}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--text-dim);font-size:13.5px;transition:all 0.15s ease;border:1px solid transparent;}
+.sidebar-item:hover{background:var(--bg-hover);color:var(--text);}
+.sidebar-item.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-border);}
+.sidebar-item svg{width:16px;height:16px;opacity:0.7;flex-shrink:0;}
+.sidebar-item.active svg{opacity:1;}
+.sidebar-footer{padding:16px 24px;border-top:1px solid var(--border);font-size:11px;color:var(--text-faint);}
+
+/* Cards & Panels */
+.card{background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04);border-radius:10px;overflow:hidden;}
+.card-header{padding:20px 24px;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:space-between;}
+.card-header h2{font-family:'Cinzel',serif;font-size:14px;font-weight:600;letter-spacing:1px;color:var(--text);}
+.card-body{padding:24px;}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
+.stat-card{background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04);border-radius:10px;padding:20px 24px;}
+.stat-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(212,67,58,0.5);margin-bottom:8px;font-weight:600;}
+.stat-value{font-size:28px;font-weight:600;color:var(--text);}
+.stat-sub{font-size:12px;color:var(--text-muted);margin-top:4px;}
+
+/* Tables */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table th{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(212,67,58,0.6);padding:12px 16px;text-align:left;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.01);font-weight:600;}
+.data-table td{padding:12px 16px;border-bottom:1px solid var(--border-mid);color:var(--text-dim);}
+.data-table tr:hover td{background:var(--bg-hover);}
+.data-table .mono{font-family:'Courier New',monospace;font-size:11px;color:var(--text-faint);}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
+.badge-active{background:rgba(94,224,154,0.08);color:#5ee09a;border:1px solid rgba(94,224,154,0.2);}
+.badge-suspended{background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);}
+.badge-pending{background:rgba(243,156,18,0.1);color:#e8940a;border:1px solid rgba(243,156,18,0.2);}
+.badge-inactive{background:rgba(140,125,110,0.1);color:var(--text-muted);border:1px solid var(--border);}
+.badge-admin{background:rgba(212,67,58,0.08);color:var(--accent);border:1px solid var(--accent-border);}
+.badge-info{background:rgba(167,139,250,0.08);color:#a78bfa;border:1px solid rgba(167,139,250,0.2);}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(--border);border-radius:8px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all 0.18s ease;background:transparent;color:var(--text-dim);}
+.btn:hover{background:var(--bg-hover);color:var(--text);border-color:rgba(212,67,58,0.15);}
+.btn-primary{background:rgba(212,67,58,0.12);color:var(--accent);border-color:var(--accent-border);}
+.btn-primary:hover{background:rgba(212,67,58,0.2);}
+.btn-danger{border-color:rgba(239,68,68,0.3);color:#ef4444;}
+.btn-danger:hover{background:rgba(239,68,68,0.08);}
+.btn-sm{padding:5px 10px;font-size:9px;border-radius:6px;}
+.btn-group{display:flex;gap:8px;}
+
+/* Forms */
+.form-group{margin-bottom:20px;}
+.form-label{display:block;font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+.form-input{width:100%;padding:10px 12px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);font-family:'Spectral',serif;font-size:14px;border-radius:8px;transition:border-color 0.15s ease;}
+.form-input:focus{border-color:var(--accent-border);outline:none;}
+.form-input::placeholder{color:var(--text-faint);}
+select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238c7d6e' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;}
+
+/* Tabs */
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px;}
+.tab-item{padding:12px 20px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s ease;}
+.tab-item:hover{color:var(--text);}
+.tab-item.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* Search */
+.search-bar{position:relative;max-width:300px;}
+.search-bar input{width:100%;padding:8px 12px 8px 36px;background:var(--bg-input);border:1px solid var(--border);color:var(--text);font-family:'Spectral',serif;font-size:13px;border-radius:8px;transition:border-color 0.15s;}
+.search-bar input:focus{border-color:var(--accent-border);outline:none;}
+.search-bar svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--text-faint);}
+
+/* Modal */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:500;animation:fadeIn 0.15s ease;}
+.modal{background:rgba(10,10,16,0.96);backdrop-filter:blur(20px);border:1px solid rgba(212,67,58,0.15);border-radius:12px;max-width:560px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.5);}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-header h3{font-family:'Cinzel',serif;font-size:14px;font-weight:600;letter-spacing:1px;}
+.modal-body{padding:24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* Key display */
+.key-block{background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.04);border-radius:8px;padding:12px 16px;font-family:'Courier New',monospace;font-size:11px;color:var(--text-faint);word-break:break-all;line-height:1.6;max-height:120px;overflow-y:auto;}
+
+/* Permissions tree */
+.perm-group{margin-bottom:16px;}
+.perm-group-header{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);padding:8px 0;border-bottom:1px solid var(--border-mid);margin-bottom:8px;}
+.perm-item{display:flex;align-items:center;gap:10px;padding:6px 0 6px 16px;font-size:13px;color:var(--text-dim);}
+.perm-check{width:16px;height:16px;border:1px solid var(--border);border-radius:2px;background:var(--bg-input);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.perm-check.checked{background:var(--accent);border-color:var(--accent);}
+.perm-check.checked::after{content:'✓';color:#fff;font-size:10px;}
+
+/* Timeline / Audit */
+.audit-entry{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border-mid);}
+.audit-time{font-family:'Courier New',monospace;font-size:11px;color:var(--text-faint);min-width:140px;flex-shrink:0;}
+.audit-action{font-size:13px;color:var(--text-dim);}
+.audit-action strong{color:var(--text);font-weight:600;}
+.audit-action .audit-detail{font-size:11px;color:var(--text-faint);margin-top:4px;}
+
+/* Rate limit display */
+.rate-bar{height:6px;background:rgba(255,255,255,0.03);border-radius:3px;overflow:hidden;margin-top:6px;}
+.rate-fill{height:100%;border-radius:3px;transition:width 0.3s ease;}
+
+/* Toggle switch */
+.toggle{width:36px;height:20px;border-radius:10px;background:var(--border);cursor:pointer;position:relative;transition:background 0.2s ease;flex-shrink:0;}
+.toggle.on{background:var(--green);}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:var(--text);top:2px;left:2px;transition:transform 0.2s ease;}
+.toggle.on::after{transform:translateX(16px);}
+
+/* Responsive */
+.mobile-toggle{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:8px;}
+@media(max-width:900px){
+  .admin-sidebar{transform:translateX(-100%);}
+  .admin-sidebar.open{transform:translateX(0);}
+  .admin-main{margin-left:0;}
+  .mobile-toggle{display:block;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:600px){
+  .admin-content{padding:16px;}
+  .stat-grid{grid-template-columns:1fr;}
+  .data-table{font-size:11px;}
+  .data-table th,.data-table td{padding:8px 10px;}
+}
+
+/* Admin Dashboard Cards */
+.admin-stat-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  padding:20px;
+  text-align:center;
+  transition:all 0.15s ease;
+}
+.admin-stat-card:hover{
+  border-color:var(--accent-border);
+  box-shadow:0 2px 8px rgba(212,67,58,0.08);
+}
+.admin-stat-value{
+  font-family:'Cinzel',serif;
+  font-size:32px;
+  color:var(--accent);
+  font-weight:700;
+  margin:12px 0 4px;
+}
+.admin-stat-label{
+  font-family:'Cinzel',serif;
+  font-size:9px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  margin-bottom:8px;
+}
+.admin-stat-sub{
+  font-size:12px;
+  color:var(--text-muted);
+  margin-top:8px;
+}
+.admin-activity-feed{
+  max-height:300px;
+  overflow-y:auto;
+  border:1px solid var(--border);
+  border-radius:10px;
+}
+.admin-activity-item{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border-subtle);
+  font-size:13px;
+  color:var(--text-dim);
+  transition:background 0.15s ease;
+}
+.admin-activity-item:hover{
+  background:var(--bg-hover);
+}
+.admin-activity-time{
+  font-size:11px;
+  color:var(--text-faint);
+  margin-top:4px;
+}
+
+/* Toasts */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:600;display:flex;flex-direction:column;gap:8px;}
+.toast{padding:12px 20px;border-radius:10px;font-size:13px;color:#f5f0e8;animation:slideUp 0.2s ease;backdrop-filter:blur(12px);}
+.toast-success{background:rgba(94,224,154,0.9);}
+.toast-error{background:rgba(239,68,68,0.9);}
+.toast-info{background:#58aaff;}
+@keyframes slideUp{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* Empty states */
+.empty-state{text-align:center;padding:48px 24px;color:var(--text-muted);}
+.empty-state svg{width:48px;height:48px;margin-bottom:16px;opacity:0.3;}
+.empty-state p{font-size:14px;margin-bottom:16px;}
+
+/* JSON viewer */
+.json-view{background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.04);border-radius:8px;padding:16px;font-family:'Courier New',monospace;font-size:11px;color:var(--text-faint);white-space:pre-wrap;max-height:300px;overflow-y:auto;line-height:1.6;}
+
+/* Pill filters */
+.filter-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.pill{padding:5px 14px;border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-family:'Spectral',serif;}
+.pill:hover{border-color:var(--accent-border);color:var(--text);}
+.pill.active{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent);}
+</style>
+</head>
+<body>
+<div id="admin-root"></div>
+
+<script>
+// Dashboard loading stub — full React components loaded on-demand after auth
+function loadAdminDashboard() {
+  fetch('admin-dashboard.jsx?v=' + Date.now(), { cache: 'no-store' })
+    .then(function(r) { return r.text(); })
+    .then(function(jsx) {
+      var js = Babel.transform(jsx, { presets: ['react'] }).code;
+      var script = document.createElement('script');
+      script.textContent = '(function(){' + js + '})();';
+      document.head.appendChild(script);
+    })
+    .catch(function(err) {
+      console.error('[Admin] Failed to load dashboard:', err);
+      var errorEl = document.getElementById('admin-root');
+      if (errorEl) {
+        errorEl.textContent = 'Failed to load admin dashboard. Please refresh.';
+        errorEl.style.color = 'red';
+        errorEl.style.padding = '40px';
+      }
+    });
+}
+</script>
+</body>
+</html>

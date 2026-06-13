@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co https://*.supabase.in https://*.stripe.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Blog · Phmurt Studios</title>
+  <meta name="description" content="Design notes, playtest reports, and DM tips from the Phmurt Studios team. Articles on homebrew classes, campaign design, and running great D&D games." />
+  <meta property="og:title" content="Blog · Phmurt Studios" />
+  <meta property="og:description" content="Design notes, playtest reports, and DM tips from the Phmurt Studios team." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://phmurtstudios.com/blog.html" />
+  <meta property="og:image" content="https://phmurtstudios.com/logo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Blog · Phmurt Studios" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="stylesheet" href="style.css?v=185" />
+  <link rel="alternate" type="application/rss+xml" title="Phmurt Studios Blog" href="rss.xml" />
+  <script defer src="theme.js?v=185"></script>
+  <link rel="canonical" href="https://phmurtstudios.com/blog.html" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Phmurt Studios Blog",
+    "description": "Design notes, playtest reports, and DM tips from the Phmurt Studios team.",
+    "url": "https://phmurtstudios.com/blog.html",
+    "publisher": { "@type": "Organization", "name": "Phmurt Studios", "url": "https://phmurtstudios.com/" }
+  }
+  </script>
+
+  <style>
+    .bl-wrap { max-width: 820px; margin: 0 auto; padding: 40px 24px 80px; }
+    .bl-hero { text-align: center; margin-bottom: 56px; }
+    .bl-hero-eyebrow {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 5px;
+      text-transform: uppercase; color: var(--crimson, #d4433a); margin-bottom: 12px;
+    }
+    .bl-hero-title {
+      font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 700;
+      color: var(--text, #f2e8d6); margin: 0 0 14px;
+    }
+    .bl-hero-subtitle {
+      font-family: 'Spectral', serif; font-size: 1.1rem; line-height: 1.6;
+      color: var(--text-muted, #9a8870); max-width: 560px; margin: 0 auto;
+    }
+
+    .bl-posts { display: flex; flex-direction: column; gap: 16px; }
+    .bl-post {
+      display: block; text-decoration: none;
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 8px; padding: 28px;
+      transition: border-color .2s, box-shadow .2s, transform .2s;
+    }
+    .bl-post:hover {
+      border-color: var(--crimson, #d4433a);
+      box-shadow: 0 6px 24px rgba(212,67,58,.08);
+      transform: translateY(-2px);
+    }
+    .bl-post-meta {
+      display: flex; gap: 14px; align-items: center; margin-bottom: 10px;
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .bl-post-type { color: var(--crimson, #d4433a); font-weight: 600; }
+    .bl-post-date { color: var(--text-faint, #7a6a55); }
+    .bl-post-title {
+      font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 600;
+      color: var(--text, #f2e8d6); margin: 0 0 10px;
+    }
+    .bl-post-excerpt {
+      font-family: 'Spectral', serif; font-size: 15px; line-height: 1.6;
+      color: var(--text-muted, #9a8870); margin: 0 0 14px;
+    }
+    .bl-post-read {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--crimson, #d4433a); font-weight: 600;
+    }
+
+    .bl-subscribe {
+      text-align: center; margin-top: 48px; padding: 28px 24px;
+      background: var(--bg-card, #141420);
+      border: 1px solid var(--border, rgba(255,255,255,0.11));
+      border-radius: 8px;
+    }
+    .bl-subscribe-title {
+      font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text, #f2e8d6); margin: 0 0 8px;
+    }
+    .bl-subscribe-desc {
+      font-family: 'Spectral', serif; font-style: italic; font-size: 14px;
+      color: var(--text-muted, #9a8870); margin: 0 0 16px;
+    }
+    .bl-subscribe-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .bl-subscribe-link {
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--text-muted, #9a8870);
+      text-decoration: none; padding: 8px 16px;
+      border: 1px solid var(--border, rgba(255,255,255,0.22));
+      border-radius: 4px; transition: border-color .2s, color .2s;
+    }
+    .bl-subscribe-link:hover { border-color: var(--crimson, #d4433a); color: var(--crimson, #d4433a); }
+
+    @media (max-width: 640px) {
+      .bl-hero-title { font-size: 1.6rem; }
+      .bl-post { padding: 20px 18px; }
+    }
+  </style>
+</head>
+<body data-nav-active="Home" data-footer-copy="Roll Well. Play Weird." data-breadcrumb="Home|index.html;Blog">
+  <a href="#main-content" class="ps-skip-nav">Skip to content</a>
+  <div id="ps-site-shell"></div>
+  <div id="ps-page-breadcrumb"></div>
+
+  <main id="main-content">
+    <div class="bl-wrap">
+
+      <div class="bl-hero">
+        <div class="bl-hero-eyebrow">Field Notes</div>
+        <h1 class="bl-hero-title">The Phmurt Blog</h1>
+        <p class="bl-hero-subtitle">Design notes, playtest reports, DM tips, and the occasional bad joke. Written by the people actually running the tables.</p>
+      </div>
+
+      <!-- ═══ POST LIST ═══
+           Each new post should be:
+           1. A standalone HTML page (blog-SLUG.html) modeled on blog-welcome.html
+           2. Prepended here (newest first) as an <a class="bl-post"> card
+           3. Added to sitemap.xml and rss.xml
+      -->
+      <div class="bl-posts">
+
+        <a class="bl-post" href="blog-welcome.html">
+          <div class="bl-post-meta">
+            <span class="bl-post-type">Studio Note</span>
+            <span class="bl-post-date">April 2026</span>
+          </div>
+          <h2 class="bl-post-title">Welcome to Phmurt Studios</h2>
+          <p class="bl-post-excerpt">What we're building, why we're building it, and what you can expect from this blog. An indie studio's opening salvo &mdash; and a rough map of where we're headed.</p>
+          <div class="bl-post-read">Read the post &rarr;</div>
+        </a>
+
+        <!-- Additional posts go here, newest first. Example:
+        <a class="bl-post" href="blog-soup-savant-design.html">
+          <div class="bl-post-meta">
+            <span class="bl-post-type">Design Diary</span>
+            <span class="bl-post-date">May 2026</span>
+          </div>
+          <h2 class="bl-post-title">How the Soup Savant Got Balanced (Or Didn't)</h2>
+          <p class="bl-post-excerpt">…</p>
+          <div class="bl-post-read">Read the post &rarr;</div>
+        </a>
+        -->
+
+      </div>
+
+      <div class="bl-subscribe">
+        <div class="bl-subscribe-title">Follow Along</div>
+        <p class="bl-subscribe-desc">No newsletter yet. We post updates on Discord first, then Instagram and YouTube.</p>
+        <div class="bl-subscribe-links">
+          <a class="bl-subscribe-link" href="https://discord.gg/GSvCXfehmK" target="_blank" rel="noopener noreferrer">Discord</a>
+          <a class="bl-subscribe-link" href="https://www.instagram.com/phmurt_studios/" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a class="bl-subscribe-link" href="https://www.youtube.com/@PhmurtStudios" target="_blank" rel="noopener noreferrer">YouTube</a>
+          <a class="bl-subscribe-link" href="rss.xml">RSS</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script defer src="phmurt-shell.js?v=187"></script>
+</body>
+</html>
